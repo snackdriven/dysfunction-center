@@ -5,6 +5,7 @@ import { Dashboard } from './pages/Dashboard';
 import { Tasks } from './pages/Tasks';
 import { Habits } from './pages/Habits';
 import { Mood } from './pages/Mood';
+import { Calendar } from './pages/Calendar';
 
 function App() {
   return (
@@ -15,7 +16,7 @@ function App() {
           <Route path="tasks" element={<Tasks />} />
           <Route path="habits" element={<Habits />} />
           <Route path="mood" element={<Mood />} />
-          <Route path="calendar" element={<div>Calendar (Coming Soon)</div>} />
+          <Route path="calendar" element={<Calendar />} />
           <Route path="analytics" element={<div>Analytics (Coming Soon)</div>} />
           <Route path="settings" element={<div>Settings (Coming Soon)</div>} />
         </Route>
