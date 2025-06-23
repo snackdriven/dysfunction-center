@@ -1,11 +1,32 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Plus } from 'lucide-react';
+import { Input } from '../components/ui/Input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select';
+import { TaskList } from '../components/tasks/TaskList';
+import { TaskForm } from '../components/tasks/TaskForm';
+import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
+import { Plus, Search, Filter } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { tasksApi } from '../services/tasks';
 
 export const Tasks: React.FC = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+  const { data: tasks, isLoading, error } = useQuery({
+    queryKey: ['tasks', { search: searchQuery, status: statusFilter, priority: priorityFilter }],
+    queryFn: () => tasksApi.getTasks({
+      search: searchQuery || undefined,
+      status: statusFilter !== 'all' ? statusFilter : undefined,
+      priority: priorityFilter !== 'all' ? priorityFilter : undefined,
+    }),
+  });
+
   return (
     <div className="space-y-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
@@ -13,20 +34,64 @@ export const Tasks: React.FC = () => {
             Manage your tasks and stay productive
           </p>
         </div>
-        <Button>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Task
-        </Button>
+        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+          <DialogTrigger asChild>
+            <Button>
+              <Plus className="mr-2 h-4 w-4" />
+              Add Task
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-md">
+            <TaskForm onSuccess={() => setIsCreateDialogOpen(false)} />
+          </DialogContent>
+        </Dialog>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Your Tasks</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-muted-foreground">No tasks yet. Create your first task to get started!</p>
-        </CardContent>
-      </Card>
+      {/* Filters */}
+      <div className="flex items-center gap-4 p-4 bg-card rounded-lg border">
+        <div className="flex-1">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search tasks..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10"
+            />
+          </div>
+        </div>
+        
+        <Select value={statusFilter} onValueChange={setStatusFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Status" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Tasks</SelectItem>
+            <SelectItem value="pending">Pending</SelectItem>
+            <SelectItem value="in_progress">In Progress</SelectItem>
+            <SelectItem value="completed">Completed</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Select value={priorityFilter} onValueChange={setPriorityFilter}>
+          <SelectTrigger className="w-40">
+            <SelectValue placeholder="Priority" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">All Priorities</SelectItem>
+            <SelectItem value="high">High</SelectItem>
+            <SelectItem value="medium">Medium</SelectItem>
+            <SelectItem value="low">Low</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      {/* Task List */}
+      <TaskList 
+        tasks={tasks || []}
+        isLoading={isLoading}
+        error={error}
+      />
     </div>
   );
 };
