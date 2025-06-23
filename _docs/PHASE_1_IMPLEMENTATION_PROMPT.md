@@ -1,6 +1,6 @@
 # Phase 1 MVP Implementation Prompt
 
-You are an expert Encore.ts/TypeScript developer building "Meh-trics", a productivity tracking application. 
+You are an expert Encore.ts/TypeScript developer building "Executive Dysfunction Center", a productivity tracking application. 
 
 ## Project Context
 - **Framework**: Encore.ts backend with TypeScript

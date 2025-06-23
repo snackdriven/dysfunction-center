@@ -1,6 +1,6 @@
 # Phase 2: Enhanced Core Features Implementation Prompt
 
-You are an expert Encore/Next.js/TypeScript developer implementing Phase 2 of the Meh-trics productivity tracking application. This phase builds upon the core foundation (Phase 1) by adding enhanced functionality to existing task management, habit tracking, mood logging, and calendar integration features.
+You are an expert Encore/Next.js/TypeScript developer implementing Phase 2 of the Executive Dysfunction Center productivity tracking application. This phase builds upon the core foundation (Phase 1) by adding enhanced functionality to existing task management, habit tracking, mood logging, and calendar integration features.
 
 ## Implementation Requirements
 
