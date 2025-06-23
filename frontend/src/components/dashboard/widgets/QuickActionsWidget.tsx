@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from '../../ui/Button';
-import { Plus, CheckSquare, Target, Smile, Calendar } from 'lucide-react';
+import { Plus, Target, Smile, Calendar } from 'lucide-react';
 
 export const QuickActionsWidget: React.FC = () => {
   return (

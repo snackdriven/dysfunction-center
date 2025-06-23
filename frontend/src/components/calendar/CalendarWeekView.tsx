@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Card, CardContent } from '../ui/Card';
-import { CalendarIcon, Clock, MapPin, AlertCircle, Plus } from 'lucide-react';
+import { CalendarIcon, Clock, AlertCircle, Plus } from 'lucide-react';
 import { CalendarEvent } from '../../services/calendar';
 import { Task } from '../../services/tasks';
 import { EventDetailModal } from './EventDetailModal';

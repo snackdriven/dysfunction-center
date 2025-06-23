@@ -7,7 +7,7 @@ import { useQuery } from '@tanstack/react-query';
 import { tasksApi, useUpdateTask } from '../../../services/tasks';
 
 export const TodaysFocusWidget: React.FC = () => {
-  const { data: tasks, isLoading } = useQuery({
+  const { data: tasks, isLoading, error } = useQuery({
     queryKey: ['tasks', 'today'],
     queryFn: () => tasksApi.getTodaysTasks(),
   });

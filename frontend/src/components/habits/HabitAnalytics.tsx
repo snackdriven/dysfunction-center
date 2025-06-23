@@ -1,7 +1,7 @@
 import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { TrendingUp, TrendingDown, Target, Calendar, Award, BarChart3 } from 'lucide-react';
+import { TrendingUp, Target, Calendar, Award, BarChart3 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { habitsApi } from '../../services/habits';
 
@@ -11,10 +11,10 @@ export const HabitAnalytics: React.FC = () => {
     queryFn: habitsApi.getHabits,
   });
 
-  const { data: analytics } = useQuery({
-    queryKey: ['habits', 'analytics'],
-    queryFn: () => habitsApi.getAnalytics(),
-  });
+  // const { data: analytics } = useQuery({
+  //   queryKey: ['habits', 'analytics'],
+  //   queryFn: () => habitsApi.getAnalytics(),
+  // });
 
   const habitStats = React.useMemo(() => {
     if (!habits) return null;

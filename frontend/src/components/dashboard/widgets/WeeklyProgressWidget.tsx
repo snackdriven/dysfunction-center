@@ -1,7 +1,7 @@
 import React from 'react';
 import { DashboardWidget } from '../../layout/DashboardGrid';
 import { Button } from '../../ui/Button';
-import { TrendingUp, Calendar, CheckSquare, Target } from 'lucide-react';
+import { TrendingUp, CheckSquare, Target } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { tasksApi } from '../../../services/tasks';
 import { habitsApi } from '../../../services/habits';

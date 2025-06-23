@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
-import { CalendarIcon, Clock, MapPin, Bell, Repeat, Link as LinkIcon, Edit, Trash2, User } from 'lucide-react';
+import { CalendarIcon, Clock, MapPin, Bell, Repeat, Link as LinkIcon, Edit, Trash2 } from 'lucide-react';
 import { CalendarEvent, useDeleteEvent } from '../../services/calendar';
 import { EventForm } from './EventForm';
 import { useQuery } from '@tanstack/react-query';

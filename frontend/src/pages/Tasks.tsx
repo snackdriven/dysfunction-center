@@ -5,8 +5,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { TaskList } from '../components/tasks/TaskList';
 import { TaskForm } from '../components/tasks/TaskForm';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
-import { Plus, Search, Filter } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { Plus, Search } from 'lucide-react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { tasksApi } from '../services/tasks';
 
 export const Tasks: React.FC = () => {
@@ -14,8 +14,9 @@ export const Tasks: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const queryClient = useQueryClient();
 
-  const { data: tasks, isLoading, error } = useQuery({
+  const { data: tasks, isLoading, error, refetch } = useQuery({
     queryKey: ['tasks', { search: searchQuery, status: statusFilter, priority: priorityFilter }],
     queryFn: () => tasksApi.getTasks({
       search: searchQuery || undefined,
@@ -23,6 +24,10 @@ export const Tasks: React.FC = () => {
       priority: priorityFilter !== 'all' ? priorityFilter : undefined,
     }),
   });
+
+  const handleRetry = () => {
+    refetch();
+  };
 
   return (
     <div className="space-y-6">
@@ -91,6 +96,7 @@ export const Tasks: React.FC = () => {
         tasks={tasks || []}
         isLoading={isLoading}
         error={error}
+        onRetry={handleRetry}
       />
     </div>
   );

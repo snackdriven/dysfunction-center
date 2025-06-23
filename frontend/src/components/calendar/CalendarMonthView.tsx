@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Dialog, DialogContent } from '../ui/Dialog';
-import { CalendarIcon, Clock, MapPin, User, AlertCircle } from 'lucide-react';
+import { CalendarIcon, Clock, AlertCircle, MapPin } from 'lucide-react';
 import { CalendarEvent } from '../../services/calendar';
 import { Task } from '../../services/tasks';
 import { EventDetailModal } from './EventDetailModal';

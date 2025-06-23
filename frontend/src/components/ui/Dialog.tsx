@@ -80,7 +80,7 @@ export const DialogContent: React.FC<DialogContentProps> = ({ children, classNam
     return () => {
       document.removeEventListener('keydown', handleEscape);
     };
-  }, [context.open, context.onOpenChange]);
+  }, [context]);
 
   if (!context.open) return null;
 

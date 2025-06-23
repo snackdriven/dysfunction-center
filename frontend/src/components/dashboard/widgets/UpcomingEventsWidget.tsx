@@ -19,7 +19,7 @@ export const UpcomingEventsWidget: React.FC = () => {
   });
 
   const sortedEvents = React.useMemo(() => {
-    if (!upcomingEvents) return [];
+    if (!upcomingEvents || !Array.isArray(upcomingEvents)) return [];
     return upcomingEvents
       .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
       .slice(0, 5); // Show only next 5 events

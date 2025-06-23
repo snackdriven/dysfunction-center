@@ -1,15 +1,17 @@
 import React from 'react';
 import { TaskCard } from './TaskCard';
 import { Task } from '../../services/tasks';
-import { AlertCircle, Loader2 } from 'lucide-react';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { ErrorState } from '../common/ErrorState';
 
 interface TaskListProps {
   tasks: Task[];
   isLoading: boolean;
   error: any;
+  onRetry?: () => void;
 }
 
-export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error }) => {
+export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onRetry }) => {
   const groupedTasks = React.useMemo(() => {
     const groups = {
       overdue: tasks.filter(task => 
@@ -36,22 +38,17 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error }) =
   }, [tasks]);
 
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">Loading tasks...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner size="lg" text="Loading tasks..." className="py-12" />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-8 text-red-600">
-        <AlertCircle className="h-6 w-6 mr-2" />
-        <span>Failed to load tasks. Please try again.</span>
-      </div>
+      <ErrorState 
+        error={error}
+        onRetry={onRetry}
+        title="Failed to load tasks"
+        description="Unable to fetch your tasks. Please check your connection and try again."
+      />
     );
   }
 

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
+import { Tabs, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { CalendarMonthView } from '../components/calendar/CalendarMonthView';
 import { CalendarAgendaView } from '../components/calendar/CalendarAgendaView';
 import { CalendarWeekView } from '../components/calendar/CalendarWeekView';

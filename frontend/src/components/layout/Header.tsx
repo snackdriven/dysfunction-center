@@ -4,7 +4,7 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 
 export const Header: React.FC = () => {
-  const [theme, setTheme] = React.useState<'light' | 'dark' | 'system'>('system');
+  const [theme] = React.useState<'light' | 'dark' | 'system'>('system');
 
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">

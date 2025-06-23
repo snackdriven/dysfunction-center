@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
+import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { Dialog, DialogContent, DialogTrigger } from '../ui/Dialog';
+import { Dialog, DialogContent } from '../ui/Dialog';
 import { Edit, Trash2, Calendar, Clock, MessageCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { moodApi, MoodEntry, useDeleteMoodEntry } from '../../services/mood';

@@ -1,33 +1,30 @@
 import React from 'react';
 import { HabitCard } from './HabitCard';
 import { Habit, HabitCompletion } from '../../services/habits';
-import { Target, Loader2, AlertCircle } from 'lucide-react';
+import { LoadingSpinner } from '../common/LoadingSpinner';
+import { ErrorState } from '../common/ErrorState';
 
 interface HabitGridProps {
   habits: Habit[];
   completions: HabitCompletion[];
   isLoading: boolean;
   error?: any;
+  onRetry?: () => void;
 }
 
-export const HabitGrid: React.FC<HabitGridProps> = ({ habits, completions, isLoading, error }) => {
+export const HabitGrid: React.FC<HabitGridProps> = ({ habits, completions, isLoading, error, onRetry }) => {
   if (isLoading) {
-    return (
-      <div className="space-y-4">
-        <div className="flex items-center justify-center py-8">
-          <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
-          <span className="ml-2 text-muted-foreground">Loading habits...</span>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner size="lg" text="Loading habits..." className="py-12" />;
   }
 
   if (error) {
     return (
-      <div className="flex items-center justify-center py-8 text-red-600">
-        <AlertCircle className="h-6 w-6 mr-2" />
-        <span>Failed to load habits. Please try again.</span>
-      </div>
+      <ErrorState 
+        error={error}
+        onRetry={onRetry}
+        title="Failed to load habits"
+        description="Unable to fetch your habits. Please check your connection and try again."
+      />
     );
   }
 
