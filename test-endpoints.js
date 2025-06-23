@@ -7,6 +7,17 @@ async function testEndpoints() {
   console.log('🧪 Testing Meh-trics API Endpoints\n');
 
   try {
+    // Test API Info
+    console.log('ℹ️ Getting API Information...');
+    const apiInfo = await axios.get(`${BASE_URL}/`);
+    console.log('✅ API Name:', apiInfo.data.name);
+    console.log('✅ Version:', apiInfo.data.version);
+    console.log('✅ Status:', apiInfo.data.status);
+    
+    // Test Health Check
+    const health = await axios.get(`${BASE_URL}/health`);
+    console.log('✅ Health Status:', health.data.status);
+    
     // Test Tasks
     console.log('📋 Testing Tasks Service...');
     
