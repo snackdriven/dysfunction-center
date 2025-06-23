@@ -1,4 +1,4 @@
-# Meh-trics Development Roadmap
+# Executive Dysfunction Center Development Roadmap
 
 This roadmap organizes all features from the .feature files into logical development phases, prioritized for iterative development and maximum user value delivery.
 

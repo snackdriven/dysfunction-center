@@ -2,7 +2,7 @@
 
 ## 🎯 Phase 2 Objective
 
-Implement the core productivity features of Meh-trics with basic CRUD operations, essential user interactions, and data visualization. This phase creates the minimum viable product with all essential functionality working end-to-end.
+Implement the core productivity features of Executive Dysfunction Center with basic CRUD operations, essential user interactions, and data visualization. This phase creates the minimum viable product with all essential functionality working end-to-end.
 
 ## 📋 Phase 2 Implementation Checklist
 

@@ -21,7 +21,7 @@ export const getApiInfo = api(
   { method: "GET", path: "/", expose: true },
   async (): Promise<ApiInfoResponse> => {
     return {
-      name: "Meh-trics API",
+      name: "Executive Dysfunction Center API",
       version: "0.1.0",
       description: "A productivity tracking application with task management, habit tracking, mood logging, and theme preferences",
       status: "healthy",

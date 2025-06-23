@@ -43,7 +43,7 @@ export const useAppStore = create<AppState>()(
       setLoading: (loading) => set({ loading }),
     }),
     {
-      name: 'meh-trics-app-store',
+      name: 'executive-dysfunction-center-app-store',
       partialize: (state) => ({
         theme: state.theme,
         sidebarCollapsed: state.sidebarCollapsed,

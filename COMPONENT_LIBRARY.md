@@ -1,4 +1,4 @@
-# Meh-trics Component Library & Style Guide
+# Executive Dysfunction Center Component Library & Style Guide
 
 ## 🎨 Design System Foundation
 
@@ -1114,4 +1114,4 @@ export const FadeIn: React.FC<FadeInProps> = ({
 };
 ```
 
-This component library provides a comprehensive foundation for building the Meh-trics frontend with consistent design patterns, reusable components, and smooth animations. Each component is built with accessibility, performance, and maintainability in mind.
+This component library provides a comprehensive foundation for building the Executive Dysfunction Center frontend with consistent design patterns, reusable components, and smooth animations. Each component is built with accessibility, performance, and maintainability in mind.
