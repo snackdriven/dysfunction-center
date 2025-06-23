@@ -4,7 +4,7 @@ import axios from 'axios';
 const BASE_URL = 'http://localhost:4000';
 
 async function testEndpoints() {
-  console.log('🧪 Testing Meh-trics API Endpoints\n');
+  console.log('🧪 Testing Executive Dysfunction Center API Endpoints\n');
 
   try {
     // Test API Info

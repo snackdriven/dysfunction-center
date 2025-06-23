@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Meh-trics is a comprehensive productivity tracking application built with Encore.ts featuring advanced task management, habit tracking, mood logging, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area and is currently in Phase 2 with enhanced functionality.
+Executive Dysfunction Center is a comprehensive productivity tracking application built with Encore.ts featuring advanced task management, habit tracking, mood logging, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area and is currently in Phase 2 with enhanced functionality.
 
 ## Development Commands
 

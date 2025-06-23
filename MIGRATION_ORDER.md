@@ -1,6 +1,6 @@
 # Database Migration Order Guide
 
-To properly deploy Phase 2 of Meh-trics, run the database migrations in the following order:
+To properly deploy Phase 2 of Executive Dysfunction Center, run the database migrations in the following order:
 
 ## Migration Execution Order
 

@@ -1,4 +1,4 @@
-# 🎯 Meh-trics API Documentation
+# 🎯 Executive Dysfunction Center API Documentation
 
 **Version:** 0.1.0  
 **Status:** ✅ Healthy  

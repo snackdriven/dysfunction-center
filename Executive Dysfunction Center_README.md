@@ -1,4 +1,4 @@
-# Meh-trics - Phase 1 MVP
+# Executive Dysfunction Center - Phase 1 MVP
 
 A productivity tracking application built with Encore.ts, featuring task management, habit tracking, mood logging, and theme customization.
 
@@ -100,7 +100,7 @@ A productivity tracking application built with Encore.ts, featuring task managem
 1. **Clone and setup**:
    ```bash
    git clone <repository>
-   cd meh-trics
+   cd executive-dysfunction-center
    npm install
    ```
 

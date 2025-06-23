@@ -1,8 +1,8 @@
 {
-  "name": "meh-trics",
+  "name": "executive-dysfunction-center",
   "private": true,
   "version": "0.1.0",
-  "description": "Meh-trics - A productivity tracking application built with Encore.ts",
+  "description": "Executive Dysfunction Center - A productivity tracking application built with Encore.ts",
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
@@ -15,6 +15,7 @@
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
+    "tailwindcss": "^4.1.10",
     "typescript": "^5.2.2",
     "vitest": "^1.5.0"
   },

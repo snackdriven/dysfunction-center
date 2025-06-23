@@ -1,6 +1,6 @@
-# Meh-trics API Phase 2 Documentation
+# Executive Dysfunction Center API Phase 2 Documentation
 
-This document outlines all the enhanced API endpoints available in Phase 2 of the Meh-trics productivity tracking application.
+This document outlines all the enhanced API endpoints available in Phase 2 of the Executive Dysfunction Center productivity tracking application.
 
 ## Table of Contents
 
