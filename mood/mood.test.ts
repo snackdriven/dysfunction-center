@@ -177,8 +177,16 @@ describe("Mood Management", () => {
     });
 
     it("should return mood entry when exists for today", async () => {
-      // Create mood entry for today
+      // Clean up any existing mood entry for today
       const today = new Date().toISOString().split('T')[0];
+      try {
+        const entries = await getMoodEntries({});
+        const todayEntry = entries.mood_entries.find(e => e.entry_date === today);
+        if (todayEntry) {
+          await deleteMoodEntry({ id: todayEntry.id });
+        }
+      } catch (e) { /* ignore */ }
+      // Create mood entry for today
       await createMoodEntry({ 
         mood_score: 4, 
         entry_date: today 

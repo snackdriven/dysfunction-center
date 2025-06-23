@@ -153,7 +153,11 @@ export const createHabit = api(
         updated_at: habitRow.updated_at,
         target_type: habitRow.target_type || 'daily',
         completion_type: habitRow.completion_type || 'boolean',
-        target_value: habitRow.target_value || 1,
+        target_value: (typeof habitRow.target_value === 'number') ? habitRow.target_value :
+          (typeof habitRow.target_value === 'string') ? parseFloat(habitRow.target_value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'string') ? parseFloat(habitRow.target_value.value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'number') ? habitRow.target_value.value :
+          1,
         unit: habitRow.unit,
         template_id: habitRow.template_id,
         reminder_enabled: habitRow.reminder_enabled || false,
@@ -205,7 +209,11 @@ export const getHabits = api(
             updated_at: habitRow.updated_at,
             target_type: habitRow.target_type || 'daily',
             completion_type: habitRow.completion_type || 'boolean',
-            target_value: habitRow.target_value || 1,
+            target_value: (typeof habitRow.target_value === 'number') ? habitRow.target_value :
+              (typeof habitRow.target_value === 'string') ? parseFloat(habitRow.target_value) :
+              (habitRow.target_value && typeof habitRow.target_value.value === 'string') ? parseFloat(habitRow.target_value.value) :
+              (habitRow.target_value && typeof habitRow.target_value.value === 'number') ? habitRow.target_value.value :
+              1,
             unit: habitRow.unit,
             template_id: habitRow.template_id,
             reminder_enabled: habitRow.reminder_enabled || false,
@@ -259,7 +267,11 @@ export const getHabit = api(
         updated_at: habitRow.updated_at,
         target_type: habitRow.target_type || 'daily',
         completion_type: habitRow.completion_type || 'boolean',
-        target_value: habitRow.target_value || 1,
+        target_value: (typeof habitRow.target_value === 'number') ? habitRow.target_value :
+          (typeof habitRow.target_value === 'string') ? parseFloat(habitRow.target_value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'string') ? parseFloat(habitRow.target_value.value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'number') ? habitRow.target_value.value :
+          1,
         unit: habitRow.unit,
         template_id: habitRow.template_id,
         reminder_enabled: habitRow.reminder_enabled || false,
@@ -342,7 +354,11 @@ export const updateHabit = api(
         updated_at: habitRow.updated_at,
         target_type: habitRow.target_type || 'daily',
         completion_type: habitRow.completion_type || 'boolean',
-        target_value: habitRow.target_value || 1,
+        target_value: (typeof habitRow.target_value === 'number') ? habitRow.target_value :
+          (typeof habitRow.target_value === 'string') ? parseFloat(habitRow.target_value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'string') ? parseFloat(habitRow.target_value.value) :
+          (habitRow.target_value && typeof habitRow.target_value.value === 'number') ? habitRow.target_value.value :
+          1,
         unit: habitRow.unit,
         template_id: habitRow.template_id,
         reminder_enabled: habitRow.reminder_enabled || false,
