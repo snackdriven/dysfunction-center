@@ -40,7 +40,10 @@ async function calculateMoodStats(entries: MoodEntry[]): Promise<MoodStats> {
       mood_trend: 'stable',
       best_day: getCurrentDateString(),
       worst_day: getCurrentDateString(),
-      total_entries: 0
+      total_entries: 0,
+      most_common_triggers: [],
+      mood_variability: 0,
+      best_locations: []
     };
   }
 
@@ -79,7 +82,10 @@ async function calculateMoodStats(entries: MoodEntry[]): Promise<MoodStats> {
     mood_trend: moodTrend,
     best_day: bestDay,
     worst_day: worstDay,
-    total_entries: entries.length
+    total_entries: entries.length,
+    most_common_triggers: [],
+    mood_variability: 0,
+    best_locations: []
   };
 }
 
@@ -428,7 +434,13 @@ export const getMoodAnalytics = api(
       return {
         stats,
         daily_averages,
-        category_breakdown
+        category_breakdown,
+        trigger_analysis: [],
+        pattern_insights: {
+          best_days_of_week: [],
+          location_impacts: [],
+          weather_impacts: []
+        }
       };
     } catch (error) {
       throw new Error(`Failed to get mood analytics: ${error instanceof Error ? error.message : 'Unknown error'}`);

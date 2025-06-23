@@ -150,7 +150,14 @@ export const createHabit = api(
         target_frequency: habitRow.target_frequency,
         active: habitRow.active,
         created_at: habitRow.created_at,
-        updated_at: habitRow.updated_at
+        updated_at: habitRow.updated_at,
+        target_type: habitRow.target_type || 'daily',
+        completion_type: habitRow.completion_type || 'boolean',
+        target_value: habitRow.target_value || 1,
+        unit: habitRow.unit,
+        template_id: habitRow.template_id,
+        reminder_enabled: habitRow.reminder_enabled || false,
+        reminder_time: habitRow.reminder_time
       };
 
       return { habit };
@@ -196,9 +203,18 @@ export const getHabits = api(
             active: habitRow.active,
             created_at: habitRow.created_at,
             updated_at: habitRow.updated_at,
+            target_type: habitRow.target_type || 'daily',
+            completion_type: habitRow.completion_type || 'boolean',
+            target_value: habitRow.target_value || 1,
+            unit: habitRow.unit,
+            template_id: habitRow.template_id,
+            reminder_enabled: habitRow.reminder_enabled || false,
+            reminder_time: habitRow.reminder_time,
             today_completed: todayCompleted,
             current_streak: currentStreak,
-            completion_rate: completionRate
+            completion_rate: completionRate,
+            longest_streak: currentStreak,
+            consistency_score: Math.min(100, completionRate)
           };
         })
       );
@@ -241,9 +257,18 @@ export const getHabit = api(
         active: habitRow.active,
         created_at: habitRow.created_at,
         updated_at: habitRow.updated_at,
+        target_type: habitRow.target_type || 'daily',
+        completion_type: habitRow.completion_type || 'boolean',
+        target_value: habitRow.target_value || 1,
+        unit: habitRow.unit,
+        template_id: habitRow.template_id,
+        reminder_enabled: habitRow.reminder_enabled || false,
+        reminder_time: habitRow.reminder_time,
         today_completed: todayCompleted,
         current_streak: currentStreak,
-        completion_rate: completionRate
+        completion_rate: completionRate,
+        longest_streak: currentStreak,
+        consistency_score: Math.min(100, completionRate)
       };
 
       return { habit };
@@ -314,7 +339,14 @@ export const updateHabit = api(
         target_frequency: habitRow.target_frequency,
         active: habitRow.active,
         created_at: habitRow.created_at,
-        updated_at: habitRow.updated_at
+        updated_at: habitRow.updated_at,
+        target_type: habitRow.target_type || 'daily',
+        completion_type: habitRow.completion_type || 'boolean',
+        target_value: habitRow.target_value || 1,
+        unit: habitRow.unit,
+        template_id: habitRow.template_id,
+        reminder_enabled: habitRow.reminder_enabled || false,
+        reminder_time: habitRow.reminder_time
       };
 
       return { habit };
@@ -392,7 +424,8 @@ export const logHabitCompletion = api(
         completion_date: completionRow.completion_date,
         completed: completionRow.completed,
         notes: completionRow.notes,
-        created_at: completionRow.created_at
+        created_at: completionRow.created_at,
+        completion_value: completionRow.completion_value || 1
       };
 
       // Calculate updated streak
@@ -466,7 +499,8 @@ export const getHabitHistory = api(
         completion_date: row.completion_date,
         completed: row.completed,
         notes: row.notes,
-        created_at: row.created_at
+        created_at: row.created_at,
+        completion_value: row.completion_value || 1
       }));
 
       // Calculate streak data
@@ -491,8 +525,10 @@ export const getHabitHistory = api(
         streak_data: {
           current_streak: currentStreak,
           longest_streak: longestStreak,
-          completion_rate: completionRate
-        }
+          completion_rate: completionRate,
+          consistency_score: Math.min(100, completionRate)
+        },
+        streaks: []
       };
     } catch (error) {
       throw new Error(`Failed to get habit history: ${error instanceof Error ? error.message : 'Unknown error'}`);
