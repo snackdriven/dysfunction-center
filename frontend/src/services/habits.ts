@@ -49,7 +49,7 @@ export const habitsApi = {
     return data;
   },
 
-  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: string }): Promise<Habit> => {
+  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: string; is_active?: boolean }): Promise<Habit> => {
     const { data } = await api.put(apiEndpoints.habits.update(id), habit);
     return data;
   },

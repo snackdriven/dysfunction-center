@@ -51,7 +51,7 @@ export const Slider: React.FC<SliderProps> = ({
           background: `linear-gradient(to right, hsl(var(--primary)) 0%, hsl(var(--primary)) ${percentage}%, hsl(var(--muted)) ${percentage}%, hsl(var(--muted)) 100%)`
         }}
       />
-      <style jsx>{`
+      <style>{`
         input[type="range"]::-webkit-slider-thumb {
           appearance: none;
           height: 20px;

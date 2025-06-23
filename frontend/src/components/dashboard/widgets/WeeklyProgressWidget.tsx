@@ -48,9 +48,13 @@ export const WeeklyProgressWidget: React.FC = () => {
     const totalTasks = weekTasks?.length || 0;
     const taskCompletionRate = totalTasks > 0 ? (tasksCompleted / totalTasks) * 100 : 0;
 
-    const averageHabitCompletion = habits?.reduce((sum, habit) => sum + habit.completion_rate, 0) / (habits?.length || 1) || 0;
+    const averageHabitCompletion = habits && habits.length > 0 
+      ? habits.reduce((sum, habit) => sum + habit.completion_rate, 0) / habits.length 
+      : 0;
     
-    const averageMood = weekMoods?.reduce((sum, mood) => sum + mood.mood_score, 0) / (weekMoods?.length || 1) || 0;
+    const averageMood = weekMoods && weekMoods.length > 0 
+      ? weekMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / weekMoods.length 
+      : 0;
 
     return {
       tasksCompleted,

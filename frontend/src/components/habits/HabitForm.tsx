@@ -157,8 +157,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
             <label className="text-sm font-medium">Frequency</label>
             <Select
               value={formData.target_frequency}
-              onValueChange={(value: 'daily' | 'weekly' | 'monthly') => 
-                handleInputChange('target_frequency', value)
+              onValueChange={(value) => 
+                handleInputChange('target_frequency', value as 'daily' | 'weekly' | 'monthly')
               }
             >
               <SelectTrigger>
@@ -179,8 +179,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
             <label className="text-sm font-medium">Completion Type</label>
             <Select
               value={formData.completion_type}
-              onValueChange={(value: 'boolean' | 'count' | 'duration') => 
-                handleInputChange('completion_type', value)
+              onValueChange={(value) => 
+                handleInputChange('completion_type', value as 'boolean' | 'count' | 'duration')
               }
             >
               <SelectTrigger>

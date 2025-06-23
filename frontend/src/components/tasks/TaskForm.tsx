@@ -120,8 +120,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
             <label className="text-sm font-medium">Priority</label>
             <Select
               value={formData.priority}
-              onValueChange={(value: 'low' | 'medium' | 'high') => 
-                handleInputChange('priority', value)
+              onValueChange={(value) => 
+                handleInputChange('priority', value as 'low' | 'medium' | 'high')
               }
             >
               <SelectTrigger>
@@ -140,8 +140,8 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
               <label className="text-sm font-medium">Status</label>
               <Select
                 value={formData.status}
-                onValueChange={(value: 'pending' | 'in_progress' | 'completed') => 
-                  handleInputChange('status', value)
+                onValueChange={(value) => 
+                  handleInputChange('status', value as 'pending' | 'in_progress' | 'completed')
                 }
               >
                 <SelectTrigger>

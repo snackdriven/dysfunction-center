@@ -10,6 +10,31 @@ interface TaskListProps {
 }
 
 export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error }) => {
+  const groupedTasks = React.useMemo(() => {
+    const groups = {
+      overdue: tasks.filter(task => 
+        !task.completed && 
+        task.due_date && 
+        new Date(task.due_date) < new Date()
+      ),
+      today: tasks.filter(task => {
+        if (!task.due_date || task.completed) return false;
+        const today = new Date().toDateString();
+        return new Date(task.due_date).toDateString() === today;
+      }),
+      upcoming: tasks.filter(task => 
+        !task.completed && 
+        task.due_date && 
+        new Date(task.due_date) > new Date() &&
+        new Date(task.due_date).toDateString() !== new Date().toDateString()
+      ),
+      completed: tasks.filter(task => task.completed),
+      noDate: tasks.filter(task => !task.due_date && !task.completed),
+    };
+
+    return groups;
+  }, [tasks]);
+
   if (isLoading) {
     return (
       <div className="space-y-4">
@@ -41,31 +66,6 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error }) =
       </div>
     );
   }
-
-  const groupedTasks = React.useMemo(() => {
-    const groups = {
-      overdue: tasks.filter(task => 
-        !task.completed && 
-        task.due_date && 
-        new Date(task.due_date) < new Date()
-      ),
-      today: tasks.filter(task => {
-        if (!task.due_date || task.completed) return false;
-        const today = new Date().toDateString();
-        return new Date(task.due_date).toDateString() === today;
-      }),
-      upcoming: tasks.filter(task => 
-        !task.completed && 
-        task.due_date && 
-        new Date(task.due_date) > new Date() &&
-        new Date(task.due_date).toDateString() !== new Date().toDateString()
-      ),
-      completed: tasks.filter(task => task.completed),
-      noDate: tasks.filter(task => !task.due_date && !task.completed),
-    };
-
-    return groups;
-  }, [tasks]);
 
   const TaskGroup: React.FC<{ title: string; tasks: Task[]; variant?: 'default' | 'error' | 'success' }> = ({ 
     title, 
