@@ -1,12 +1,17 @@
 {
-  "name": "encore-ts-starter",
+  "name": "meh-trics",
   "private": true,
-  "version": "0.0.1",
-  "description": "Encore Typescript Starter",
+  "version": "0.1.0",
+  "description": "Meh-trics - A productivity tracking application built with Encore.ts",
   "license": "MPL-2.0",
   "type": "module",
   "scripts": {
-    "test": "vitest"
+    "test": "vitest",
+    "test:watch": "vitest --watch",
+    "test:coverage": "vitest --coverage",
+    "dev": "encore run",
+    "build": "encore build",
+    "deploy": "encore deploy"
   },
   "devDependencies": {
     "@types/node": "^20.5.7",
@@ -14,6 +19,7 @@
     "vitest": "^1.5.0"
   },
   "dependencies": {
+    "axios": "^1.10.0",
     "encore.dev": "^1.48.5"
   },
   "optionalDependencies": {

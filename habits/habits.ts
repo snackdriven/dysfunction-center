@@ -1,0 +1,501 @@
+import { api } from "encore.dev/api";
+import { habitDB } from "./encore.service";
+import {
+  Habit,
+  HabitCompletion,
+  HabitWithCompletion,
+  CreateHabitRequest,
+  CreateHabitResponse,
+  UpdateHabitRequest,
+  UpdateHabitResponse,
+  GetHabitResponse,
+  GetHabitsRequest,
+  GetHabitsResponse,
+  DeleteHabitRequest,
+  DeleteHabitResponse,
+  LogHabitCompletionRequest,
+  LogHabitCompletionResponse,
+  GetHabitHistoryRequest,
+  GetHabitHistoryResponse
+} from "./types";
+import { 
+  sanitizeString, 
+  isValidDateString, 
+  isValidHabitCategory,
+  getCurrentDateString
+} from "../shared/utils";
+
+// Helper function to collect database results
+async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
+  const results: T[] = [];
+  for await (const result of generator) {
+    results.push(result);
+  }
+  return results;
+}
+
+// Calculate streak for a habit
+async function calculateStreak(habitId: number, asOfDate: string = getCurrentDateString()): Promise<number> {
+  const generator = habitDB.query`
+    SELECT completion_date, completed 
+    FROM habit_completions 
+    WHERE habit_id = ${habitId} AND completion_date <= ${asOfDate}
+    ORDER BY completion_date DESC
+  `;
+  
+  const completions = await collectResults(generator);
+  
+  let streak = 0;
+  let currentDate = new Date(asOfDate);
+  
+  for (const completion of completions) {
+    const completionDate = new Date(completion.completion_date);
+    const daysDiff = Math.floor((currentDate.getTime() - completionDate.getTime()) / (1000 * 60 * 60 * 24));
+    
+    if (daysDiff === streak && completion.completed) {
+      streak++;
+    } else if (daysDiff === streak && !completion.completed) {
+      // Gap in streak, but continue checking for potential earlier streak
+      break;
+    } else if (daysDiff > streak) {
+      // Gap found, streak ends
+      break;
+    }
+  }
+  
+  return streak;
+}
+
+// Calculate completion rate for last 30 days
+async function calculateCompletionRate(habitId: number): Promise<number> {
+  const thirtyDaysAgo = new Date();
+  thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+  const startDate = thirtyDaysAgo.toISOString().split('T')[0];
+  const endDate = getCurrentDateString();
+  
+  const generator = habitDB.query`
+    SELECT COUNT(*) as total, 
+           SUM(CASE WHEN completed = true THEN 1 ELSE 0 END) as completed_count
+    FROM habit_completions 
+    WHERE habit_id = ${habitId} 
+    AND completion_date >= ${startDate} 
+    AND completion_date <= ${endDate}
+  `;
+  
+  const result = await collectResults(generator);
+  const stats = result[0];
+  
+  if (stats.total === 0) return 0;
+  return Math.round((stats.completed_count / stats.total) * 100);
+}
+
+// Check if habit was completed today
+async function isCompletedToday(habitId: number): Promise<boolean> {
+  const today = getCurrentDateString();
+  
+  const generator = habitDB.query`
+    SELECT completed 
+    FROM habit_completions 
+    WHERE habit_id = ${habitId} AND completion_date = ${today}
+  `;
+  
+  const result = await collectResults(generator);
+  return result.length > 0 && result[0].completed;
+}
+
+// Create a new habit
+export const createHabit = api(
+  { method: "POST", path: "/habits", expose: true },
+  async (req: CreateHabitRequest): Promise<CreateHabitResponse> => {
+    try {
+      // Validate required fields
+      if (!req.name || req.name.trim() === '') {
+        throw new Error("Habit name is required");
+      }
+
+      // Sanitize inputs
+      const name = sanitizeString(req.name, 255);
+      const description = req.description ? sanitizeString(req.description, 1000) : null;
+      const category = req.category || 'personal';
+      const target_frequency = req.target_frequency || 1;
+      
+      // Validate category
+      if (!isValidHabitCategory(category)) {
+        throw new Error("Invalid category. Must be 'health', 'productivity', or 'personal'");
+      }
+
+      // Validate target frequency
+      if (target_frequency < 1 || target_frequency > 10) {
+        throw new Error("Target frequency must be between 1 and 10");      }
+
+      // Insert habit into database using database timestamps
+      const generator = habitDB.query`
+        INSERT INTO habits (name, description, category, target_frequency, created_at, updated_at)
+        VALUES (${name}, ${description}, ${category}, ${target_frequency}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+        RETURNING *
+      `;
+
+      const result = await collectResults(generator);
+
+      if (result.length === 0) {
+        throw new Error("Failed to create habit");
+      }
+
+      const habitRow = result[0];
+      const habit: Habit = {
+        id: habitRow.id,
+        name: habitRow.name,
+        description: habitRow.description,
+        category: habitRow.category,
+        target_frequency: habitRow.target_frequency,
+        active: habitRow.active,
+        created_at: habitRow.created_at,
+        updated_at: habitRow.updated_at
+      };
+
+      return { habit };
+    } catch (error) {
+      throw new Error(`Failed to create habit: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get all habits with completion data
+export const getHabits = api(
+  { method: "GET", path: "/habits", expose: true },
+  async (req: GetHabitsRequest): Promise<GetHabitsResponse> => {
+    try {
+      // Get habits with filters
+      const generator = habitDB.query`SELECT * FROM habits ORDER BY created_at DESC`;
+      const allHabits = await collectResults(generator);
+      
+      // Apply in-memory filters
+      let filteredHabits = allHabits;
+      
+      if (req.active !== undefined) {
+        filteredHabits = filteredHabits.filter(habit => habit.active === req.active);
+      }
+      
+      if (req.category && isValidHabitCategory(req.category)) {
+        filteredHabits = filteredHabits.filter(habit => habit.category === req.category);
+      }
+      
+      // Enrich with completion data
+      const habits: HabitWithCompletion[] = await Promise.all(
+        filteredHabits.map(async (habitRow: any) => {
+          const todayCompleted = req.include_today ? await isCompletedToday(habitRow.id) : false;
+          const currentStreak = await calculateStreak(habitRow.id);
+          const completionRate = await calculateCompletionRate(habitRow.id);
+          
+          return {
+            id: habitRow.id,
+            name: habitRow.name,
+            description: habitRow.description,
+            category: habitRow.category,
+            target_frequency: habitRow.target_frequency,
+            active: habitRow.active,
+            created_at: habitRow.created_at,
+            updated_at: habitRow.updated_at,
+            today_completed: todayCompleted,
+            current_streak: currentStreak,
+            completion_rate: completionRate
+          };
+        })
+      );
+
+      return { habits };
+    } catch (error) {
+      throw new Error(`Failed to get habits: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get a specific habit by ID
+export const getHabit = api(
+  { method: "GET", path: "/habits/:id", expose: true },
+  async ({ id }: { id: number }): Promise<GetHabitResponse> => {
+    try {
+      const generator = habitDB.query`
+        SELECT * FROM habits WHERE id = ${id}
+      `;
+
+      const result = await collectResults(generator);
+
+      if (result.length === 0) {
+        throw new Error("Habit not found");
+      }
+
+      const habitRow = result[0];
+      
+      // Get completion data
+      const todayCompleted = await isCompletedToday(id);
+      const currentStreak = await calculateStreak(id);
+      const completionRate = await calculateCompletionRate(id);
+
+      const habit: HabitWithCompletion = {
+        id: habitRow.id,
+        name: habitRow.name,
+        description: habitRow.description,
+        category: habitRow.category,
+        target_frequency: habitRow.target_frequency,
+        active: habitRow.active,
+        created_at: habitRow.created_at,
+        updated_at: habitRow.updated_at,
+        today_completed: todayCompleted,
+        current_streak: currentStreak,
+        completion_rate: completionRate
+      };
+
+      return { habit };
+    } catch (error) {
+      throw new Error(`Failed to get habit: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Update a habit
+export const updateHabit = api(
+  { method: "PUT", path: "/habits/:id", expose: true },
+  async (req: UpdateHabitRequest): Promise<UpdateHabitResponse> => {
+    try {
+      const { id, ...updates } = req;
+
+      // Check if habit exists
+      const existingGenerator = habitDB.query`
+        SELECT * FROM habits WHERE id = ${id}
+      `;
+
+      const existingResult = await collectResults(existingGenerator);
+
+      if (existingResult.length === 0) {
+        throw new Error("Habit not found");
+      }
+
+      const existingHabit = existingResult[0];
+      
+      // Prepare update values
+      const name = updates.name ? sanitizeString(updates.name, 255) : existingHabit.name;
+      const description = updates.description !== undefined 
+        ? (updates.description ? sanitizeString(updates.description, 1000) : null)
+        : existingHabit.description;
+      const category = updates.category || existingHabit.category;
+      const target_frequency = updates.target_frequency !== undefined ? updates.target_frequency : existingHabit.target_frequency;
+      const active = updates.active !== undefined ? updates.active : existingHabit.active;
+      
+      // Validate category
+      if (!isValidHabitCategory(category)) {
+        throw new Error("Invalid category. Must be 'health', 'productivity', or 'personal'");
+      }
+
+      // Validate target frequency
+      if (target_frequency < 1 || target_frequency > 10) {
+        throw new Error("Target frequency must be between 1 and 10");
+      }      // Update habit in database using database timestamps
+      const updateGenerator = habitDB.query`
+        UPDATE habits 
+        SET name = ${name}, 
+            description = ${description}, 
+            category = ${category},
+            target_frequency = ${target_frequency},
+            active = ${active},
+            updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${id}
+        RETURNING *
+      `;
+
+      const result = await collectResults(updateGenerator);
+      const habitRow = result[0];
+      
+      const habit: Habit = {
+        id: habitRow.id,
+        name: habitRow.name,
+        description: habitRow.description,
+        category: habitRow.category,
+        target_frequency: habitRow.target_frequency,
+        active: habitRow.active,
+        created_at: habitRow.created_at,
+        updated_at: habitRow.updated_at
+      };
+
+      return { habit };
+    } catch (error) {
+      throw new Error(`Failed to update habit: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Delete a habit
+export const deleteHabit = api(
+  { method: "DELETE", path: "/habits/:id", expose: true },
+  async ({ id }: { id: number }): Promise<DeleteHabitResponse> => {
+    try {
+      const generator = habitDB.query`
+        DELETE FROM habits WHERE id = ${id}
+        RETURNING id
+      `;
+
+      const result = await collectResults(generator);
+
+      if (result.length === 0) {
+        throw new Error("Habit not found");
+      }
+
+      return {
+        success: true,
+        message: "Habit deleted successfully"
+      };
+    } catch (error) {
+      throw new Error(`Failed to delete habit: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Log habit completion
+export const logHabitCompletion = api(
+  { method: "POST", path: "/habits/:habit_id/completions", expose: true },
+  async (req: LogHabitCompletionRequest): Promise<LogHabitCompletionResponse> => {
+    try {
+      const habit_id = req.habit_id;
+      const completion_date = req.completion_date || getCurrentDateString();
+      const completed = req.completed !== undefined ? req.completed : true;
+      const notes = req.notes ? sanitizeString(req.notes, 500) : null;
+
+      // Validate completion date
+      if (!isValidDateString(completion_date)) {
+        throw new Error("Invalid completion date format. Use YYYY-MM-DD");
+      }
+
+      // Check if habit exists
+      const habitGenerator = habitDB.query`
+        SELECT id FROM habits WHERE id = ${habit_id} AND active = true
+      `;
+      const habitResult = await collectResults(habitGenerator);
+      
+      if (habitResult.length === 0) {        throw new Error("Habit not found or inactive");
+      }
+
+      // Insert or update completion record using database timestamps
+      const upsertGenerator = habitDB.query`
+        INSERT INTO habit_completions (habit_id, completion_date, completed, notes, created_at)
+        VALUES (${habit_id}, ${completion_date}, ${completed}, ${notes}, CURRENT_TIMESTAMP)
+        ON CONFLICT (habit_id, completion_date) 
+        DO UPDATE SET completed = ${completed}, notes = ${notes}
+        RETURNING *
+      `;
+
+      const result = await collectResults(upsertGenerator);
+      const completionRow = result[0];
+
+      const completion: HabitCompletion = {
+        id: completionRow.id,
+        habit_id: completionRow.habit_id,
+        completion_date: completionRow.completion_date,
+        completed: completionRow.completed,
+        notes: completionRow.notes,
+        created_at: completionRow.created_at
+      };
+
+      // Calculate updated streak
+      const updatedStreak = await calculateStreak(habit_id, completion_date);
+
+      return { 
+        completion,
+        updated_streak: updatedStreak
+      };
+    } catch (error) {
+      throw new Error(`Failed to log habit completion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get habit completion history
+export const getHabitHistory = api(
+  { method: "GET", path: "/habits/:habit_id/history", expose: true },
+  async (req: GetHabitHistoryRequest): Promise<GetHabitHistoryResponse> => {
+    try {
+      const { habit_id, start_date, end_date } = req;
+
+      // Check if habit exists
+      const habitGenerator = habitDB.query`
+        SELECT id FROM habits WHERE id = ${habit_id}
+      `;
+      const habitResult = await collectResults(habitGenerator);
+      
+      if (habitResult.length === 0) {
+        throw new Error("Habit not found");
+      }
+
+      // Build query for completions
+      let completionsQuery = `
+        SELECT * FROM habit_completions 
+        WHERE habit_id = ${habit_id}
+      `;
+
+      if (start_date && isValidDateString(start_date)) {
+        completionsQuery += ` AND completion_date >= '${start_date}'`;
+      }
+
+      if (end_date && isValidDateString(end_date)) {
+        completionsQuery += ` AND completion_date <= '${end_date}'`;
+      }
+
+      completionsQuery += ` ORDER BY completion_date DESC`;
+
+      const generator = habitDB.query`
+        SELECT * FROM habit_completions 
+        WHERE habit_id = ${habit_id}
+        ORDER BY completion_date DESC
+      `;
+
+      const allCompletions = await collectResults(generator);
+
+      // Apply date filters in memory for now
+      let filteredCompletions = allCompletions;
+      
+      if (start_date && isValidDateString(start_date)) {
+        filteredCompletions = filteredCompletions.filter(c => c.completion_date >= start_date);
+      }
+      
+      if (end_date && isValidDateString(end_date)) {
+        filteredCompletions = filteredCompletions.filter(c => c.completion_date <= end_date);
+      }
+
+      const completions: HabitCompletion[] = filteredCompletions.map((row: any) => ({
+        id: row.id,
+        habit_id: row.habit_id,
+        completion_date: row.completion_date,
+        completed: row.completed,
+        notes: row.notes,
+        created_at: row.created_at
+      }));
+
+      // Calculate streak data
+      const currentStreak = await calculateStreak(habit_id);
+      const completionRate = await calculateCompletionRate(habit_id);
+      
+      // Calculate longest streak (simplified for now)
+      let longestStreak = 0;
+      let tempStreak = 0;
+      
+      for (const completion of allCompletions.reverse()) {
+        if (completion.completed) {
+          tempStreak++;
+          longestStreak = Math.max(longestStreak, tempStreak);
+        } else {
+          tempStreak = 0;
+        }
+      }
+
+      return {
+        completions,
+        streak_data: {
+          current_streak: currentStreak,
+          longest_streak: longestStreak,
+          completion_rate: completionRate
+        }
+      };
+    } catch (error) {
+      throw new Error(`Failed to get habit history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
