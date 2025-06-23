@@ -13,6 +13,16 @@ interface TaskListProps {
 
 export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onRetry }) => {
   const groupedTasks = React.useMemo(() => {
+    if (!tasks || !Array.isArray(tasks)) {
+      return {
+        overdue: [],
+        today: [],
+        upcoming: [],
+        completed: [],
+        noDate: [],
+      };
+    }
+
     const groups = {
       overdue: tasks.filter(task => 
         !task.completed && 

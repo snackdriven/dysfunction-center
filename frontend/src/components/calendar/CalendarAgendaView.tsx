@@ -26,10 +26,9 @@ export const CalendarAgendaView: React.FC<CalendarAgendaViewProps> = ({
   // Group events and tasks by date
   const groupedByDate = React.useMemo(() => {
     const groups: Record<string, { events: CalendarEvent[]; tasks: Task[] }> = {};
-    
-    // Add events
+      // Add events
     events.forEach(event => {
-      const date = new Date(event.start_time).toISOString().split('T')[0];
+      const date = new Date(event.start_datetime).toISOString().split('T')[0];
       if (!groups[date]) {
         groups[date] = { events: [], tasks: [] };
       }
@@ -162,14 +161,13 @@ export const CalendarAgendaView: React.FC<CalendarAgendaViewProps> = ({
                             {event.description}
                           </p>
                         )}
-                        <div className="flex items-center gap-4 mt-2 text-xs text-blue-600">
-                          {!event.all_day && (
+                        <div className="flex items-center gap-4 mt-2 text-xs text-blue-600">                          {!event.is_all_day && (
                             <div className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
-                              {formatTime(event.start_time)} - {formatTime(event.end_time)}
+                              {formatTime(event.start_datetime)} - {formatTime(event.end_datetime)}
                             </div>
                           )}
-                          {event.all_day && (
+                          {event.is_all_day && (
                             <Badge variant="secondary" className="text-xs">All Day</Badge>
                           )}
                           {event.location && (

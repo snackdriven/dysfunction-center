@@ -2,16 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiEndpoints } from './api';
 
 export interface Task {
-  id: string;
+  id: number;
   title: string;
   description?: string;
   priority: 'low' | 'medium' | 'high';
-  status: 'pending' | 'in_progress' | 'completed';
+  status?: 'pending' | 'in_progress' | 'completed';
   completed: boolean;
   due_date?: string;
   created_at: string;
   updated_at?: string;
-  category_id?: string;
+  category_id?: number;
   tags?: string[];
 }
 
@@ -35,14 +35,12 @@ export interface UpdateTaskRequest {
   tags?: string[];
 }
 
-export const tasksApi = {
-  getTasks: async (filters?: any): Promise<Task[]> => {
+export const tasksApi = {  getTasks: async (filters?: any): Promise<Task[]> => {
     const { data } = await api.get(apiEndpoints.tasks.list, { params: filters });
-    return data;
+    return data.tasks || [];
   },
-
-  getTask: async (id: string): Promise<Task> => {
-    const { data } = await api.get(apiEndpoints.tasks.get(id));
+  getTask: async (id: number): Promise<Task> => {
+    const { data } = await api.get(apiEndpoints.tasks.get(id.toString()));
     return data;
   },
 
@@ -50,32 +48,29 @@ export const tasksApi = {
     const { data } = await api.post(apiEndpoints.tasks.create, task);
     return data;
   },
-
-  updateTask: async ({ id, ...task }: UpdateTaskRequest & { id: string }): Promise<Task> => {
-    const { data } = await api.put(apiEndpoints.tasks.update(id), task);
+  updateTask: async ({ id, ...task }: UpdateTaskRequest & { id: number }): Promise<Task> => {
+    const { data } = await api.put(apiEndpoints.tasks.update(id.toString()), task);
     return data;
   },
 
-  deleteTask: async (id: string): Promise<void> => {
-    await api.delete(apiEndpoints.tasks.delete(id));
+  deleteTask: async (id: number): Promise<void> => {
+    await api.delete(apiEndpoints.tasks.delete(id.toString()));
   },
-
   getTodaysTasks: async (): Promise<Task[]> => {
     const today = new Date().toISOString().split('T')[0];
     const { data } = await api.get(apiEndpoints.tasks.list, {
       params: { due_date: today }
     });
-    return data;
+    return data.tasks || [];
   },
-
   getCategories: async () => {
     const { data } = await api.get(apiEndpoints.tasks.categories);
-    return data;
+    return data.categories || [];
   },
 
   getTags: async () => {
     const { data } = await api.get(apiEndpoints.tasks.tags);
-    return data;
+    return data.tags || [];
   },
 };
 

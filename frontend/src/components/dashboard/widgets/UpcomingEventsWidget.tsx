@@ -18,10 +18,9 @@ export const UpcomingEventsWidget: React.FC = () => {
     }),
   });
 
-  const sortedEvents = React.useMemo(() => {
-    if (!upcomingEvents || !Array.isArray(upcomingEvents)) return [];
+  const sortedEvents = React.useMemo(() => {    if (!upcomingEvents || !Array.isArray(upcomingEvents)) return [];
     return upcomingEvents
-      .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+      .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
       .slice(0, 5); // Show only next 5 events
   }, [upcomingEvents]);
 
@@ -74,14 +73,13 @@ export const UpcomingEventsWidget: React.FC = () => {
                 <div className="flex items-start justify-between">
                   <div className="flex-1 min-w-0">
                     <h4 className="font-medium text-sm truncate">{event.title}</h4>
-                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">
-                      <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-3 mt-1 text-xs text-muted-foreground">                      <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {formatEventDate(event.start_time)}
+                        {formatEventDate(event.start_datetime)}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
-                        {formatEventTime(event.start_time, event.end_time, event.all_day)}
+                        {formatEventTime(event.start_datetime, event.end_datetime, event.is_all_day)}
                       </div>
                     </div>
                     {event.location && (
@@ -90,17 +88,16 @@ export const UpcomingEventsWidget: React.FC = () => {
                         <span className="truncate">{event.location}</span>
                       </div>
                     )}
-                  </div>
-                  <div className="flex flex-col gap-1 ml-2">
-                    {event.linked_task_id && (
+                  </div>                  <div className="flex flex-col gap-1 ml-2">
+                    {event.task_id && (
                       <Badge variant="secondary" className="text-xs">
                         <LinkIcon className="h-2 w-2 mr-1" />
                         Task
                       </Badge>
                     )}
-                    {event.reminder_minutes && (
+                    {false && (
                       <Badge variant="outline" className="text-xs">
-                        {event.reminder_minutes}m
+                        {/* event.reminder_minutes */}m
                       </Badge>
                     )}
                   </div>

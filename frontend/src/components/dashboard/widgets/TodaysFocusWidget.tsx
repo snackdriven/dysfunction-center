@@ -13,9 +13,8 @@ export const TodaysFocusWidget: React.FC = () => {
   });
 
   const updateTask = useUpdateTask();
-
   const taskSummary = React.useMemo(() => {
-    if (!tasks) return { total: 0, completed: 0, overdue: 0, inProgress: 0 };
+    if (!tasks || !Array.isArray(tasks)) return { total: 0, completed: 0, overdue: 0, inProgress: 0 };
     
     const now = new Date();
     return {
@@ -25,8 +24,7 @@ export const TodaysFocusWidget: React.FC = () => {
       inProgress: tasks.filter(t => !t.completed && t.status === 'in_progress').length,
     };
   }, [tasks]);
-
-  const handleToggleComplete = async (taskId: string, completed: boolean) => {
+  const handleToggleComplete = async (taskId: number, completed: boolean) => {
     try {
       await updateTask.mutateAsync({
         id: taskId,
@@ -79,7 +77,7 @@ export const TodaysFocusWidget: React.FC = () => {
           {/* Top Tasks */}
           <div className="space-y-2">
             <h4 className="font-medium text-sm text-muted-foreground">Priority Tasks</h4>
-            {tasks && tasks.length > 0 ? (
+            {tasks && Array.isArray(tasks) && tasks.length > 0 ? (
               tasks.slice(0, 3).map((task) => (
                 <div key={task.id} className="flex items-center gap-3 p-2 rounded-lg border bg-card">
                   <button

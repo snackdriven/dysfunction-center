@@ -2,39 +2,38 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiEndpoints } from './api';
 
 export interface CalendarEvent {
-  id: string;
+  id: number;
   title: string;
   description?: string;
-  start_time: string;
-  end_time: string;
-  all_day: boolean;
+  start_datetime: string;
+  end_datetime: string;
+  is_all_day: boolean;
   location?: string;
-  reminder_minutes?: number;
-  recurrence_pattern?: string;
-  linked_task_id?: string;
+  color?: string;
+  recurrence_rule?: string;
+  task_id?: number;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface CreateEventRequest {
   title: string;
   description?: string;
-  start_time: string;
-  end_time: string;
-  all_day?: boolean;
+  start_datetime: string;
+  end_datetime: string;
+  is_all_day?: boolean;
   location?: string;
-  reminder_minutes?: number;
-  recurrence_pattern?: string;
-  linked_task_id?: string;
+  color?: string;
+  recurrence_rule?: string;
+  task_id?: number;
 }
 
-export const calendarApi = {
-  getEvents: async (params?: { start?: string; end?: string }): Promise<CalendarEvent[]> => {
+export const calendarApi = {  getEvents: async (params?: { start?: string; end?: string }): Promise<CalendarEvent[]> => {
     const { data } = await api.get(apiEndpoints.calendar.events, { params });
-    return data;
+    return data.events || [];
   },
-
-  getEvent: async (id: string): Promise<CalendarEvent> => {
-    const { data } = await api.get(apiEndpoints.calendar.get(id));
+  getEvent: async (id: number): Promise<CalendarEvent> => {
+    const { data } = await api.get(apiEndpoints.calendar.get(id.toString()));
     return data;
   },
 
@@ -43,13 +42,13 @@ export const calendarApi = {
     return data;
   },
 
-  updateEvent: async ({ id, ...event }: Partial<CreateEventRequest> & { id: string }): Promise<CalendarEvent> => {
-    const { data } = await api.put(apiEndpoints.calendar.update(id), event);
+  updateEvent: async ({ id, ...event }: Partial<CreateEventRequest> & { id: number }): Promise<CalendarEvent> => {
+    const { data } = await api.put(apiEndpoints.calendar.update(id.toString()), event);
     return data;
   },
 
-  deleteEvent: async (id: string): Promise<void> => {
-    await api.delete(apiEndpoints.calendar.delete(id));
+  deleteEvent: async (id: number): Promise<void> => {
+    await api.delete(apiEndpoints.calendar.delete(id.toString()));
   },
 
   getDayEvents: async (date: string): Promise<CalendarEvent[]> => {

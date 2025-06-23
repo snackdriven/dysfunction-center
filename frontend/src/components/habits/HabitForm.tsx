@@ -23,15 +23,14 @@ const habitCategories = [
   'Other'
 ];
 
-export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
-  const [formData, setFormData] = React.useState({
+export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {  const [formData, setFormData] = React.useState({
     name: habit?.name || '',
     description: habit?.description || '',
     category: habit?.category || 'Health & Fitness',
-    target_frequency: habit?.target_frequency || 'daily' as 'daily' | 'weekly' | 'monthly',
+    target_frequency: habit?.target_frequency || 1,
     target_value: habit?.target_value || 1,
     completion_type: habit?.completion_type || 'boolean' as 'boolean' | 'count' | 'duration',
-    is_active: habit?.is_active ?? true,
+    active: habit?.active ?? true,
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -76,11 +75,10 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
         completion_type: formData.completion_type,
       };
 
-      if (isEditing) {
-        await updateHabit.mutateAsync({
+      if (isEditing) {        await updateHabit.mutateAsync({
           id: habit.id,
           ...habitData,
-          is_active: formData.is_active,
+          active: formData.active,
         });
       } else {
         await createHabit.mutateAsync(habitData);
@@ -151,23 +149,23 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
                 ))}
               </SelectContent>
             </Select>
-          </div>
-
-          <div className="space-y-2">
-            <label className="text-sm font-medium">Frequency</label>
+          </div>          <div className="space-y-2">
+            <label className="text-sm font-medium">Target Frequency (times per day)</label>
             <Select
-              value={formData.target_frequency}
+              value={formData.target_frequency.toString()}
               onValueChange={(value) => 
-                handleInputChange('target_frequency', value as 'daily' | 'weekly' | 'monthly')
+                handleInputChange('target_frequency', parseInt(value))
               }
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="daily">Daily</SelectItem>
-                <SelectItem value="weekly">Weekly</SelectItem>
-                <SelectItem value="monthly">Monthly</SelectItem>
+                <SelectItem value="1">1 time per day</SelectItem>
+                <SelectItem value="2">2 times per day</SelectItem>
+                <SelectItem value="3">3 times per day</SelectItem>
+                <SelectItem value="4">4 times per day</SelectItem>
+                <SelectItem value="5">5 times per day</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -213,15 +211,14 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
 
         {/* Active Status (for editing only) */}
         {isEditing && (
-          <div className="flex items-center space-x-2">
-            <input
+          <div className="flex items-center space-x-2">            <input
               type="checkbox"
-              id="is_active"
-              checked={formData.is_active}
-              onChange={(e) => handleInputChange('is_active', e.target.checked)}
+              id="active"
+              checked={formData.active}
+              onChange={(e) => handleInputChange('active', e.target.checked)}
               className="rounded border-gray-300 text-primary focus:ring-primary"
             />
-            <label htmlFor="is_active" className="text-sm font-medium">
+            <label htmlFor="active" className="text-sm font-medium">
               Active habit
             </label>
           </div>

@@ -32,10 +32,9 @@ export const MoodCheckinWidget: React.FC = () => {
   }, [recentMoods]);
 
   const handleQuickMoodLog = async () => {
-    try {
-      await createMoodEntry.mutateAsync({
+    try {      await createMoodEntry.mutateAsync({
         mood_score: moodScore,
-        date: new Date().toISOString().split('T')[0],
+        entry_date: new Date().toISOString().split('T')[0],
       });
       setShowQuickEntry(false);
     } catch (error) {
@@ -140,7 +139,7 @@ export const MoodCheckinWidget: React.FC = () => {
                 <div 
                   key={mood.id} 
                   className="flex-1 text-center text-xs"
-                  title={`${new Date(mood.date).toLocaleDateString()}: ${moodLabels[mood.mood_score - 1]}`}
+                  title={`${new Date(mood.entry_date).toLocaleDateString()}: ${moodLabels[mood.mood_score - 1]}`}
                 >
                   <div className="text-lg">{moodEmojis[mood.mood_score - 1]}</div>
                 </div>

@@ -30,11 +30,10 @@ export const HabitTrackerWidget: React.FC = () => {
       percentage: total > 0 ? (completed / total) * 100 : 0
     };
   }, [habits, todayCompletions]);
-
-  const handleToggleHabit = async (habitId: string) => {
+  const handleToggleHabit = async (habitId: number) => {
     const today = new Date().toISOString().split('T')[0];
     const currentCompletion = todayCompletions?.find(c => c.habit_id === habitId);
-    
+
     try {
       await logCompletion.mutateAsync({
         habitId,

@@ -2,22 +2,27 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiEndpoints } from './api';
 
 export interface Habit {
-  id: string;
+  id: number;
   name: string;
   description?: string;
   category: string;
-  target_frequency: 'daily' | 'weekly' | 'monthly';
+  target_frequency: number;
   target_value: number;
   completion_type: 'boolean' | 'count' | 'duration';
-  is_active: boolean;
+  active: boolean;
   created_at: string;
-  streak_count: number;
-  completion_rate: number;
+  updated_at?: string;
+  streak_count?: number;
+  completion_rate?: number;
+  today_completed?: boolean;
+  current_streak?: number;
+  longest_streak?: number;
+  consistency_score?: number;
 }
 
 export interface HabitCompletion {
-  id: string;
-  habit_id: string;
+  id: number;
+  habit_id: number;
   date: string;
   completed: boolean;
   value?: number;
@@ -28,19 +33,17 @@ export interface CreateHabitRequest {
   name: string;
   description?: string;
   category: string;
-  target_frequency: 'daily' | 'weekly' | 'monthly';
+  target_frequency: number;
   target_value: number;
   completion_type: 'boolean' | 'count' | 'duration';
 }
 
-export const habitsApi = {
-  getHabits: async (): Promise<Habit[]> => {
+export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
     const { data } = await api.get(apiEndpoints.habits.list);
-    return data;
+    return data.habits || [];
   },
-
-  getHabit: async (id: string): Promise<Habit> => {
-    const { data } = await api.get(apiEndpoints.habits.get(id));
+  getHabit: async (id: number): Promise<Habit> => {
+    const { data } = await api.get(apiEndpoints.habits.get(id.toString()));
     return data;
   },
 
@@ -48,23 +51,22 @@ export const habitsApi = {
     const { data } = await api.post(apiEndpoints.habits.create, habit);
     return data;
   },
-
-  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: string; is_active?: boolean }): Promise<Habit> => {
-    const { data } = await api.put(apiEndpoints.habits.update(id), habit);
+  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: number; active?: boolean }): Promise<Habit> => {
+    const { data } = await api.put(apiEndpoints.habits.update(id.toString()), habit);
     return data;
   },
 
-  deleteHabit: async (id: string): Promise<void> => {
-    await api.delete(apiEndpoints.habits.delete(id));
+  deleteHabit: async (id: number): Promise<void> => {
+    await api.delete(apiEndpoints.habits.delete(id.toString()));
   },
 
-  getHabitCompletions: async (habitId: string, params?: any): Promise<HabitCompletion[]> => {
-    const { data } = await api.get(apiEndpoints.habits.completions(habitId), { params });
+  getHabitCompletions: async (habitId: number, params?: any): Promise<HabitCompletion[]> => {
+    const { data } = await api.get(apiEndpoints.habits.completions(habitId.toString()), { params });
     return data;
   },
 
-  logCompletion: async (habitId: string, completion: { date: string; completed: boolean; value?: number; notes?: string }): Promise<HabitCompletion> => {
-    const { data } = await api.post(apiEndpoints.habits.completions(habitId), completion);
+  logCompletion: async (habitId: number, completion: { date: string; completed: boolean; value?: number; notes?: string }): Promise<HabitCompletion> => {
+    const { data } = await api.post(apiEndpoints.habits.completions(habitId.toString()), completion);
     return data;
   },
 
@@ -125,7 +127,7 @@ export const useLogHabitCompletion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ habitId, ...completion }: { habitId: string; date: string; completed: boolean; value?: number; notes?: string }) =>
+    mutationFn: ({ habitId, ...completion }: { habitId: number; date: string; completed: boolean; value?: number; notes?: string }) =>
       habitsApi.logCompletion(habitId, completion),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habit-completions'] });

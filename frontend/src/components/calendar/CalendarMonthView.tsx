@@ -51,17 +51,16 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
     for (let day = 1; day <= daysInMonth; day++) {
       const date = new Date(year, month, day);
       const dateStr = date.toISOString().split('T')[0];
-      
-      const dayEvents = events.filter(event => {
-        const eventDate = new Date(event.start_time).toISOString().split('T')[0];
+        const dayEvents = events && Array.isArray(events) ? events.filter(event => {
+        const eventDate = new Date(event.start_datetime).toISOString().split('T')[0];
         return eventDate === dateStr;
-      });
+      }) : [];
       
-      const dayTasks = tasks.filter(task => {
+      const dayTasks = tasks && Array.isArray(tasks) ? tasks.filter(task => {
         if (!task.due_date) return false;
         const taskDate = new Date(task.due_date).toISOString().split('T')[0];
         return taskDate === dateStr;
-      });
+      }) : [];
       
       days.push({
         date,
@@ -169,10 +168,9 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                     <div className="flex items-center gap-1">
                       <CalendarIcon className="h-3 w-3" />
                       <span className="truncate">{event.title}</span>
-                    </div>
-                    {!event.all_day && (
+                    </div>                    {!event.is_all_day && (
                       <div className="text-blue-600 text-[10px]">
-                        {formatTime(event.start_time)}
+                        {formatTime(event.start_datetime)}
                       </div>
                     )}
                   </button>
@@ -242,12 +240,11 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                 </h3>
               </div>
 
-              <div className="space-y-3">
-                {/* Events for this day */}
-                {events.filter(event => {
-                  const eventDate = new Date(event.start_time).toDateString();
+              <div className="space-y-3">                {/* Events for this day */}
+                {(events && Array.isArray(events) ? events.filter(event => {
+                  const eventDate = new Date(event.start_datetime).toDateString();
                   return eventDate === selectedDate.toDateString();
-                }).map((event) => (
+                }) : []).map((event) => (
                   <div key={event.id} className="p-3 border rounded-lg">
                     <div className="flex items-start justify-between">
                       <div>
@@ -256,14 +253,13 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                           <p className="text-sm text-muted-foreground mt-1">
                             {event.description}
                           </p>
+                        )}                      <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                        {!event.is_all_day && (
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-3 w-3" />
+                            {formatTime(event.start_datetime)} - {formatTime(event.end_datetime)}
+                          </div>
                         )}
-                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
-                          {!event.all_day && (
-                            <div className="flex items-center gap-1">
-                              <Clock className="h-3 w-3" />
-                              {formatTime(event.start_time)} - {formatTime(event.end_time)}
-                            </div>
-                          )}
                           {event.location && (
                             <div className="flex items-center gap-1">
                               <MapPin className="h-3 w-3" />
@@ -278,11 +274,11 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                 ))}
 
                 {/* Tasks for this day */}
-                {tasks.filter(task => {
+                {(tasks && Array.isArray(tasks) ? tasks.filter(task => {
                   if (!task.due_date) return false;
                   const taskDate = new Date(task.due_date).toDateString();
                   return taskDate === selectedDate.toDateString();
-                }).map((task) => (
+                }) : []).map((task) => (
                   <div key={task.id} className="p-3 border rounded-lg">
                     <div className="flex items-start justify-between">
                       <div>
@@ -304,18 +300,16 @@ export const CalendarMonthView: React.FC<CalendarMonthViewProps> = ({
                       <Badge variant="outline">Task</Badge>
                     </div>
                   </div>
-                ))}
-
-                {/* No events message */}
-                {events.filter(event => {
-                  const eventDate = new Date(event.start_time).toDateString();
+                ))}                {/* No events message */}
+                {(events && Array.isArray(events) ? events.filter(event => {
+                  const eventDate = new Date(event.start_datetime).toDateString();
                   return eventDate === selectedDate.toDateString();
-                }).length === 0 && 
-                tasks.filter(task => {
+                }) : []).length === 0 &&
+                (tasks && Array.isArray(tasks) ? tasks.filter(task => {
                   if (!task.due_date) return false;
                   const taskDate = new Date(task.due_date).toDateString();
                   return taskDate === selectedDate.toDateString();
-                }).length === 0 && (
+                }) : []).length === 0 && (
                   <div className="text-center py-8 text-muted-foreground">
                     <CalendarIcon className="h-12 w-12 mx-auto mb-4 opacity-50" />
                     <p>No events or tasks scheduled for this day</p>

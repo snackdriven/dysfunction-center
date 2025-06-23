@@ -68,7 +68,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
 
   return (
     <>
-      <Card className={`transition-all hover:shadow-md ${!habit.is_active ? 'opacity-60' : ''}`}>
+      <Card className={`transition-all hover:shadow-md ${!habit.active ? 'opacity-60' : ''}`}>
         <CardHeader className="pb-2">
           <div className="flex items-start justify-between">
             <div className="flex-1">
@@ -126,10 +126,9 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
         <CardContent className="space-y-4">
           {/* Completion Button */}
           <div className="flex items-center justify-center">
-            <Button
-              variant={isCompleted ? "default" : "outline"}
+            <Button              variant={isCompleted ? "default" : "outline"}
               onClick={handleToggleCompletion}
-              disabled={isLoading || !habit.is_active}
+              disabled={isLoading || !habit.active}
               className="w-full"
             >
               {isCompleted ? (
@@ -150,7 +149,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
             
             <div className="flex justify-between">
               <span className="text-muted-foreground">Frequency:</span>
-              <span>{getFrequencyDisplay(habit.target_frequency)}</span>
+              <span>{getFrequencyDisplay(habit.target_frequency.toString())}</span>
             </div>
             
             <div className="flex justify-between">
@@ -173,16 +172,13 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
               <span className="font-medium">{habit.streak_count}</span>
               <span className="text-muted-foreground">day streak</span>
             </div>
-            
-            <div className="flex items-center gap-1 text-sm">
+              <div className="flex items-center gap-1 text-sm">
               <Target className="h-4 w-4 text-blue-500" />
-              <span className="font-medium">{habit.completion_rate.toFixed(0)}%</span>
+              <span className="font-medium">{(habit.completion_rate || 0).toFixed(0)}%</span>
               <span className="text-muted-foreground">rate</span>
             </div>
-          </div>
-
-          {/* Status Badge */}
-          {!habit.is_active && (
+          </div>          {/* Status Badge */}
+          {!habit.active && (
             <Badge variant="outline" className="w-full justify-center">
               Inactive
             </Badge>

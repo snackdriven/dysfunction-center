@@ -121,7 +121,7 @@ export const MoodHistory: React.FC = () => {
                     <div className="flex items-center gap-4 text-sm text-muted-foreground">
                       <div className="flex items-center gap-1">
                         <Calendar className="h-3 w-3" />
-                        {formatDate(entry.date)}
+                        {formatDate(entry.entry_date)}
                       </div>
                       <div className="flex items-center gap-1">
                         <Clock className="h-3 w-3" />
@@ -136,28 +136,29 @@ export const MoodHistory: React.FC = () => {
                           Energy: {entry.energy_level}/5
                         </span>
                       )}
-                      {entry.stress_level && (
-                        <span className="text-muted-foreground">
+                      {entry.stress_level && (                        <span className="text-muted-foreground">
                           Stress: {entry.stress_level}/5
                         </span>
                       )}
-                      {entry.context && (
+                      {/* TODO: Re-enable Phase 2 features when backend support is ready */}
+                      {/* {entry.context && (
                         <Badge variant="outline" className="text-xs">
                           {entry.context}
                         </Badge>
-                      )}
+                      )} */}
                     </div>
 
+                    {/* TODO: Re-enable Phase 2 features when backend support is ready */}
                     {/* Triggers */}
-                    {entry.triggers && entry.triggers.length > 0 && (
+                    {/* {entry.triggers && entry.triggers.length > 0 && (
                       <div className="flex flex-wrap gap-1">
                         {entry.triggers.map((trigger) => (
-                          <Badge key={trigger} variant="destructive" className="text-xs">
-                            {trigger}
+                          <Badge key={trigger.id} variant="destructive" className="text-xs">
+                            {trigger.name}
                           </Badge>
                         ))}
                       </div>
-                    )}
+                    )} */}
 
                     {/* Notes */}
                     {entry.notes && (

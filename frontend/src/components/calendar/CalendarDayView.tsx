@@ -52,22 +52,25 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
       const dateStr = day.toISOString().split('T')[0];
       grouped[dateStr] = { events: [], tasks: [] };
     });
-    
-    events.forEach(event => {
-      const eventDate = new Date(event.start_time).toISOString().split('T')[0];
-      if (grouped[eventDate]) {
-        grouped[eventDate].events.push(event);
-      }
-    });
-    
-    tasks.forEach(task => {
-      if (task.due_date) {
-        const taskDate = new Date(task.due_date).toISOString().split('T')[0];
-        if (grouped[taskDate]) {
-          grouped[taskDate].tasks.push(task);
+      if (events && Array.isArray(events)) {
+      events.forEach(event => {
+        const eventDate = new Date(event.start_datetime).toISOString().split('T')[0];
+        if (grouped[eventDate]) {
+          grouped[eventDate].events.push(event);
         }
-      }
-    });
+      });
+    }
+    
+    if (tasks && Array.isArray(tasks)) {
+      tasks.forEach(task => {
+        if (task.due_date) {
+          const taskDate = new Date(task.due_date).toISOString().split('T')[0];
+          if (grouped[taskDate]) {
+            grouped[taskDate].tasks.push(task);
+          }
+        }
+      });
+    }
     
     return grouped;
   }, [days, events, tasks]);
@@ -156,9 +159,8 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
               </div>
 
               {/* Day Content */}
-              <CardContent className="p-4 space-y-3">
-                {/* All Day Events */}
-                {dayData.events.filter(e => e.all_day).map((event) => (
+              <CardContent className="p-4 space-y-3">                {/* All Day Events */}
+                {dayData.events.filter(e => e.is_all_day).map((event) => (
                   <div
                     key={event.id}
                     onClick={() => setSelectedEvent(event)}
@@ -170,12 +172,10 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
                     </div>
                     <Badge variant="secondary" className="text-xs mt-1">All Day</Badge>
                   </div>
-                ))}
-
-                {/* Timed Events */}
+                ))}                {/* Timed Events */}
                 {dayData.events
-                  .filter(e => !e.all_day)
-                  .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+                  .filter(e => !e.is_all_day)
+                  .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
                   .map((event) => (
                     <div
                       key={event.id}
@@ -189,10 +189,9 @@ export const CalendarDayView: React.FC<CalendarDayViewProps> = ({
                             <span className="text-sm font-medium text-blue-900 truncate">
                               {event.title}
                             </span>
-                          </div>
-                          <div className="flex items-center gap-1 mt-1 text-xs text-blue-700">
+                          </div>                          <div className="flex items-center gap-1 mt-1 text-xs text-blue-700">
                             <Clock className="h-3 w-3" />
-                            {formatTime(event.start_time)} - {formatTime(event.end_time)}
+                            {formatTime(event.start_datetime)} - {formatTime(event.end_datetime)}
                           </div>
                           {event.location && (
                             <div className="flex items-center gap-1 mt-1 text-xs text-blue-600">

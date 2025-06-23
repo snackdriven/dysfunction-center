@@ -61,22 +61,25 @@ export const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
         grouped[dateStr] = { events: [], tasks: [] };
       });
     });
-    
-    events.forEach(event => {
-      const eventDate = new Date(event.start_time).toISOString().split('T')[0];
-      if (grouped[eventDate]) {
-        grouped[eventDate].events.push(event);
-      }
-    });
-    
-    tasks.forEach(task => {
-      if (task.due_date) {
-        const taskDate = new Date(task.due_date).toISOString().split('T')[0];
-        if (grouped[taskDate]) {
-          grouped[taskDate].tasks.push(task);
+      if (events && Array.isArray(events)) {
+      events.forEach(event => {
+        const eventDate = new Date(event.start_datetime).toISOString().split('T')[0];
+        if (grouped[eventDate]) {
+          grouped[eventDate].events.push(event);
         }
-      }
-    });
+      });
+    }
+    
+    if (tasks && Array.isArray(tasks)) {
+      tasks.forEach(task => {
+        if (task.due_date) {
+          const taskDate = new Date(task.due_date).toISOString().split('T')[0];
+          if (grouped[taskDate]) {
+            grouped[taskDate].tasks.push(task);
+          }
+        }
+      });
+    }
     
     return grouped;
   }, [weeks, events, tasks]);
@@ -186,9 +189,8 @@ export const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
                         "min-h-[200px] p-2 border-r border-b space-y-1",
                         dayHeader.isToday && "bg-primary/5"
                       )}
-                    >
-                      {/* All Day Events */}
-                      {dayData.events.filter(e => e.all_day).slice(0, 1).map((event) => (
+                    >                      {/* All Day Events */}
+                      {dayData.events.filter(e => e.is_all_day).slice(0, 1).map((event) => (
                         <div
                           key={event.id}
                           onClick={() => setSelectedEvent(event)}
@@ -199,12 +201,10 @@ export const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
                             <span className="truncate">{event.title}</span>
                           </div>
                         </div>
-                      ))}
-
-                      {/* Timed Events */}
+                      ))}                      {/* Timed Events */}
                       {dayData.events
-                        .filter(e => !e.all_day)
-                        .sort((a, b) => new Date(a.start_time).getTime() - new Date(b.start_time).getTime())
+                        .filter(e => !e.is_all_day)
+                        .sort((a, b) => new Date(a.start_datetime).getTime() - new Date(b.start_datetime).getTime())
                         .slice(0, 2)
                         .map((event) => (
                           <div
@@ -215,9 +215,8 @@ export const CalendarWeekView: React.FC<CalendarWeekViewProps> = ({
                             <div className="flex items-center gap-1">
                               <Clock className="h-2 w-2 text-blue-600" />
                               <span className="truncate text-blue-900">{event.title}</span>
-                            </div>
-                            <div className="text-blue-700 text-[10px]">
-                              {formatTime(event.start_time)}
+                            </div>                            <div className="text-blue-700 text-[10px]">
+                              {formatTime(event.start_datetime)}
                             </div>
                           </div>
                         ))}

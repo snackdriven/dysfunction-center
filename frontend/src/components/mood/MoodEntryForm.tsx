@@ -32,16 +32,16 @@ const contextOptions = [
   'Exercising', 'Eating', 'Working', 'Relaxing', 'Studying', 'Traveling'
 ];
 
-export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }) => {
-  const [formData, setFormData] = useState({
+export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }) => {  const [formData, setFormData] = useState({
     mood_score: entry?.mood_score || 3,
     energy_level: entry?.energy_level || 3,
     stress_level: entry?.stress_level || 3,
     secondary_mood: entry?.secondary_mood || '',
     notes: entry?.notes || '',
-    triggers: entry?.triggers || [],
-    context: entry?.context || '',
-    date: entry?.date || new Date().toISOString().split('T')[0],
+    // TODO: Re-enable Phase 2 features when backend support is ready
+    // triggers: entry?.triggers || [],
+    // context_tags: entry?.context_tags || { activities: [], people: [], emotions: [], locations: [] },
+    entry_date: entry?.entry_date || new Date().toISOString().split('T')[0],
   });
 
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -74,18 +74,17 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    try {
+    if (!validateForm()) return;    try {
       const entryData = {
         mood_score: formData.mood_score,
         energy_level: formData.energy_level || undefined,
         stress_level: formData.stress_level || undefined,
         secondary_mood: formData.secondary_mood || undefined,
         notes: formData.notes || undefined,
-        triggers: formData.triggers.length > 0 ? formData.triggers : undefined,
-        context: formData.context || undefined,
-        date: formData.date,
+        entry_date: formData.entry_date,
+        // TODO: Re-enable Phase 2 features when backend support is ready
+        // triggers: formData.triggers?.length > 0 ? formData.triggers : undefined,
+        // context_tags: formData.context_tags,
       };
 
       if (isEditing) {
@@ -107,19 +106,19 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
   const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
-      setErrors(prev => ({ ...prev, [field]: '' }));
-    }
+      setErrors(prev => ({ ...prev, [field]: '' }));    }
   };
 
-  const addTrigger = (trigger: string) => {
-    if (!formData.triggers.includes(trigger)) {
-      handleInputChange('triggers', [...formData.triggers, trigger]);
-    }
-  };
+  // TODO: Re-enable Phase 2 features when backend support is ready
+  // const addTrigger = (trigger: string) => {
+  //   if (!formData.triggers.includes(trigger)) {
+  //     handleInputChange('triggers', [...formData.triggers, trigger]);
+  //   }
+  // };
 
-  const removeTrigger = (trigger: string) => {
-    handleInputChange('triggers', formData.triggers.filter(t => t !== trigger));
-  };
+  // const removeTrigger = (trigger: string) => {
+  //   handleInputChange('triggers', formData.triggers.filter(t => t !== trigger));
+  // };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -134,9 +133,8 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
         <div>
           <Input
             label="Date"
-            type="date"
-            value={formData.date}
-            onChange={(e) => handleInputChange('date', e.target.value)}
+            type="date"            value={formData.entry_date}
+            onChange={(e) => handleInputChange('entry_date', e.target.value)}
             required
           />
         </div>
@@ -233,10 +231,9 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
               <p className="text-sm text-red-600">{errors.stress_level}</p>
             )}
           </div>
-        </div>
-
+        </div>        {/* TODO: Re-enable Phase 2 features when backend support is ready */}
         {/* Context */}
-        <div className="space-y-2">
+        {/* <div className="space-y-2">
           <label className="text-sm font-medium">Context (optional)</label>
           <Select
             value={formData.context}
@@ -253,10 +250,9 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
               ))}
             </SelectContent>
           </Select>
-        </div>
-
+        </div> */}        {/* TODO: Re-enable Phase 2 features when backend support is ready */}
         {/* Triggers */}
-        <div className="space-y-3">
+        {/* <div className="space-y-3">
           <label className="text-sm font-medium">Triggers (optional)</label>
           <div className="grid grid-cols-2 gap-2">
             {commonTriggers.map((trigger) => (
@@ -292,7 +288,7 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
               ))}
             </div>
           )}
-        </div>
+        </div> */}
 
         {/* Notes */}
         <div>

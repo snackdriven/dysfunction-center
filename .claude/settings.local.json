@@ -10,7 +10,8 @@
       "Bash(npx tailwindcss init:*)",
       "Bash(npm ls:*)",
       "Bash(npm uninstall:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

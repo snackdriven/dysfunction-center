@@ -44,15 +44,19 @@ export const WeeklyProgressWidget: React.FC = () => {
   });
 
   const weeklyStats = React.useMemo(() => {
-    const tasksCompleted = weekTasks?.filter(t => t.completed).length || 0;
-    const totalTasks = weekTasks?.length || 0;
+    const tasksCompleted = weekTasks && Array.isArray(weekTasks) 
+      ? weekTasks.filter(t => t.completed).length 
+      : 0;
+    const totalTasks = weekTasks && Array.isArray(weekTasks) 
+      ? weekTasks.length 
+      : 0;
     const taskCompletionRate = totalTasks > 0 ? (tasksCompleted / totalTasks) * 100 : 0;
 
-    const averageHabitCompletion = habits && habits.length > 0 
-      ? habits.reduce((sum, habit) => sum + habit.completion_rate, 0) / habits.length 
+    const averageHabitCompletion = habits && Array.isArray(habits) && habits.length > 0 
+      ? habits.reduce((sum, habit) => sum + (habit.completion_rate || 0), 0) / habits.length 
       : 0;
     
-    const averageMood = weekMoods && weekMoods.length > 0 
+    const averageMood = weekMoods && Array.isArray(weekMoods) && weekMoods.length > 0 
       ? weekMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / weekMoods.length 
       : 0;
 
@@ -62,7 +66,7 @@ export const WeeklyProgressWidget: React.FC = () => {
       taskCompletionRate,
       averageHabitCompletion,
       averageMood,
-      moodEntries: weekMoods?.length || 0,
+      moodEntries: weekMoods && Array.isArray(weekMoods) ? weekMoods.length : 0,
     };
   }, [weekTasks, habits, weekMoods]);
 

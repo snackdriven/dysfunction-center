@@ -39,9 +39,8 @@ export const HabitGrid: React.FC<HabitGridProps> = ({ habits, completions, isLoa
       </div>
     );
   }
-
-  const activeHabits = habits.filter(habit => habit.is_active);
-  const inactiveHabits = habits.filter(habit => !habit.is_active);
+  const activeHabits = habits && Array.isArray(habits) ? habits.filter(habit => habit.active) : [];
+  const inactiveHabits = habits && Array.isArray(habits) ? habits.filter(habit => !habit.active) : [];
 
   return (
     <div className="space-y-8">

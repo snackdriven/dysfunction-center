@@ -13,17 +13,16 @@ interface EventFormProps {
   onSuccess?: () => void;
 }
 
-export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {
-  const [formData, setFormData] = React.useState({
+export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {  const [formData, setFormData] = React.useState({
     title: event?.title || '',
     description: event?.description || '',
-    start_time: event?.start_time ? new Date(event.start_time).toISOString().slice(0, 16) : '',
-    end_time: event?.end_time ? new Date(event.end_time).toISOString().slice(0, 16) : '',
-    all_day: event?.all_day || false,
+    start_time: event?.start_datetime ? new Date(event.start_datetime).toISOString().slice(0, 16) : '',
+    end_time: event?.end_datetime ? new Date(event.end_datetime).toISOString().slice(0, 16) : '',
+    all_day: event?.is_all_day || false,
     location: event?.location || '',
-    reminder_minutes: event?.reminder_minutes?.toString() || '15',
-    recurrence_pattern: event?.recurrence_pattern || '',
-    linked_task_id: event?.linked_task_id || '',
+    color: event?.color || '',
+    recurrence_rule: event?.recurrence_rule || '',
+    task_id: event?.task_id?.toString() || '',
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -68,19 +67,17 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
-
-    try {
+    if (!validateForm()) return;    try {
       const eventData = {
         title: formData.title.trim(),
         description: formData.description.trim() || undefined,
-        start_time: formData.start_time,
-        end_time: formData.all_day ? formData.start_time : formData.end_time,
-        all_day: formData.all_day,
+        start_datetime: formData.start_time,
+        end_datetime: formData.all_day ? formData.start_time : formData.end_time,
+        is_all_day: formData.all_day,
         location: formData.location.trim() || undefined,
-        reminder_minutes: formData.reminder_minutes ? parseInt(formData.reminder_minutes) : undefined,
-        recurrence_pattern: formData.recurrence_pattern || undefined,
-        linked_task_id: formData.linked_task_id || undefined,
+        color: formData.color || undefined,
+        recurrence_rule: formData.recurrence_rule || undefined,
+        task_id: formData.task_id ? parseInt(formData.task_id) : undefined,
       };
 
       if (isEditing) {
@@ -216,9 +213,8 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Reminder</label>
-            <Select
-              value={formData.reminder_minutes}
-              onValueChange={(value) => handleInputChange('reminder_minutes', value)}
+            <Select              value={formData.color}
+              onValueChange={(value) => handleInputChange('color', value)}
             >
               <SelectTrigger>
                 <SelectValue />
@@ -237,9 +233,8 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {
 
           <div className="space-y-2">
             <label className="text-sm font-medium">Repeat</label>
-            <Select
-              value={formData.recurrence_pattern}
-              onValueChange={(value) => handleInputChange('recurrence_pattern', value)}
+            <Select              value={formData.recurrence_rule}
+              onValueChange={(value) => handleInputChange('recurrence_rule', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="No repeat" />
@@ -259,17 +254,15 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {
         {tasks && tasks.length > 0 && (
           <div className="space-y-2">
             <label className="text-sm font-medium">Link to Task (optional)</label>
-            <Select
-              value={formData.linked_task_id}
-              onValueChange={(value) => handleInputChange('linked_task_id', value)}
+            <Select              value={formData.task_id}
+              onValueChange={(value) => handleInputChange('task_id', value)}
             >
               <SelectTrigger>
                 <SelectValue placeholder="Select a task to link" />
               </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">No linked task</SelectItem>
+              <SelectContent>                <SelectItem value="">No linked task</SelectItem>
                 {tasks.map((task) => (
-                  <SelectItem key={task.id} value={task.id}>
+                  <SelectItem key={task.id} value={task.id.toString()}>
                     {task.title}
                   </SelectItem>
                 ))}

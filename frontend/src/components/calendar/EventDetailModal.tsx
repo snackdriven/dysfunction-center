@@ -22,11 +22,10 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
   const [isEditing, setIsEditing] = useState(false);
   
   const deleteEvent = useDeleteEvent();
-
   const { data: linkedTask } = useQuery({
-    queryKey: ['task', event.linked_task_id],
-    queryFn: () => event.linked_task_id ? tasksApi.getTask(event.linked_task_id) : null,
-    enabled: !!event.linked_task_id,
+    queryKey: ['task', event.task_id],
+    queryFn: () => event.task_id ? tasksApi.getTask(event.task_id) : null,
+    enabled: !!event.task_id,
   });
 
   const formatDateTime = (dateTime: string) => {
@@ -45,12 +44,11 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
       }),
     };
   };
-
   const formatDuration = () => {
-    if (event.all_day) return 'All day';
-    
-    const start = new Date(event.start_time);
-    const end = new Date(event.end_time);
+    if (event.is_all_day) return 'All day';
+
+    const start = new Date(event.start_datetime);
+    const end = new Date(event.end_datetime);
     const durationMs = end.getTime() - start.getTime();
     const hours = Math.floor(durationMs / (1000 * 60 * 60));
     const minutes = Math.floor((durationMs % (1000 * 60 * 60)) / (1000 * 60));
@@ -105,9 +103,8 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
       </Dialog>
     );
   }
-
-  const startDateTime = formatDateTime(event.start_time);
-  const endDateTime = event.all_day ? null : formatDateTime(event.end_time);
+  const startDateTime = formatDateTime(event.start_datetime);
+  const endDateTime = event.is_all_day ? null : formatDateTime(event.end_datetime);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -117,11 +114,10 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
             <div className="flex-1">
               <DialogTitle className="text-xl">{event.title}</DialogTitle>
               <div className="flex items-center gap-2 mt-2">
-                <Badge variant="secondary">Event</Badge>
-                {event.all_day && (
+                <Badge variant="secondary">Event</Badge>                {event.is_all_day && (
                   <Badge variant="outline">All Day</Badge>
                 )}
-                {event.recurrence_pattern && (
+                {event.recurrence_rule && (
                   <Badge variant="outline">Recurring</Badge>
                 )}
               </div>
@@ -159,8 +155,7 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
             <div className="flex items-start gap-3">
               <CalendarIcon className="h-5 w-5 text-muted-foreground mt-0.5" />
               <div>
-                <p className="font-medium">{startDateTime.date}</p>
-                {!event.all_day && (
+                <p className="font-medium">{startDateTime.date}</p>                {!event.is_all_day && (
                   <div className="text-sm text-muted-foreground flex items-center gap-2">
                     <Clock className="h-3 w-3" />
                     <span>
@@ -182,27 +177,28 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
                   <p className="text-sm text-muted-foreground">{event.location}</p>
                 </div>
               </div>
+            )}            {/* Reminder - TODO: Add to backend schema */}
+            {false && (
+              <div className="flex items-start gap-3">
+                <Bell className="h-5 w-5 text-muted-foreground mt-0.5" />
+                <div>
+                  <p className="font-medium">Reminder</p>
+                  <p className="text-sm text-muted-foreground">
+                    {/* getReminderText(event.reminder_minutes) */}
+                  </p>
+                </div>
+              </div>
             )}
 
-            {/* Reminder */}
-            <div className="flex items-start gap-3">
-              <Bell className="h-5 w-5 text-muted-foreground mt-0.5" />
-              <div>
-                <p className="font-medium">Reminder</p>
-                <p className="text-sm text-muted-foreground">
-                  {getReminderText(event.reminder_minutes)}
-                </p>
-              </div>
-            </div>
-
-            {/* Recurrence */}
-            {event.recurrence_pattern && (
+            {/* Recurrence - TODO: Add to backend schema */}
+            {event.recurrence_rule && (
               <div className="flex items-start gap-3">
                 <Repeat className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div>
                   <p className="font-medium">Repeats</p>
                   <p className="text-sm text-muted-foreground">
-                    {getRecurrenceText(event.recurrence_pattern)}
+                    {/* getRecurrenceText(event.recurrence_rule) */}
+                    {event.recurrence_rule}
                   </p>
                 </div>
               </div>

@@ -16,27 +16,26 @@ export const HabitAnalytics: React.FC = () => {
   //   queryFn: () => habitsApi.getAnalytics(),
   // });
 
-  const habitStats = React.useMemo(() => {
-    if (!habits) return null;
+  const habitStats = React.useMemo(() => {    if (!habits || !Array.isArray(habits)) return null;
 
-    const activeHabits = habits.filter(h => h.is_active);
-    const completionRates = activeHabits.map(h => h.completion_rate);
-    
-    const avgCompletionRate = completionRates.length > 0 
-      ? completionRates.reduce((sum, rate) => sum + rate, 0) / completionRates.length 
-      : 0;
+    const activeHabits = habits.filter(h => h.active);    const completionRates = activeHabits.map(h => h.completion_rate).filter((rate): rate is number => rate !== undefined);
+    const avgCompletionRate = completionRates.length > 0
+      ? completionRates.reduce((sum, rate) => sum + rate, 0) / completionRates.length
+      : 0;const bestHabit = activeHabits.length > 0 
+      ? activeHabits.reduce((best, current) =>
+          (current.completion_rate || 0) > (best?.completion_rate || 0) ? current : best,
+          activeHabits[0]
+        )
+      : null;
 
-    const bestHabit = activeHabits.reduce((best, current) => 
-      current.completion_rate > (best?.completion_rate || 0) ? current : best, 
-      activeHabits[0]
-    );
+    const longestStreak = activeHabits.length > 0
+      ? activeHabits.reduce((longest, current) =>
+          (current.current_streak || 0) > (longest?.current_streak || 0) ? current : longest,
+          activeHabits[0]
+        )
+      : null;
 
-    const longestStreak = activeHabits.reduce((longest, current) => 
-      current.streak_count > (longest?.streak_count || 0) ? current : longest,
-      activeHabits[0]
-    );
-
-    const totalStreakDays = activeHabits.reduce((sum, habit) => sum + habit.streak_count, 0);
+    const totalStreakDays = activeHabits.reduce((sum, habit) => sum + (habit.current_streak || 0), 0);
 
     return {
       totalHabits: habits.length,
@@ -55,10 +54,9 @@ export const HabitAnalytics: React.FC = () => {
       const category = habit.category;
       if (!acc[category]) {
         acc[category] = { count: 0, totalCompletion: 0, totalStreak: 0 };
-      }
-      acc[category].count++;
-      acc[category].totalCompletion += habit.completion_rate;
-      acc[category].totalStreak += habit.streak_count;
+      }      acc[category].count++;
+      acc[category].totalCompletion += habit.completion_rate || 0;
+      acc[category].totalStreak += habit.current_streak || 0;
       return acc;
     }, {} as Record<string, { count: number; totalCompletion: number; totalStreak: number }>);
 
@@ -166,13 +164,12 @@ export const HabitAnalytics: React.FC = () => {
                     {habitStats.bestHabit.streak_count} day streak
                   </span>
                 </div>
-              </div>
-              <div className="text-right">
-                <div className="text-2xl font-bold text-green-600">
-                  {habitStats.bestHabit.completion_rate.toFixed(0)}%
+              </div>                <div className="text-right">
+                  <div className="text-2xl font-bold text-green-600">
+                    {(habitStats.bestHabit.completion_rate || 0).toFixed(0)}%
+                  </div>
+                  <p className="text-sm text-muted-foreground">completion rate</p>
                 </div>
-                <p className="text-sm text-muted-foreground">completion rate</p>
-              </div>
             </div>
           </CardContent>
         </Card>
@@ -229,7 +226,7 @@ export const HabitAnalytics: React.FC = () => {
             {habits?.map((habit) => (
               <div key={habit.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex items-center gap-3">
-                  <div className={`w-3 h-3 rounded-full ${habit.is_active ? 'bg-green-500' : 'bg-gray-300'}`} />
+                  <div className={`w-3 h-3 rounded-full ${habit.active ? 'bg-green-500' : 'bg-gray-300'}`} />
                   <div>
                     <h4 className="font-medium">{habit.name}</h4>
                     <div className="flex items-center gap-2 mt-1">
@@ -244,19 +241,18 @@ export const HabitAnalytics: React.FC = () => {
                   <div className="text-center">
                     <div className="text-sm font-medium">{habit.streak_count}</div>
                     <div className="text-xs text-muted-foreground">streak</div>
-                  </div>
-                  <div className="text-center">
-                    <div className="text-sm font-medium">{habit.completion_rate.toFixed(0)}%</div>
+                  </div>                  <div className="text-center">
+                    <div className="text-sm font-medium">{(habit.completion_rate || 0).toFixed(0)}%</div>
                     <div className="text-xs text-muted-foreground">rate</div>
                   </div>
                   <div className="w-16 bg-muted rounded-full h-2">
-                    <div 
+                    <div
                       className={`h-2 rounded-full transition-all ${
-                        habit.completion_rate >= 80 ? 'bg-green-500' :
-                        habit.completion_rate >= 60 ? 'bg-yellow-500' :
+                        (habit.completion_rate || 0) >= 80 ? 'bg-green-500' :
+                        (habit.completion_rate || 0) >= 60 ? 'bg-yellow-500' :
                         'bg-red-500'
                       }`}
-                      style={{ width: `${habit.completion_rate}%` }}
+                      style={{ width: `${habit.completion_rate || 0}%` }}
                     />
                   </div>
                 </div>

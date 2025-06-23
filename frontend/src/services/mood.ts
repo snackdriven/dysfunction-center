@@ -1,38 +1,60 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiEndpoints } from './api';
 
+export interface MoodTrigger {
+  id: number;
+  name: string;
+  category?: string;
+  icon?: string;
+  created_at: string;
+}
+
+export interface ContextTags {
+  activities?: string[];
+  people?: string[];
+  emotions?: string[];
+  locations?: string[];
+}
+
 export interface MoodEntry {
-  id: string;
+  id: number;
   mood_score: number;
+  mood_category?: string;
+  notes?: string;
+  entry_date: string;
+  created_at: string;
+  updated_at?: string;
+  // Phase 2 enhancements
+  secondary_mood?: string;
   energy_level?: number;
   stress_level?: number;
-  secondary_mood?: string;
-  notes?: string;
-  triggers?: string[];
-  context?: string;
-  date: string;
-  created_at: string;
+  location?: string;
+  weather?: string;
+  context_tags?: ContextTags;
+  triggers?: MoodTrigger[];
 }
 
 export interface CreateMoodEntryRequest {
   mood_score: number;
+  mood_category?: string;
+  notes?: string;
+  entry_date?: string;
+  // Phase 2 enhancements
+  secondary_mood?: string;
   energy_level?: number;
   stress_level?: number;
-  secondary_mood?: string;
-  notes?: string;
-  triggers?: string[];
-  context?: string;
-  date?: string;
+  location?: string;
+  weather?: string;
+  context_tags?: ContextTags;
+  triggers?: MoodTrigger[];
 }
 
-export const moodApi = {
-  getMoodEntries: async (params?: { limit?: number; start_date?: string; end_date?: string }): Promise<MoodEntry[]> => {
+export const moodApi = {  getMoodEntries: async (params?: { limit?: number; start_date?: string; end_date?: string }): Promise<MoodEntry[]> => {
     const { data } = await api.get(apiEndpoints.mood.list, { params });
-    return data;
+    return data.mood_entries || [];
   },
-
-  getMoodEntry: async (id: string): Promise<MoodEntry> => {
-    const { data } = await api.get(apiEndpoints.mood.get(id));
+  getMoodEntry: async (id: number): Promise<MoodEntry> => {
+    const { data } = await api.get(apiEndpoints.mood.get(id.toString()));
     return data;
   },
 
@@ -41,13 +63,13 @@ export const moodApi = {
     return data;
   },
 
-  updateMoodEntry: async ({ id, ...entry }: Partial<CreateMoodEntryRequest> & { id: string }): Promise<MoodEntry> => {
-    const { data } = await api.put(apiEndpoints.mood.update(id), entry);
+  updateMoodEntry: async ({ id, ...entry }: Partial<CreateMoodEntryRequest> & { id: number }): Promise<MoodEntry> => {
+    const { data } = await api.put(apiEndpoints.mood.update(id.toString()), entry);
     return data;
   },
 
-  deleteMoodEntry: async (id: string): Promise<void> => {
-    await api.delete(apiEndpoints.mood.delete(id));
+  deleteMoodEntry: async (id: number): Promise<void> => {
+    await api.delete(apiEndpoints.mood.delete(id.toString()));
   },
 
   getTodayMood: async (): Promise<MoodEntry | null> => {
