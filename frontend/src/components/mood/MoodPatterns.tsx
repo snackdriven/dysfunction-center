@@ -329,7 +329,8 @@ export const MoodPatterns: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      )}      {/* Top Triggers */}
+      )}
+      {/* Top Triggers */}
       {patterns.topTriggers?.length > 0 && (
         <Card>
           <CardHeader>
