@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { CheckCircle, Circle, Calendar, Edit, Trash2, Clock, Tag, MoreHorizontal } from 'lucide-react';
-import { Task, useUpdateTask, useDeleteTask } from '../../services/tasks';
+import { CheckCircle, Circle, Calendar, Edit, Trash2, Clock, Tag, MoreHorizontal, Timer, FolderOpen, PlayCircle, FileText } from 'lucide-react';
+import { Task, useUpdateTask, useDeleteTask, tasksApi } from '../../services/tasks';
 import { TaskForm } from './TaskForm';
+import { TaskTimeTracker } from './TaskTimeTracker';
 import { Dialog, DialogContent } from '../ui/Dialog';
 
 interface TaskCardProps {
@@ -14,9 +16,23 @@ interface TaskCardProps {
 export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showActions, setShowActions] = useState(false);
+  const [showTimeTracker, setShowTimeTracker] = useState(false);
 
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['task-categories'],
+    queryFn: tasksApi.getCategories
+  });
+
+  const { data: tags = [] } = useQuery({
+    queryKey: ['task-tags'],
+    queryFn: () => tasksApi.getTags()
+  });
+
+  const category = categories.find(c => c.id === task.category_id);
+  const taskTags = task.tag_ids ? tags.filter(t => task.tag_ids!.includes(t.id)) : [];
 
   const handleToggleComplete = async () => {
     try {
@@ -103,6 +119,40 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                     </p>
                   )}
 
+                  {/* Category */}
+                  {category && (
+                    <div className="flex items-center gap-2 mt-2">
+                      <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full"
+                           style={{ backgroundColor: `${category.color}20`, color: category.color }}>
+                        <FolderOpen className="h-3 w-3" />
+                        <span>{category.icon}</span>
+                        <span>{category.name}</span>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tags */}
+                  {taskTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mt-2">
+                      {taskTags.map((tag) => (
+                        <Badge key={tag.id} variant="outline" className="text-xs">
+                          <Tag className="h-2 w-2 mr-1" />
+                          {tag.name}
+                        </Badge>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Notes Preview */}
+                  {task.notes && (
+                    <div className="mt-2">
+                      <div className="flex items-center gap-1 text-xs text-muted-foreground">
+                        <FileText className="h-3 w-3" />
+                        <span className="truncate">{task.notes}</span>
+                      </div>
+                    </div>
+                  )}
+
                   {/* Metadata */}
                   <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
                     {task.due_date && (
@@ -119,10 +169,27 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                       </div>
                     )}
 
-                    {task.tags && task.tags.length > 0 && (
+                    {/* Time Estimate */}
+                    {task.estimated_minutes && (
                       <div className="flex items-center gap-1">
-                        <Tag className="h-3 w-3" />
-                        <span>{task.tags.join(', ')}</span>
+                        <Timer className="h-3 w-3" />
+                        <span>{Math.floor(task.estimated_minutes / 60)}h {task.estimated_minutes % 60}m</span>
+                      </div>
+                    )}
+
+                    {/* Actual Time */}
+                    {task.actual_minutes && task.actual_minutes > 0 && (
+                      <div className="flex items-center gap-1">
+                        <PlayCircle className="h-3 w-3" />
+                        <span>{Math.floor(task.actual_minutes / 60)}h {task.actual_minutes % 60}m</span>
+                      </div>
+                    )}
+
+                    {/* Subtask Count */}
+                    {task.subtasks && task.subtasks.length > 0 && (
+                      <div className="flex items-center gap-1">
+                        <span>📋</span>
+                        <span>{task.subtasks.filter(s => s.completed).length}/{task.subtasks.length} subtasks</span>
                       </div>
                     )}
                   </div>
@@ -158,7 +225,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                           className="fixed inset-0 z-40"
                           onClick={() => setShowActions(false)}
                         />
-                        <div className="absolute right-0 top-full mt-1 z-50 bg-background border rounded-md shadow-md py-1 min-w-[120px]">
+                        <div className="absolute right-0 top-full mt-1 z-50 bg-background border rounded-md shadow-md py-1 min-w-[140px]">
                           <button
                             onClick={() => {
                               setIsEditing(true);
@@ -168,6 +235,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                           >
                             <Edit className="h-3 w-3" />
                             Edit
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowTimeTracker(!showTimeTracker);
+                              setShowActions(false);
+                            }}
+                            className="w-full px-3 py-1.5 text-left text-sm hover:bg-muted flex items-center gap-2"
+                          >
+                            <Timer className="h-3 w-3" />
+                            Time Tracker
                           </button>
                           <button
                             onClick={() => {
@@ -187,6 +264,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               </div>
             </div>
           </div>
+
+          {/* Time Tracker */}
+          {showTimeTracker && (
+            <div className="border-t mt-3 pt-3">
+              <TaskTimeTracker
+                taskId={task.id}
+                estimatedMinutes={task.estimated_minutes}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
 

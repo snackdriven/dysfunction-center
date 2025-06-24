@@ -1,10 +1,13 @@
 import React from 'react';
+import { useQuery } from '@tanstack/react-query';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { DialogHeader, DialogTitle } from '../ui/Dialog';
-import { Task, useCreateTask, useUpdateTask } from '../../services/tasks';
+import { Task, useCreateTask, useUpdateTask, tasksApi } from '../../services/tasks';
+import { TaskTagInput } from './TaskTagInput';
+import { TaskTimeTracker } from './TaskTimeTracker';
 
 interface TaskFormProps {
   task?: Task;
@@ -18,6 +21,21 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     priority: task?.priority || 'medium' as 'low' | 'medium' | 'high',
     due_date: task?.due_date ? task.due_date.split('T')[0] : '',
     status: task?.status || 'pending' as 'pending' | 'in_progress' | 'completed',
+    category_id: task?.category_id || undefined as number | undefined,
+    notes: task?.notes || '',
+    estimated_minutes: task?.estimated_minutes || undefined as number | undefined,
+    tag_ids: task?.tag_ids || [] as number[],
+  });
+
+  const { data: categories = [] } = useQuery({
+    queryKey: ['task-categories'],
+    queryFn: tasksApi.getCategories
+  });
+
+  const { data: parentTasks = [] } = useQuery({
+    queryKey: ['parent-tasks'],
+    queryFn: () => tasksApi.getTasks({ parent_task_id: null }),
+    enabled: !task // Only fetch for new tasks
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -57,6 +75,10 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
         priority: formData.priority,
         due_date: formData.due_date || undefined,
         status: formData.status,
+        category_id: formData.category_id,
+        notes: formData.notes.trim() || undefined,
+        estimated_minutes: formData.estimated_minutes,
+        tag_ids: formData.tag_ids.length > 0 ? formData.tag_ids : undefined,
       };
 
       if (isEditing) {
@@ -75,7 +97,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string) => {
+  const handleInputChange = (field: string, value: string | number | number[] | undefined) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -167,6 +189,77 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
             error={errors.due_date}
           />
         </div>
+
+        {/* Category and Estimated Time */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Category</label>
+            <Select
+              value={formData.category_id?.toString() || ''}
+              onValueChange={(value) => 
+                handleInputChange('category_id', value ? parseInt(value) : undefined)
+              }
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select category..." />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">No category</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category.id} value={category.id.toString()}>
+                    <div className="flex items-center gap-2">
+                      <span 
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: category.color }}
+                      />
+                      <span>{category.icon}</span>
+                      {category.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Estimated Time (minutes)</label>
+            <Input
+              type="number"
+              min="5"
+              step="5"
+              value={formData.estimated_minutes || ''}
+              onChange={(e) => handleInputChange('estimated_minutes', e.target.value ? parseInt(e.target.value) : undefined)}
+              placeholder="e.g., 30"
+            />
+          </div>
+        </div>
+
+        {/* Tags */}
+        <TaskTagInput
+          selectedTagIds={formData.tag_ids}
+          onTagsChange={(tagIds) => handleInputChange('tag_ids', tagIds)}
+        />
+
+        {/* Notes */}
+        <div>
+          <Textarea
+            label="Notes"
+            placeholder="Additional notes or details..."
+            value={formData.notes}
+            onChange={(e) => handleInputChange('notes', e.target.value)}
+            rows={2}
+          />
+        </div>
+
+        {/* Time Tracking (for editing existing tasks) */}
+        {isEditing && (
+          <div className="border-t pt-4">
+            <TaskTimeTracker
+              taskId={task.id}
+              estimatedMinutes={formData.estimated_minutes}
+            />
+          </div>
+        )}
 
         {/* Submit Error */}
         {errors.submit && (

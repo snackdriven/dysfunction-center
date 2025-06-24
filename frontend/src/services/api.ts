@@ -50,6 +50,10 @@ export const apiEndpoints = {
     tags: '/tasks/tags',
     timeEntries: '/tasks/time-entries',
     analytics: '/tasks/analytics',
+    bulkActions: '/tasks/bulk-actions',
+    startTimeEntry: (taskId: string) => `/tasks/${taskId}/time-entries`,
+    stopTimeEntry: (entryId: string) => `/tasks/time-entries/${entryId}/stop`,
+    activeTimeEntry: (taskId: string) => `/tasks/${taskId}/time-entries/active`,
   },
   
   // Habits

@@ -5,9 +5,9 @@ import { Textarea } from '../ui/Textarea';
 import { Slider } from '../ui/Slider';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { DialogHeader, DialogTitle } from '../ui/Dialog';
-import { Badge } from '../ui/Badge';
-import { X } from 'lucide-react';
-import { MoodEntry, useCreateMoodEntry, useUpdateMoodEntry } from '../../services/mood';
+import { MoodEntry, useCreateMoodEntry, useUpdateMoodEntry, ContextTags } from '../../services/mood';
+import { MoodTriggerSelector } from './MoodTriggerSelector';
+import { MoodContextTags } from './MoodContextTags';
 
 interface MoodEntryFormProps {
   entry?: MoodEntry;
@@ -32,15 +32,17 @@ const contextOptions = [
   'Exercising', 'Eating', 'Working', 'Relaxing', 'Studying', 'Traveling'
 ];
 
-export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }) => {  const [formData, setFormData] = useState({
+export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }) => {
+  const [formData, setFormData] = useState({
     mood_score: entry?.mood_score || 3,
     energy_level: entry?.energy_level || 3,
     stress_level: entry?.stress_level || 3,
     secondary_mood: entry?.secondary_mood || '',
     notes: entry?.notes || '',
-    // TODO: Re-enable Phase 2 features when backend support is ready
-    // triggers: entry?.triggers || [],
-    // context_tags: entry?.context_tags || { activities: [], people: [], emotions: [], locations: [] },
+    location: entry?.location || '',
+    weather: entry?.weather || '',
+    trigger_ids: entry?.triggers?.map(t => t.id) || [] as number[],
+    context_tags: entry?.context_tags || { activities: [], people: [], emotions: [], locations: [] } as ContextTags,
     entry_date: entry?.entry_date || new Date().toISOString().split('T')[0],
   });
 
@@ -81,10 +83,11 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
         stress_level: formData.stress_level || undefined,
         secondary_mood: formData.secondary_mood || undefined,
         notes: formData.notes || undefined,
+        location: formData.location || undefined,
+        weather: formData.weather || undefined,
+        trigger_ids: formData.trigger_ids.length > 0 ? formData.trigger_ids : undefined,
+        context_tags: Object.values(formData.context_tags).some(arr => arr && arr.length > 0) ? formData.context_tags : undefined,
         entry_date: formData.entry_date,
-        // TODO: Re-enable Phase 2 features when backend support is ready
-        // triggers: formData.triggers?.length > 0 ? formData.triggers : undefined,
-        // context_tags: formData.context_tags,
       };
 
       if (isEditing) {
@@ -109,16 +112,6 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
       setErrors(prev => ({ ...prev, [field]: '' }));    }
   };
 
-  // TODO: Re-enable Phase 2 features when backend support is ready
-  // const addTrigger = (trigger: string) => {
-  //   if (!formData.triggers.includes(trigger)) {
-  //     handleInputChange('triggers', [...formData.triggers, trigger]);
-  //   }
-  // };
-
-  // const removeTrigger = (trigger: string) => {
-  //   handleInputChange('triggers', formData.triggers.filter(t => t !== trigger));
-  // };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -231,64 +224,44 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
               <p className="text-sm text-red-600">{errors.stress_level}</p>
             )}
           </div>
-        </div>        {/* TODO: Re-enable Phase 2 features when backend support is ready */}
-        {/* Context */}
-        {/* <div className="space-y-2">
-          <label className="text-sm font-medium">Context (optional)</label>
+        </div>        {/* Location & Weather */}
+        <div className="grid grid-cols-2 gap-4">
+          <Input
+            label="Location (optional)"
+            placeholder="Where are you?"
+            value={formData.location}
+            onChange={(e) => handleInputChange('location', e.target.value)}
+          />
           <Select
-            value={formData.context}
-            onValueChange={(value) => handleInputChange('context', value)}
+            value={formData.weather}
+            onValueChange={(value) => handleInputChange('weather', value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Where are you / what are you doing?" />
+              <SelectValue placeholder="Weather (optional)" />
             </SelectTrigger>
             <SelectContent>
-              {contextOptions.map((context) => (
-                <SelectItem key={context} value={context}>
-                  {context}
-                </SelectItem>
-              ))}
+              <SelectItem value="">No weather info</SelectItem>
+              <SelectItem value="sunny">☀️ Sunny</SelectItem>
+              <SelectItem value="cloudy">☁️ Cloudy</SelectItem>
+              <SelectItem value="rainy">🌧️ Rainy</SelectItem>
+              <SelectItem value="snowy">❄️ Snowy</SelectItem>
+              <SelectItem value="stormy">⛈️ Stormy</SelectItem>
+              <SelectItem value="foggy">🌫️ Foggy</SelectItem>
             </SelectContent>
           </Select>
-        </div> */}        {/* TODO: Re-enable Phase 2 features when backend support is ready */}
-        {/* Triggers */}
-        {/* <div className="space-y-3">
-          <label className="text-sm font-medium">Triggers (optional)</label>
-          <div className="grid grid-cols-2 gap-2">
-            {commonTriggers.map((trigger) => (
-              <button
-                key={trigger}
-                type="button"
-                onClick={() => addTrigger(trigger)}
-                disabled={formData.triggers.includes(trigger)}
-                className={`text-xs px-3 py-1 rounded-full border transition-colors ${
-                  formData.triggers.includes(trigger)
-                    ? 'bg-primary text-primary-foreground border-primary'
-                    : 'bg-background hover:bg-muted border-border'
-                }`}
-              >
-                {trigger}
-              </button>
-            ))}
-          </div>
-          
-          {formData.triggers.length > 0 && (
-            <div className="flex flex-wrap gap-2 mt-3">
-              {formData.triggers.map((trigger) => (
-                <Badge key={trigger} variant="secondary" className="gap-1">
-                  {trigger}
-                  <button
-                    type="button"
-                    onClick={() => removeTrigger(trigger)}
-                    className="hover:bg-muted rounded-full p-0.5"
-                  >
-                    <X className="h-3 w-3" />
-                  </button>
-                </Badge>
-              ))}
-            </div>
-          )}
-        </div> */}
+        </div>
+
+        {/* Mood Triggers */}
+        <MoodTriggerSelector
+          selectedTriggerIds={formData.trigger_ids}
+          onTriggersChange={(triggerIds) => handleInputChange('trigger_ids', triggerIds)}
+        />
+
+        {/* Context Tags */}
+        <MoodContextTags
+          contextTags={formData.context_tags}
+          onContextChange={(contextTags) => handleInputChange('context_tags', contextTags)}
+        />
 
         {/* Notes */}
         <div>
