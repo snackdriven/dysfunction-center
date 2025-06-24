@@ -17,6 +17,11 @@ Executive Dysfunction Center is a comprehensive productivity tracking applicatio
 - `npm run test:watch` - Run tests in watch mode
 - `npm run test:coverage` - Run tests with coverage report
 
+### Frontend Development
+- `cd frontend && npm start` - Start React development server (frontend only)
+- `cd frontend && npm run build` - Build frontend for production
+- `cd frontend && npm test` - Run frontend tests only
+
 ### Building and Deployment
 - `npm run build` or `encore build` - Build for production
 - `npm run deploy` or `encore deploy` - Deploy to Encore Cloud
@@ -63,6 +68,23 @@ The application follows Encore.ts microservices patterns with these services:
 - `shared/types.ts` - Common types used across all services
 - `shared/utils.ts` - Utility functions for validation, sanitization, and common operations
 
+### Frontend Architecture
+- **React 19** with **TypeScript** and **Tailwind CSS**
+- **React Router** for navigation between pages
+- **TanStack Query** for server state management and caching
+- **Zustand** for client-side state management
+- **Radix UI** components for accessible UI primitives
+- **React Hook Form** with **Zod** validation for forms
+- **Vitest** and **React Testing Library** for frontend testing
+
+#### Frontend Structure
+- `frontend/src/components/` - Reusable UI components organized by feature
+- `frontend/src/pages/` - Page-level components (Dashboard, Tasks, Habits, Mood, Calendar)
+- `frontend/src/services/` - API client functions that match backend services
+- `frontend/src/hooks/` - Custom React hooks
+- `frontend/src/stores/` - Zustand stores for global state
+- `frontend/src/providers/` - React context providers
+
 ## Development Patterns
 
 ### Database Migration Management
@@ -93,6 +115,13 @@ The application follows Encore.ts microservices patterns with these services:
 - Shared types for common data structures
 - Enhanced interfaces support optional Phase 2 fields for backward compatibility
 
+### Frontend Development Patterns
+- **API Integration**: Frontend services in `frontend/src/services/` mirror backend service structure
+- **Component Structure**: Use Radix UI primitives with custom styling via Tailwind
+- **Form Handling**: React Hook Form with Zod schemas for validation
+- **State Management**: TanStack Query for server state, Zustand for client state
+- **Testing**: Component tests with React Testing Library, API mocking with MSW patterns
+
 ## API Documentation
 
 - **Phase 1 API**: `API_DOCUMENTATION.md` - Original MVP endpoints
@@ -113,6 +142,11 @@ The application follows Encore.ts microservices patterns with these services:
 3. **Run migrations**: `encore db migrate` after schema changes
 4. **Test changes**: `npm test` to ensure no regressions
 5. **Start development**: `npm run dev` and use dashboard at http://localhost:9400/
+
+### Full Stack Development
+- **Backend + Frontend**: `encore run` serves both backend APIs and frontend (recommended)
+- **Frontend Only**: `cd frontend && npm start` for frontend-only development
+- **API Testing**: Use the Encore dashboard at http://localhost:9400/ or direct API calls to http://localhost:4000/
 
 ## Common Implementation Patterns
 
