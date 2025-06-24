@@ -19,6 +19,25 @@ export interface Habit {
   current_streak?: number;
   longest_streak?: number;
   consistency_score?: number;
+  template_id?: number;
+  reminder_enabled?: boolean;
+  reminder_time?: string;
+  unit?: string;
+}
+
+export interface HabitTemplate {
+  id: number;
+  name: string;
+  description: string;
+  category: 'health' | 'productivity' | 'personal';
+  suggested_frequency: number;
+  suggested_value: number;
+  completion_type: 'boolean' | 'count' | 'duration';
+  target_type: 'daily' | 'weekly' | 'custom';
+  unit?: string;
+  icon?: string;
+  tags?: string[];
+  created_at: string;
 }
 
 export interface HabitCompletion {
@@ -38,6 +57,18 @@ export interface CreateHabitRequest {
   target_value: number;
   completion_type: 'boolean' | 'count' | 'duration';
   target_type?: 'daily' | 'weekly' | 'custom';
+  template_id?: number;
+  reminder_enabled?: boolean;
+  reminder_time?: string;
+  unit?: string;
+}
+
+export interface CreateHabitFromTemplateRequest {
+  template_id: number;
+  name?: string;
+  target_value?: number;
+  reminder_enabled?: boolean;
+  reminder_time?: string;
 }
 
 export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
@@ -78,8 +109,15 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
     return data;
   },
 
-  getTemplates: async () => {
-    const { data } = await api.get(apiEndpoints.habits.templates);
+  getTemplates: async (category?: string): Promise<HabitTemplate[]> => {
+    const { data } = await api.get(apiEndpoints.habits.templates, { 
+      params: category ? { category } : undefined 
+    });
+    return data.templates || [];
+  },
+
+  createHabitFromTemplate: async (request: CreateHabitFromTemplateRequest): Promise<Habit> => {
+    const { data } = await api.post(`/habits/from-template/${request.template_id}`, request);
     return data;
   },
 
@@ -133,6 +171,17 @@ export const useLogHabitCompletion = () => {
       habitsApi.logCompletion(habitId, completion),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habit-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    },
+  });
+};
+
+export const useCreateHabitFromTemplate = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: habitsApi.createHabitFromTemplate,
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habits'] });
     },
   });

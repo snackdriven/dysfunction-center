@@ -46,7 +46,27 @@ export interface CreateMoodEntryRequest {
   location?: string;
   weather?: string;
   context_tags?: ContextTags;
-  triggers?: MoodTrigger[];
+  trigger_ids?: number[];
+}
+
+export interface CreateTriggerRequest {
+  name: string;
+  category?: 'work' | 'personal' | 'health' | 'social';
+  icon?: string;
+}
+
+export interface CustomMood {
+  id: number;
+  name: string;
+  color?: string;
+  icon?: string;
+  created_at: string;
+}
+
+export interface CreateCustomMoodRequest {
+  name: string;
+  color?: string;
+  icon?: string;
 }
 
 export const moodApi = {  getMoodEntries: async (params?: { limit?: number; start_date?: string; end_date?: string }): Promise<MoodEntry[]> => {
@@ -89,8 +109,46 @@ export const moodApi = {  getMoodEntries: async (params?: { limit?: number; star
     return data;
   },
 
-  getTriggers: async (): Promise<string[]> => {
-    const { data } = await api.get(apiEndpoints.mood.triggers);
+  // Triggers
+  getTriggers: async (category?: string): Promise<MoodTrigger[]> => {
+    const { data } = await api.get(apiEndpoints.mood.triggers, {
+      params: category ? { category } : undefined
+    });
+    return data.triggers || [];
+  },
+
+  createTrigger: async (trigger: CreateTriggerRequest): Promise<MoodTrigger> => {
+    const { data } = await api.post(apiEndpoints.mood.triggers, trigger);
+    return data;
+  },
+
+  deleteTrigger: async (id: number): Promise<void> => {
+    await api.delete(`${apiEndpoints.mood.triggers}/${id}`);
+  },
+
+  // Custom Moods
+  getCustomMoods: async (): Promise<CustomMood[]> => {
+    const { data } = await api.get('/mood/custom-moods');
+    return data.custom_moods || [];
+  },
+
+  createCustomMood: async (mood: CreateCustomMoodRequest): Promise<CustomMood> => {
+    const { data } = await api.post('/mood/custom-moods', mood);
+    return data;
+  },
+
+  updateCustomMood: async ({ id, ...mood }: CreateCustomMoodRequest & { id: number }): Promise<CustomMood> => {
+    const { data } = await api.put(`/mood/custom-moods/${id}`, mood);
+    return data;
+  },
+
+  deleteCustomMood: async (id: number): Promise<void> => {
+    await api.delete(`/mood/custom-moods/${id}`);
+  },
+
+  // Advanced Analytics
+  getMoodInsights: async (params?: { days?: number }): Promise<any> => {
+    const { data } = await api.get('/mood/insights', { params });
     return data;
   },
 };
@@ -125,6 +183,63 @@ export const useDeleteMoodEntry = () => {
     mutationFn: moodApi.deleteMoodEntry,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['mood'] });
+    },
+  });
+};
+
+// Trigger hooks
+export const useCreateTrigger = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: moodApi.createTrigger,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mood-triggers'] });
+    },
+  });
+};
+
+export const useDeleteTrigger = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: moodApi.deleteTrigger,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['mood-triggers'] });
+    },
+  });
+};
+
+// Custom mood hooks
+export const useCreateCustomMood = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: moodApi.createCustomMood,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-moods'] });
+    },
+  });
+};
+
+export const useUpdateCustomMood = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: moodApi.updateCustomMood,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-moods'] });
+    },
+  });
+};
+
+export const useDeleteCustomMood = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: moodApi.deleteCustomMood,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['custom-moods'] });
     },
   });
 };

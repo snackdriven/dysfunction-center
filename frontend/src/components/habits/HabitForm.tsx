@@ -32,8 +32,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
     target_frequency: habit?.target_frequency || 1,
     target_value: habit?.target_value || 1,
     completion_type: habit?.completion_type || 'boolean' as 'boolean' | 'count' | 'duration',
-    target_type: 'daily' as 'daily' | 'weekly' | 'custom',
+    target_type: habit?.target_type || 'daily' as 'daily' | 'weekly' | 'custom',
     active: habit?.active ?? true,
+    reminder_enabled: habit?.reminder_enabled || false,
+    reminder_time: habit?.reminder_time || '',
+    unit: habit?.unit || '',
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -77,6 +80,9 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
         target_value: formData.target_value,
         completion_type: formData.completion_type,
         target_type: formData.target_type,
+        reminder_enabled: formData.reminder_enabled,
+        reminder_time: formData.reminder_enabled ? formData.reminder_time : undefined,
+        unit: formData.completion_type !== 'boolean' ? formData.unit : undefined,
       };
 
       if (isEditing) {        await updateHabit.mutateAsync({
@@ -134,7 +140,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
           />
         </div>
 
-        {/* Category and Frequency */}
+        {/* Category and Target Type */}
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Category</label>
@@ -153,26 +159,48 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
                 ))}
               </SelectContent>
             </Select>
-          </div>          <div className="space-y-2">
-            <label className="text-sm font-medium">Target Frequency (times per day)</label>
+          </div>
+
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Target Type</label>
             <Select
-              value={formData.target_frequency.toString()}
-              onValueChange={(value) => 
-                handleInputChange('target_frequency', parseInt(value))
-              }
+              value={formData.target_type}
+              onValueChange={(value) => handleInputChange('target_type', value)}
             >
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="1">1 time per day</SelectItem>
-                <SelectItem value="2">2 times per day</SelectItem>
-                <SelectItem value="3">3 times per day</SelectItem>
-                <SelectItem value="4">4 times per day</SelectItem>
-                <SelectItem value="5">5 times per day</SelectItem>
+                <SelectItem value="daily">Daily</SelectItem>
+                <SelectItem value="weekly">Weekly</SelectItem>
+                <SelectItem value="custom">Custom</SelectItem>
               </SelectContent>
             </Select>
           </div>
+        </div>
+
+        {/* Target Frequency */}
+        <div className="space-y-2">
+          <label className="text-sm font-medium">
+            Target Frequency (times per {formData.target_type === 'daily' ? 'day' : formData.target_type === 'weekly' ? 'week' : 'period'})
+          </label>
+          <Select
+            value={formData.target_frequency.toString()}
+            onValueChange={(value) => 
+              handleInputChange('target_frequency', parseInt(value))
+            }
+          >
+            <SelectTrigger>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {[1, 2, 3, 4, 5, 6, 7].map((num) => (
+                <SelectItem key={num} value={num.toString()}>
+                  {num} time{num !== 1 ? 's' : ''} per {formData.target_type === 'daily' ? 'day' : formData.target_type === 'weekly' ? 'week' : 'period'}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         {/* Completion Type and Target Value */}
@@ -208,6 +236,50 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
                 value={formData.target_value}
                 onChange={(e) => handleInputChange('target_value', parseInt(e.target.value) || 1)}
                 error={errors.target_value}
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Unit (for count/duration types) */}
+        {formData.completion_type !== 'boolean' && (
+          <div className="space-y-2">
+            <label className="text-sm font-medium">
+              Unit {formData.completion_type === 'duration' ? '(optional - defaults to minutes)' : '(optional)'}
+            </label>
+            <Input
+              placeholder={formData.completion_type === 'count' ? 'e.g., reps, pages, glasses' : 'e.g., minutes, hours'}
+              value={formData.unit}
+              onChange={(e) => handleInputChange('unit', e.target.value)}
+            />
+          </div>
+        )}
+
+        {/* Reminder Settings */}
+        <div className="space-y-3 border-t pt-4">
+          <h4 className="font-medium">Reminder Settings</h4>
+          
+          <div className="flex items-center space-x-2">
+            <input
+              type="checkbox"
+              id="reminder_enabled"
+              checked={formData.reminder_enabled}
+              onChange={(e) => handleInputChange('reminder_enabled', e.target.checked)}
+              className="rounded border-gray-300 text-primary focus:ring-primary"
+            />
+            <label htmlFor="reminder_enabled" className="text-sm font-medium">
+              Enable daily reminder
+            </label>
+          </div>
+
+          {formData.reminder_enabled && (
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Reminder Time</label>
+              <Input
+                type="time"
+                value={formData.reminder_time}
+                onChange={(e) => handleInputChange('reminder_time', e.target.value)}
+                required={formData.reminder_enabled}
               />
             </div>
           )}
