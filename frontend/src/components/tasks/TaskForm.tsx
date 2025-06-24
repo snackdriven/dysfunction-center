@@ -101,7 +101,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: any) => {
+  const handleInputChange = (field: string, value: string | number | undefined | RecurrencePattern) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
