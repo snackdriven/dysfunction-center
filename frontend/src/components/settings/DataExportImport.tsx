@@ -25,7 +25,7 @@ import { cn } from '../../utils/cn';
 
 export const DataExportImport: React.FC = () => {
   const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
-  const [selectedDomains, setSelectedDomains] = useState<string[]>(['tasks', 'habits', 'mood', 'calendar']);
+  const [selectedDomains, setSelectedDomains] = useState<string[]>(['tasks', 'habits', 'mood', 'calendar', 'journal']);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [activeTab, setActiveTab] = useState<'export' | 'backup'>('export');
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
@@ -78,6 +78,7 @@ export const DataExportImport: React.FC = () => {
     { id: 'habits', label: 'Habits', icon: RefreshCw },
     { id: 'mood', label: 'Mood', icon: AlertCircle },
     { id: 'calendar', label: 'Calendar', icon: Calendar },
+    { id: 'journal', label: 'Journal', icon: FileText },
     { id: 'preferences', label: 'Preferences', icon: Database },
   ];
 
@@ -452,6 +453,7 @@ const RestoreBackupDialog: React.FC<RestoreBackupDialogProps> = ({
     { id: 'habits', label: 'Habits' },
     { id: 'mood', label: 'Mood' },
     { id: 'calendar', label: 'Calendar' },
+    { id: 'journal', label: 'Journal' },
     { id: 'preferences', label: 'Preferences' },
   ];
 

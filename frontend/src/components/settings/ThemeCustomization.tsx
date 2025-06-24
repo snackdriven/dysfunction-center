@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -130,6 +130,7 @@ export const ThemeCustomization: React.FC = () => {
     }
   );
   const [previewMode, setPreviewMode] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleColorChange = (colorKey: string, value: string) => {
     setEditingTheme({
@@ -508,20 +509,20 @@ export const ThemeCustomization: React.FC = () => {
                 <Download className="h-4 w-4 mr-2" />
                 Export Theme
               </Button>
-              <label className="cursor-pointer">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={importTheme}
-                  className="hidden"
-                />
-                <Button variant="outline" asChild>
-                  <span>
-                    <Upload className="h-4 w-4 mr-2" />
-                    Import Theme
-                  </span>
-                </Button>
-              </label>
+              <input
+                type="file"
+                accept=".json"
+                onChange={importTheme}
+                className="hidden"
+                ref={fileInputRef}
+              />
+              <Button
+                variant="outline"
+                onClick={() => fileInputRef.current?.click()}
+              >
+                <Upload className="h-4 w-4 mr-2" />
+                Import Theme
+              </Button>
               <Button onClick={resetToDefault} variant="outline">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset to Default
