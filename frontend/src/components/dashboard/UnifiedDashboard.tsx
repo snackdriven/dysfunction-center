@@ -300,7 +300,7 @@ export const UnifiedDashboard: React.FC = () => {
                             Streak: 0 days
                           </div>
                         </div>
-                        <Button size="sm" variant={isCompleted ? "default" : "outline"}>
+                        <Button size="sm" variant={isCompleted ? "primary" : "outline"}>
                           {isCompleted ? 'Done' : 'Mark'}
                         </Button>
                       </div>

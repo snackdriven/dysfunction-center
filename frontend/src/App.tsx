@@ -8,6 +8,7 @@ import { Mood } from './pages/Mood';
 import { Journal } from './pages/Journal';
 import { Calendar } from './pages/Calendar';
 import { Settings } from './pages/Settings';
+import { UIDemo } from './pages/UIDemo';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { QueryProvider } from './providers/QueryProvider';
 
@@ -26,6 +27,7 @@ function App() {
               <Route path="calendar" element={<Calendar />} />
               <Route path="analytics" element={<div>Analytics (Coming Soon)</div>} />
               <Route path="settings" element={<Settings />} />
+              <Route path="ui-demo" element={<UIDemo />} />
             </Route>
           </Routes>
         </Router>
