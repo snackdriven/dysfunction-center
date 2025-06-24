@@ -1,6 +1,5 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
-import { DailyProductivityData, CalendarDataOverlay, CustomTheme } from '../../../shared/types';
 
 interface TaskFilters {
   search: string;
@@ -49,7 +48,7 @@ interface AppState {
   errors: Record<string, string | null>;
   
   // Selected date for cross-component communication
-  selectedDate: string;
+  selectedDate: Date;
   
   // Recent activity for quick access
   recentTasks: number[];
@@ -58,14 +57,6 @@ interface AppState {
   // Undo/Redo functionality
   undoStack: Array<{ action: string; data: any; timestamp: number }>;
   redoStack: Array<{ action: string; data: any; timestamp: number }>;
-  
-  // Sync state
-  lastSyncTime: string | null;
-  
-  // Additional properties for test compatibility
-  customTheme?: CustomTheme;
-  dailyProductivityData: Map<string, DailyProductivityData>;
-  calendarOverlayData: Map<string, CalendarDataOverlay>;
   
   // Actions
   setSidebarOpen: (open: boolean) => void;
@@ -86,7 +77,7 @@ interface AppState {
   clearErrors: () => void;
   
   // Date selection
-  setSelectedDate: (date: string) => void;
+  setSelectedDate: (date: Date) => void;
   
   // Recent activity
   addRecentTask: (taskId: number) => void;
@@ -97,24 +88,16 @@ interface AppState {
   undo: () => any | null;
   redo: () => any | null;
   clearUndoRedo: () => void;
-  
-  // Sync
-  setLastSyncTime: (time: string) => void;
-  
-  // Custom theme
-  setCustomTheme: (theme?: CustomTheme) => void;
-  
-  // Data caching
-  setDailyProductivityData: (date: string, data: DailyProductivityData) => void;
-  setCalendarOverlayData: (date: string, data: CalendarDataOverlay) => void;
 }
 
 const defaultPreferences: UserPreferences = {
   dashboardLayout: [
-    { id: 'todays-focus', title: "Today's Focus", size: 'medium', position: { x: 0, y: 0 }, visible: true },
-    { id: 'weekly-progress', title: 'Weekly Progress', size: 'large', position: { x: 1, y: 0 }, visible: true },
-    { id: 'mood-tracker', title: 'Mood Tracker', size: 'small', position: { x: 0, y: 1 }, visible: true },
-    { id: 'habit-streak', title: 'Habit Streaks', size: 'medium', position: { x: 1, y: 1 }, visible: true },
+    { id: 'todays-focus', title: 'Today\'s Focus', size: 'medium', position: { x: 0, y: 0 }, visible: true },
+    { id: 'habit-tracker', title: 'Habit Tracker', size: 'medium', position: { x: 1, y: 0 }, visible: true },
+    { id: 'mood-checkin', title: 'Mood Check-in', size: 'small', position: { x: 2, y: 0 }, visible: true },
+    { id: 'weekly-progress', title: 'Weekly Progress', size: 'large', position: { x: 0, y: 1 }, visible: true },
+    { id: 'upcoming-events', title: 'Upcoming Events', size: 'medium', position: { x: 1, y: 1 }, visible: true },
+    { id: 'quick-actions', title: 'Quick Actions', size: 'small', position: { x: 2, y: 1 }, visible: true },
   ],
   defaultTaskView: 'list',
   notificationsEnabled: true,
@@ -147,16 +130,12 @@ export const useAppStore = create<AppState>()(
       preferences: defaultPreferences,
       loading: {},
       errors: {},
-      selectedDate: new Date().toISOString().split('T')[0],
+      selectedDate: new Date(),
       recentTasks: [],
       recentHabits: [],
       undoStack: [],
       redoStack: [],
-      lastSyncTime: null,
-      customTheme: undefined,
-      dailyProductivityData: new Map(),
-      calendarOverlayData: new Map(),
-      
+
       // Actions
       setSidebarOpen: (open) => set({ sidebarOpen: open }),
       
@@ -179,126 +158,135 @@ export const useAppStore = create<AppState>()(
           }
         }
       },
-      
+
       // Filter actions
-      setTaskFilters: (filters) => {
-        const currentFilters = get().taskFilters;
-        set({ taskFilters: { ...currentFilters, ...filters } });
-      },
+      setTaskFilters: (filters) => 
+        set((state) => ({
+          taskFilters: { ...state.taskFilters, ...filters }
+        })),
       
       resetTaskFilters: () => set({ taskFilters: defaultTaskFilters }),
-      
+
       // Preferences actions
-      setPreferences: (preferences) => {
-        const currentPreferences = get().preferences;
-        set({ preferences: { ...currentPreferences, ...preferences } });
-      },
+      setPreferences: (preferences) =>
+        set((state) => ({
+          preferences: { ...state.preferences, ...preferences }
+        })),
       
-      updateDashboardLayout: (layout) => {
-        const currentPreferences = get().preferences;
-        set({ 
-          preferences: { 
-            ...currentPreferences, 
-            dashboardLayout: layout 
-          } 
-        });
-      },
-      
+      updateDashboardLayout: (layout) =>
+        set((state) => ({
+          preferences: { ...state.preferences, dashboardLayout: layout }
+        })),
+
       // Loading & Error management
-      setLoading: (key, loading) => {
-        const currentLoading = get().loading;
-        set({ loading: { ...currentLoading, [key]: loading } });
-      },
+      setLoading: (key, loading) =>
+        set((state) => ({
+          loading: { ...state.loading, [key]: loading }
+        })),
       
-      setError: (key, error) => {
-        const currentErrors = get().errors;
-        set({ errors: { ...currentErrors, [key]: error } });
-      },
+      setError: (key, error) =>
+        set((state) => ({
+          errors: { ...state.errors, [key]: error }
+        })),
       
       clearErrors: () => set({ errors: {} }),
-      
+
       // Date selection
       setSelectedDate: (date) => set({ selectedDate: date }),
-      
+
       // Recent activity
-      addRecentTask: (taskId) => {
-        const recentTasks = get().recentTasks;
-        const updated = [taskId, ...recentTasks.filter(id => id !== taskId)].slice(0, 10);
-        set({ recentTasks: updated });
-      },
+      addRecentTask: (taskId) =>
+        set((state) => ({
+          recentTasks: [taskId, ...state.recentTasks.filter(id => id !== taskId)].slice(0, 10)
+        })),
       
-      addRecentHabit: (habitId) => {
-        const recentHabits = get().recentHabits;
-        const updated = [habitId, ...recentHabits.filter(id => id !== habitId)].slice(0, 10);
-        set({ recentHabits: updated });
-      },
-      
-      // Undo/Redo
-      addToUndoStack: (action, data) => {
-        const undoStack = get().undoStack;
-        const timestamp = Date.now();
-        const updated = [...undoStack, { action, data, timestamp }].slice(-50); // Keep last 50 actions
-        set({ undoStack: updated, redoStack: [] }); // Clear redo stack when new action is added
-      },
+      addRecentHabit: (habitId) =>
+        set((state) => ({
+          recentHabits: [habitId, ...state.recentHabits.filter(id => id !== habitId)].slice(0, 10)
+        })),
+
+      // Undo/Redo functionality
+      addToUndoStack: (action, data) =>
+        set((state) => ({
+          undoStack: [...state.undoStack, { action, data, timestamp: Date.now() }].slice(-20), // Keep last 20 actions
+          redoStack: [], // Clear redo stack when new action is performed
+        })),
       
       undo: () => {
-        const { undoStack, redoStack } = get();
-        if (undoStack.length === 0) return null;
+        const state = get();
+        if (state.undoStack.length === 0) return null;
         
-        const lastAction = undoStack[undoStack.length - 1];
-        const newUndoStack = undoStack.slice(0, -1);
-        const newRedoStack = [...redoStack, lastAction];
+        const lastAction = state.undoStack[state.undoStack.length - 1];
+        set({
+          undoStack: state.undoStack.slice(0, -1),
+          redoStack: [...state.redoStack, lastAction],
+        });
         
-        set({ undoStack: newUndoStack, redoStack: newRedoStack });
         return lastAction;
       },
       
       redo: () => {
-        const { undoStack, redoStack } = get();
-        if (redoStack.length === 0) return null;
+        const state = get();
+        if (state.redoStack.length === 0) return null;
         
-        const lastAction = redoStack[redoStack.length - 1];
-        const newRedoStack = redoStack.slice(0, -1);
-        const newUndoStack = [...undoStack, lastAction];
+        const actionToRedo = state.redoStack[state.redoStack.length - 1];
+        set({
+          redoStack: state.redoStack.slice(0, -1),
+          undoStack: [...state.undoStack, actionToRedo],
+        });
         
-        set({ undoStack: newUndoStack, redoStack: newRedoStack });
-        return lastAction;
+        return actionToRedo;
       },
       
       clearUndoRedo: () => set({ undoStack: [], redoStack: [] }),
-      
-      // Sync
-      setLastSyncTime: (time) => set({ lastSyncTime: time }),
-      
-      // Custom theme
-      setCustomTheme: (theme) => set({ customTheme: theme }),
-      
-      // Data caching
-      setDailyProductivityData: (date, data) => {
-        const currentData = get().dailyProductivityData;
-        const updatedData = new Map(currentData);
-        updatedData.set(date, data);
-        set({ dailyProductivityData: updatedData });
-      },
-      
-      setCalendarOverlayData: (date, data) => {
-        const currentData = get().calendarOverlayData;
-        const updatedData = new Map(currentData);
-        updatedData.set(date, data);
-        set({ calendarOverlayData: updatedData });
-      },
     }),
     {
-      name: 'executive-dysfunction-app-store',
+      name: 'app-store',
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         theme: state.theme,
         preferences: state.preferences,
-        taskFilters: state.taskFilters,
+        sidebarOpen: state.sidebarOpen,
         recentTasks: state.recentTasks,
         recentHabits: state.recentHabits,
-        lastSyncTime: state.lastSyncTime,
       }),
     }
   )
 );
+
+// Utility hooks for specific state slices
+export const useSidebar = () => useAppStore((state) => ({
+  isOpen: state.sidebarOpen,
+  toggle: () => state.setSidebarOpen(!state.sidebarOpen),
+  open: () => state.setSidebarOpen(true),
+  close: () => state.setSidebarOpen(false),
+}));
+
+export const useTheme = () => useAppStore((state) => ({
+  theme: state.theme,
+  setTheme: state.setTheme,
+}));
+
+export const useTaskFilters = () => useAppStore((state) => ({
+  filters: state.taskFilters,
+  setFilters: state.setTaskFilters,
+  resetFilters: state.resetTaskFilters,
+}));
+
+export const usePreferences = () => useAppStore((state) => ({
+  preferences: state.preferences,
+  setPreferences: state.setPreferences,
+  updateDashboardLayout: state.updateDashboardLayout,
+}));
+
+export const useAppErrors = () => useAppStore((state) => ({
+  errors: state.errors,
+  setError: state.setError,
+  clearErrors: state.clearErrors,
+}));
+
+export const useAppLoading = () => useAppStore((state) => ({
+  loading: state.loading,
+  setLoading: state.setLoading,
+  isLoading: (key: string) => state.loading[key] || false,
+}));

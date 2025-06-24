@@ -37,7 +37,13 @@ export interface HabitTemplate {
   unit?: string;
   icon?: string;
   tags?: string[];
+  difficulty?: 'easy' | 'medium' | 'hard';
+  estimated_time_minutes?: number;
+  benefits?: string[];
+  tips?: string[];
+  is_preset?: boolean;
   created_at: string;
+  updated_at?: string;
 }
 
 export interface HabitCompletion {
@@ -126,6 +132,21 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
       params: habitId ? { habit_id: habitId } : undefined 
     });
     return data;
+  },
+
+  // Template management
+  createTemplate: async (template: Omit<HabitTemplate, 'id' | 'created_at' | 'updated_at'>): Promise<HabitTemplate> => {
+    const { data } = await api.post('/habit-templates', template);
+    return data;
+  },
+
+  updateTemplate: async (id: number, template: Partial<HabitTemplate>): Promise<HabitTemplate> => {
+    const { data } = await api.put(`/habit-templates/${id}`, template);
+    return data;
+  },
+
+  deleteTemplate: async (id: number): Promise<void> => {
+    await api.delete(`/habit-templates/${id}`);
   },
 };
 

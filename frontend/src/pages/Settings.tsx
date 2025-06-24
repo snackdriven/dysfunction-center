@@ -3,13 +3,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { DataExportImport } from '../components/settings/DataExportImport';
 import { ThemeCustomization } from '../components/settings/ThemeCustomization';
+import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
 import { 
   Settings as SettingsIcon,
   Palette,
   Download,
   User,
   Bell,
-  Shield
+  Shield,
+  Database
 } from 'lucide-react';
 
 export const Settings: React.FC = () => {
@@ -30,10 +32,11 @@ export const Settings: React.FC = () => {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="general">
-        <TabsList className="grid w-full grid-cols-5">
+        <TabsList className="grid w-full grid-cols-6">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
+          <TabsTrigger value="sync">Sync</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
           <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
@@ -100,6 +103,11 @@ export const Settings: React.FC = () => {
               <DataExportImport />
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* Sync Settings */}
+        <TabsContent value="sync" className="space-y-6">
+          <OfflineSyncManager />
         </TabsContent>
 
         {/* Notifications Settings */}

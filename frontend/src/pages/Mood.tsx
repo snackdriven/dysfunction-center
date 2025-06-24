@@ -4,8 +4,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs'
 import { MoodEntryForm } from '../components/mood/MoodEntryForm';
 import { MoodHistory } from '../components/mood/MoodHistory';
 import { MoodPatterns } from '../components/mood/MoodPatterns';
+import { MoodAnalytics } from '../components/mood/MoodAnalytics';
+import { MoodCorrelationAnalyzer } from '../components/mood/MoodCorrelationAnalyzer';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
-import { Smile, History, TrendingUp } from 'lucide-react';
+import { Smile, History, TrendingUp, BarChart3, Plus, Brain } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { moodApi } from '../services/mood';
 
@@ -38,19 +40,25 @@ export const Mood: React.FC = () => {
             Monitor your emotional wellbeing and identify patterns
           </p>
         </div>
-        {!todayMood && (
+        <div className="flex gap-2">
+          {todayMood && (
+            <Button variant="outline">
+              <Smile className="mr-2 h-4 w-4" />
+              Update Today's Mood
+            </Button>
+          )}
           <Dialog open={isEntryDialogOpen} onOpenChange={setIsEntryDialogOpen}>
             <DialogTrigger asChild>
               <Button>
-                <Smile className="mr-2 h-4 w-4" />
-                Log Today's Mood
+                <Plus className="mr-2 h-4 w-4" />
+                {todayMood ? 'Add Entry' : 'Log Today\'s Mood'}
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-lg">
               <MoodEntryForm onSuccess={() => setIsEntryDialogOpen(false)} />
             </DialogContent>
           </Dialog>
-        )}
+        </div>
       </div>
 
       {/* Today's Mood Summary */}
@@ -106,9 +114,17 @@ export const Mood: React.FC = () => {
             <History className="h-4 w-4" />
             History
           </TabsTrigger>
+          <TabsTrigger value="analytics" className="flex items-center gap-2">
+            <BarChart3 className="h-4 w-4" />
+            Analytics
+          </TabsTrigger>
           <TabsTrigger value="patterns" className="flex items-center gap-2">
             <TrendingUp className="h-4 w-4" />
             Patterns
+          </TabsTrigger>
+          <TabsTrigger value="correlations" className="flex items-center gap-2">
+            <Brain className="h-4 w-4" />
+            Correlations
           </TabsTrigger>
         </TabsList>
 
@@ -116,8 +132,16 @@ export const Mood: React.FC = () => {
           <MoodHistory />
         </TabsContent>
 
+        <TabsContent value="analytics">
+          <MoodAnalytics />
+        </TabsContent>
+
         <TabsContent value="patterns">
           <MoodPatterns />
+        </TabsContent>
+
+        <TabsContent value="correlations">
+          <MoodCorrelationAnalyzer />
         </TabsContent>
       </Tabs>
     </div>

@@ -5,7 +5,7 @@ import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { DialogHeader, DialogTitle } from '../ui/Dialog';
-import { Task, useCreateTask, useUpdateTask, tasksApi } from '../../services/tasks';
+import { Task, useCreateTask, useUpdateTask, tasksApi, RecurrencePattern } from '../../services/tasks';
 import { TaskTagInput } from './TaskTagInput';
 import { TaskTimeTracker } from './TaskTimeTracker';
 import { SubtaskList } from './SubtaskList';
@@ -101,7 +101,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string | number | undefined | RecurrencePattern) => {
+  const handleInputChange = (field: string, value: string | number | undefined | RecurrencePattern | number[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));

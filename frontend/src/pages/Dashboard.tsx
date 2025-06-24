@@ -6,6 +6,7 @@ import { MoodCheckinWidget } from '../components/dashboard/widgets/MoodCheckinWi
 import { WeeklyProgressWidget } from '../components/dashboard/widgets/WeeklyProgressWidget';
 import { UpcomingEventsWidget } from '../components/dashboard/widgets/UpcomingEventsWidget';
 import { QuickActionsWidget } from '../components/dashboard/widgets/QuickActionsWidget';
+import { QuickStatsWidget } from '../components/dashboard/widgets/QuickStatsWidget';
 
 export const Dashboard: React.FC = () => {
   const currentHour = new Date().getHours();
@@ -33,6 +34,9 @@ export const Dashboard: React.FC = () => {
         </div>
         <QuickActionsWidget />
       </div>
+
+      {/* Stats Overview */}
+      <QuickStatsWidget />
 
       {/* Main Dashboard Grid */}
       <DashboardGrid columns={3}>

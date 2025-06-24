@@ -10,6 +10,7 @@ import { Calendar } from './pages/Calendar';
 import { Settings } from './pages/Settings';
 import { UIDemo } from './pages/UIDemo';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
+import { ToastContainer } from './components/common/Toast';
 import { QueryProvider } from './providers/QueryProvider';
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
             </Route>
           </Routes>
         </Router>
+        <ToastContainer />
       </QueryProvider>
     </ErrorBoundary>
   );

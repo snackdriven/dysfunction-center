@@ -76,7 +76,7 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
 }) => {
   const [selectedDay, setSelectedDay] = useState<CalendarDayData | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const { selectedDate, setSelectedDate, calendarOverlayData, setCalendarOverlayData } = useAppStore();
+  const { selectedDate, setSelectedDate } = useAppStore();
 
   // Generate calendar days with integrated data
   const calendarDays = React.useMemo(() => {
