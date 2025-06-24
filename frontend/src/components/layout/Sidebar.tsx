@@ -6,6 +6,7 @@ import {
   CheckSquare, 
   Target, 
   Smile, 
+  BookOpen,
   Calendar, 
   BarChart3, 
   Settings 
@@ -29,12 +30,17 @@ const navigationItems = [
     href: '/habits',
     icon: Target,
     description: 'Track your habits'
-  },
-  {
+  },  {
     name: 'Mood',
     href: '/mood',
     icon: Smile,
     description: 'Log your mood'
+  },
+  {
+    name: 'Journal',
+    href: '/journal',
+    icon: BookOpen,
+    description: 'Record your thoughts'
   },
   {
     name: 'Calendar',

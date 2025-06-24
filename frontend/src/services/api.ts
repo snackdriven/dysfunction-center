@@ -87,12 +87,27 @@ export const apiEndpoints = {
     week: (date: string) => `/calendar/events/week/${date}`,
     month: (year: number, month: number) => `/calendar/events/month/${year}/${month}`,
   },
-  
-  // Preferences
+    // Preferences
   preferences: {
     get: (key: string) => `/preferences/${key}`,
     set: '/preferences',
     theme: '/theme',
+  },
+  
+  // Journal
+  journal: {
+    list: '/journal',
+    create: '/journal',
+    get: (id: string) => `/journal/${id}`,
+    update: (id: string) => `/journal/${id}`,
+    delete: (id: string) => `/journal/${id}`,
+    search: '/journal/search',
+    analytics: '/journal/analytics',
+    export: '/journal/export',
+    templates: '/journal/templates',
+    createTemplate: '/journal/templates',
+    updateTemplate: (id: string) => `/journal/templates/${id}`,
+    deleteTemplate: (id: string) => `/journal/templates/${id}`,
   },
   
   // API Info
