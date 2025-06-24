@@ -3,20 +3,30 @@ import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { CheckCircle, Circle, Calendar, Edit, Trash2, Clock, Tag, MoreHorizontal, Timer, FolderOpen, PlayCircle, FileText } from 'lucide-react';
+import { CheckCircle, Circle, Calendar, Edit, Trash2, Clock, Tag, MoreHorizontal, Timer, FolderOpen, PlayCircle, FileText, Repeat } from 'lucide-react';
 import { Task, useUpdateTask, useDeleteTask, tasksApi } from '../../services/tasks';
 import { TaskForm } from './TaskForm';
 import { TaskTimeTracker } from './TaskTimeTracker';
+import { SubtaskList } from './SubtaskList';
 import { Dialog, DialogContent } from '../ui/Dialog';
 
 interface TaskCardProps {
   task: Task;
+  isSelected?: boolean;
+  onSelectionChange?: (taskId: number, selected: boolean) => void;
+  selectionMode?: boolean;
 }
 
-export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
+export const TaskCard: React.FC<TaskCardProps> = ({ 
+  task, 
+  isSelected = false, 
+  onSelectionChange, 
+  selectionMode = false 
+}) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showTimeTracker, setShowTimeTracker] = useState(false);
+  const [showSubtasks, setShowSubtasks] = useState(false);
 
   const updateTask = useUpdateTask();
   const deleteTask = useDeleteTask();
@@ -78,6 +88,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
     });
   };
 
+  const formatRecurrencePattern = (pattern: any) => {
+    if (!pattern) return null;
+    
+    const { type, interval } = pattern;
+    
+    if (type === 'daily') {
+      return interval === 1 ? 'Daily' : `Every ${interval} days`;
+    } else if (type === 'weekly') {
+      return interval === 1 ? 'Weekly' : `Every ${interval} weeks`;
+    } else if (type === 'monthly') {
+      return interval === 1 ? 'Monthly' : `Every ${interval} months`;
+    } else {
+      return 'Custom recurrence';
+    }
+  };
+
   const isOverdue = task.due_date && !task.completed && new Date(task.due_date) < new Date();
   const isDueToday = task.due_date && new Date(task.due_date).toDateString() === new Date().toDateString();
 
@@ -89,10 +115,22 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
         } ${
           isOverdue ? 'border-red-200 bg-red-50' : 
           isDueToday ? 'border-orange-200 bg-orange-50' : ''
+        } ${
+          isSelected ? 'ring-2 ring-blue-500 border-blue-200' : ''
         }`}
       >
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
+            {/* Selection Checkbox */}
+            {selectionMode && (
+              <input
+                type="checkbox"
+                checked={isSelected}
+                onChange={(e) => onSelectionChange?.(task.id, e.target.checked)}
+                className="mt-1 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+              />
+            )}
+
             {/* Completion Toggle */}
             <button
               onClick={handleToggleComplete}
@@ -185,12 +223,23 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                       </div>
                     )}
 
+                    {/* Recurrence Pattern */}
+                    {task.recurrence_pattern && (
+                      <div className="flex items-center gap-1">
+                        <Repeat className="h-3 w-3" />
+                        <span>{formatRecurrencePattern(task.recurrence_pattern)}</span>
+                      </div>
+                    )}
+
                     {/* Subtask Count */}
                     {task.subtasks && task.subtasks.length > 0 && (
-                      <div className="flex items-center gap-1">
+                      <button
+                        onClick={() => setShowSubtasks(!showSubtasks)}
+                        className="flex items-center gap-1 hover:text-blue-600 transition-colors"
+                      >
                         <span>📋</span>
                         <span>{task.subtasks.filter(s => s.completed).length}/{task.subtasks.length} subtasks</span>
-                      </div>
+                      </button>
                     )}
                   </div>
                 </div>
@@ -248,6 +297,16 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
                           </button>
                           <button
                             onClick={() => {
+                              setShowSubtasks(!showSubtasks);
+                              setShowActions(false);
+                            }}
+                            className="w-full px-3 py-1.5 text-left text-sm hover:bg-muted flex items-center gap-2"
+                          >
+                            <span className="h-3 w-3">📋</span>
+                            Manage Subtasks
+                          </button>
+                          <button
+                            onClick={() => {
                               handleDelete();
                               setShowActions(false);
                             }}
@@ -271,6 +330,18 @@ export const TaskCard: React.FC<TaskCardProps> = ({ task }) => {
               <TaskTimeTracker
                 taskId={task.id}
                 estimatedMinutes={task.estimated_minutes}
+              />
+            </div>
+          )}
+
+          {/* Subtasks */}
+          {showSubtasks && (
+            <div className="border-t mt-3 pt-3">
+              <SubtaskList
+                parentTaskId={task.id}
+                onSubtaskUpdate={() => {
+                  // Optionally refresh the task data
+                }}
               />
             </div>
           )}

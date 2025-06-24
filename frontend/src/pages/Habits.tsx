@@ -3,14 +3,16 @@ import { Button } from '../components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { HabitGrid } from '../components/habits/HabitGrid';
 import { HabitForm } from '../components/habits/HabitForm';
+import { HabitTemplateSelector } from '../components/habits/HabitTemplateSelector';
 import { HabitAnalytics } from '../components/habits/HabitAnalytics';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
-import { Plus, Target, BarChart3 } from 'lucide-react';
+import { Plus, Target, BarChart3, Sparkles } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { habitsApi } from '../services/habits';
 
 export const Habits: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
 
   const { data: habits, isLoading } = useQuery({
     queryKey: ['habits'],
@@ -32,17 +34,26 @@ export const Habits: React.FC = () => {
             Build positive routines and track your progress
           </p>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Habit
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-md">
-            <HabitForm onSuccess={() => setIsCreateDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
+        <div className="flex gap-2">
+          <Button
+            variant="outline"
+            onClick={() => setIsTemplateDialogOpen(true)}
+          >
+            <Sparkles className="mr-2 h-4 w-4" />
+            Use Template
+          </Button>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button>
+                <Plus className="mr-2 h-4 w-4" />
+                Create Custom
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-md">
+              <HabitForm onSuccess={() => setIsCreateDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
+        </div>
       </div>
 
       {/* Tabs */}
@@ -89,6 +100,16 @@ export const Habits: React.FC = () => {
           <HabitAnalytics />
         </TabsContent>
       </Tabs>
+
+      {/* Template Selector */}
+      <HabitTemplateSelector
+        isOpen={isTemplateDialogOpen}
+        onClose={() => setIsTemplateDialogOpen(false)}
+        onSuccess={() => {
+          setIsTemplateDialogOpen(false);
+          // Refresh habits data
+        }}
+      />
     </div>
   );
 };

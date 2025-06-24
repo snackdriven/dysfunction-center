@@ -16,7 +16,10 @@
       "Bash(ls:*)",
       "Bash(npm test)",
       "Bash(encore db migrate:*)",
-      "Bash(timeout 10 npm run dev)"
+      "Bash(timeout 10 npm run dev)",
+      "Bash(npm test:*)",
+      "Bash(encore run:*)",
+      "Bash(npm --version)"
     ],
     "deny": []
   }
