@@ -235,7 +235,7 @@ export const HabitReminderManager: React.FC<HabitReminderManagerProps> = ({
                   <div className="space-y-2">
                     <label className="text-sm font-medium">Reminder Type</label>
                     <Select
-                      value={newReminder.type}
+                      value={newReminder.type || ''}
                       onValueChange={(value) => setNewReminder(prev => ({ ...prev, type: value as any }))}
                     >
                       <SelectTrigger>

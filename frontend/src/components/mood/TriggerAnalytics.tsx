@@ -209,7 +209,7 @@ export const TriggerAnalytics: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select value={timeRange} onValueChange={(value) => setTimeRange(value as typeof timeRange)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>

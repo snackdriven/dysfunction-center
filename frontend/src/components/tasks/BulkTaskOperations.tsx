@@ -51,7 +51,7 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
 
   const { data: tags = [] } = useQuery({
     queryKey: ['task-tags'],
-    queryFn: tasksApi.getTags
+    queryFn: () => tasksApi.getTags()
   });
 
   const bulkOperation = useMutation({
@@ -61,15 +61,15 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
       const promises = selectedTasks.map(task => {
         switch (config.action) {
           case 'complete':
-            return tasksApi.updateTask(task.id, { completed: true, status: 'completed' });
+            return tasksApi.updateTask({ id: task.id, completed: true, status: 'completed' });
           case 'incomplete':
-            return tasksApi.updateTask(task.id, { completed: false, status: 'pending' });
+            return tasksApi.updateTask({ id: task.id, completed: false, status: 'pending' });
           case 'delete':
             return tasksApi.deleteTask(task.id);
           case 'assign_category':
-            return tasksApi.updateTask(task.id, { category_id: config.categoryId });
+            return tasksApi.updateTask({ id: task.id, category_id: config.categoryId });
           case 'assign_tags':
-            return tasksApi.updateTask(task.id, { tag_ids: config.tagIds });
+            return tasksApi.updateTask({ id: task.id, tag_ids: config.tagIds });
           default:
             throw new Error(`Unknown action: ${config.action}`);
         }
@@ -117,7 +117,7 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
         const category = categories.find(c => c.id === selectedCategoryId);
         return `Assign ${count} task${count !== 1 ? 's' : ''} to category "${category?.name || 'Unknown'}"`;
       case 'assign_tags':
-        const selectedTagNames = tags.filter(t => selectedTagIds.includes(t.id)).map(t => t.name);
+        const selectedTagNames = (tags as TaskTag[]).filter(t => selectedTagIds.includes(t.id)).map(t => t.name);
         return `Add tags "${selectedTagNames.join(', ')}" to ${count} task${count !== 1 ? 's' : ''}`;
       default:
         return '';
@@ -213,7 +213,7 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
                       <label className="text-sm font-medium">Action</label>
                       <Select 
                         value={actionConfig.action} 
-                        onValueChange={(value: BulkAction) => setActionConfig({ action: value })}
+                        onValueChange={(value: string) => setActionConfig({ action: value as BulkAction })}
                       >
                         <SelectTrigger>
                           <SelectValue />
@@ -267,7 +267,7 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
                       <div className="space-y-2">
                         <label className="text-sm font-medium">Tags</label>
                         <div className="space-y-2">
-                          {tags.map((tag) => (
+                          {(tags as TaskTag[]).map((tag) => (
                             <div key={tag.id} className="flex items-center space-x-2">
                               <input
                                 type="checkbox"
@@ -320,7 +320,7 @@ export const BulkTaskOperations: React.FC<BulkTaskOperationsProps> = ({
                       <Button
                         onClick={handleExecuteAction}
                         disabled={!canExecuteAction() || bulkOperation.isPending}
-                        variant={actionConfig.action === 'delete' ? 'destructive' : 'default'}
+                        variant={actionConfig.action === 'delete' ? 'destructive' : 'primary'}
                       >
                         {bulkOperation.isPending ? (
                           <>

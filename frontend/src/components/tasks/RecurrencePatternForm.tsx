@@ -172,7 +172,7 @@ export const RecurrencePatternForm: React.FC<RecurrencePatternFormProps> = ({
           </CardTitle>
           <Button
             type="button"
-            variant={isEnabled ? "default" : "outline"}
+            variant={isEnabled ? "primary" : "outline"}
             size="sm"
             onClick={handleToggleEnabled}
           >
@@ -186,7 +186,7 @@ export const RecurrencePatternForm: React.FC<RecurrencePatternFormProps> = ({
           {/* Pattern Type */}
           <div className="space-y-2">
             <label className="text-sm font-medium">Repeat</label>
-            <Select value={formData.type} onValueChange={handleTypeChange}>
+            <Select value={formData.type} onValueChange={(value: string) => handleTypeChange(value as 'daily' | 'weekly' | 'monthly' | 'custom')}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>

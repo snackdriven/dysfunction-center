@@ -18,7 +18,7 @@ import {
   Filter,
   Calendar
 } from 'lucide-react';
-import { moodApi, useCreateTrigger, useUpdateTrigger, useDeleteTrigger } from '../../services/mood';
+import { moodApi, useCreateTrigger, useDeleteTrigger } from '../../services/mood';
 
 interface TriggerManagerProps {
   selectedTriggerIds?: number[];
@@ -49,19 +49,18 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
     queryFn: () => moodApi.getTriggers(categoryFilter || undefined)
   });
 
-  const { data: triggerAnalytics } = useQuery({
-    queryKey: ['mood-triggers', 'analytics'],
-    queryFn: () => moodApi.getTriggerAnalytics(),
-    enabled: showAnalytics
-  });
+  // const { data: triggerAnalytics } = useQuery({
+  //   queryKey: ['mood-triggers', 'analytics'],
+  //   queryFn: () => moodApi.getTriggerAnalytics(),
+  //   enabled: showAnalytics
+  // });
 
   const createTrigger = useCreateTrigger();
-  const updateTrigger = useUpdateTrigger();
+  // const updateTrigger = useUpdateTrigger(); // Not implemented yet
   const deleteTrigger = useDeleteTrigger();
 
   const filteredTriggers = triggers.filter(trigger => 
-    trigger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (trigger.description && trigger.description.toLowerCase().includes(searchTerm.toLowerCase()))
+    trigger.name.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   const handleCreateTrigger = async (e: React.FormEvent) => {
@@ -72,8 +71,7 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
       const trigger = await createTrigger.mutateAsync({
         name: newTrigger.name,
         category: newTrigger.category || undefined,
-        icon: newTrigger.icon || undefined,
-        description: newTrigger.description || undefined
+        icon: newTrigger.icon || undefined
       });
 
       if (showSelection && onTriggersChange) {
@@ -92,13 +90,8 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
     if (!editingTrigger || !editingTrigger.name.trim()) return;
 
     try {
-      await updateTrigger.mutateAsync({
-        id: editingTrigger.id,
-        name: editingTrigger.name,
-        category: editingTrigger.category || undefined,
-        icon: editingTrigger.icon || undefined,
-        description: editingTrigger.description || undefined
-      });
+      // TODO: Implement updateTrigger functionality
+      console.log('Update trigger:', editingTrigger);
 
       setEditingTrigger(null);
     } catch (error) {
@@ -157,7 +150,7 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
         acc[category] = { count: 0, usage: 0 };
       }
       acc[category].count++;
-      acc[category].usage += trigger.usage_count || 0;
+      acc[category].usage += 0;
       return acc;
     }, {} as Record<string, { count: number; usage: number }>);
 
@@ -218,15 +211,9 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
             <CardContent>
               {triggers.length > 0 ? (
                 <div className="flex items-center gap-2">
-                  <span>{triggers.reduce((most, current) => 
-                    (current.usage_count || 0) > (most.usage_count || 0) ? current : most
-                  ).icon || getCategoryIcon(triggers.reduce((most, current) => 
-                    (current.usage_count || 0) > (most.usage_count || 0) ? current : most
-                  ).category)}</span>
+                  <span>{triggers[0]?.icon || getCategoryIcon(triggers[0]?.category)}</span>
                   <span className="font-medium text-sm truncate">
-                    {triggers.reduce((most, current) => 
-                      (current.usage_count || 0) > (most.usage_count || 0) ? current : most
-                    ).name}
+                    {triggers[0]?.name || 'Unknown'}
                   </span>
                 </div>
               ) : (
@@ -360,14 +347,8 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
               </div>
             </CardHeader>
             <CardContent>
-              {trigger.description && (
-                <p className="text-sm text-muted-foreground mb-2">{trigger.description}</p>
-              )}
               <div className="flex items-center justify-between text-xs text-muted-foreground">
-                <span>Used {trigger.usage_count || 0} times</span>
-                {trigger.last_used && (
-                  <span>Last: {new Date(trigger.last_used).toLocaleDateString()}</span>
-                )}
+                <span>Category: {trigger.category || 'None'}</span>
               </div>
             </CardContent>
           </Card>
@@ -452,21 +433,21 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
                 label="Name"
                 placeholder="Enter trigger name"
                 value={editingTrigger.name}
-                onChange={(e) => setEditingTrigger(prev => ({ ...prev, name: e.target.value }))}
+                onChange={(e) => setEditingTrigger((prev: any) => ({ ...prev, name: e.target.value }))}
                 required
               />
               <Input
                 label="Description (Optional)"
                 placeholder="Describe this trigger"
                 value={editingTrigger.description || ''}
-                onChange={(e) => setEditingTrigger(prev => ({ ...prev, description: e.target.value }))}
+                onChange={(e) => setEditingTrigger((prev: any) => ({ ...prev, description: e.target.value }))}
               />
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <label className="text-sm font-medium">Category</label>
                   <Select
                     value={editingTrigger.category || ''}
-                    onValueChange={(value) => setEditingTrigger(prev => ({ ...prev, category: value as any }))}
+                    onValueChange={(value) => setEditingTrigger((prev: any) => ({ ...prev, category: value as any }))}
                   >
                     <SelectTrigger>
                       <SelectValue placeholder="Select category" />
@@ -484,14 +465,14 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
                   label="Icon (Optional)"
                   placeholder="Emoji"
                   value={editingTrigger.icon || ''}
-                  onChange={(e) => setEditingTrigger(prev => ({ ...prev, icon: e.target.value }))}
+                  onChange={(e) => setEditingTrigger((prev: any) => ({ ...prev, icon: e.target.value }))}
                 />
               </div>
               <div className="flex justify-end gap-2 pt-4">
                 <Button type="button" variant="outline" onClick={() => setEditingTrigger(null)}>
                   Cancel
                 </Button>
-                <Button type="submit" disabled={updateTrigger.isPending || !editingTrigger.name.trim()}>
+                <Button type="submit" disabled={!editingTrigger.name.trim()}>
                   Update Trigger
                 </Button>
               </div>

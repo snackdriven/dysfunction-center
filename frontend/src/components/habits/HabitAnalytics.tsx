@@ -229,7 +229,7 @@ export const HabitAnalytics: React.FC = () => {
               ))}
             </SelectContent>
           </Select>
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select value={timeRange} onValueChange={(value) => setTimeRange(value as typeof timeRange)}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -338,7 +338,7 @@ export const HabitAnalytics: React.FC = () => {
             </div>
             <div className="text-center">
               <div className="text-2xl font-bold text-red-600">{habitStats.strugglingHabits}</div>
-              <div className="text-sm text-muted-foreground">Needs Work (<60%)</div>
+              <div className="text-sm text-muted-foreground">Needs Work (&lt;60%)</div>
               <div className="w-full bg-muted rounded-full h-2 mt-2">
                 <div 
                   className="bg-red-600 h-2 rounded-full transition-all"

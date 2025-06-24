@@ -146,7 +146,7 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onR
             <div className="flex items-center gap-2">
               <Button
                 size="sm"
-                variant={selectionMode ? "default" : "outline"}
+                variant={selectionMode ? "primary" : "outline"}
                 onClick={toggleSelectionMode}
               >
                 {selectionMode ? <CheckSquare className="h-4 w-4 mr-1" /> : <Square className="h-4 w-4 mr-1" />}
