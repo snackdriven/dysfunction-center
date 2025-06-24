@@ -28,6 +28,8 @@ export const DataExportImport: React.FC = () => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>(['tasks', 'habits', 'mood', 'calendar']);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [activeTab, setActiveTab] = useState<'export' | 'backup'>('export');
+  const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
+  const [selectedBackup, setSelectedBackup] = useState<any>(null);
   const queryClient = useQueryClient();
 
   // Fetch backups
@@ -55,7 +57,7 @@ export const DataExportImport: React.FC = () => {
 
   // Restore mutation
   const restoreMutation = useMutation({
-    mutationFn: (request: { backup_id: string; domains?: string[] }) => 
+    mutationFn: (request: { backup_id: string; domains?: ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences')[] }) => 
       integrationService.restoreFromBackup(request),
     onSuccess: () => {
       // Invalidate all queries to refresh data
@@ -170,7 +172,7 @@ export const DataExportImport: React.FC = () => {
               {/* Format Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Export Format</label>
-                <Select value={exportFormat} onValueChange={(value: 'json' | 'csv') => setExportFormat(value)}>
+                <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as 'json' | 'csv')}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -374,24 +376,34 @@ export const DataExportImport: React.FC = () => {
                         </div>
                       </div>
                       <div className="flex items-center gap-2">
-                        <Dialog>
+                        <Dialog open={restoreDialogOpen} onOpenChange={setRestoreDialogOpen}>
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="sm">
+                            <Button 
+                              variant="outline" 
+                              size="sm"
+                              onClick={() => {
+                                setSelectedBackup(backup);
+                                setRestoreDialogOpen(true);
+                              }}
+                            >
                               <Upload className="h-4 w-4 mr-2" />
                               Restore
                             </Button>
                           </DialogTrigger>
                           <DialogContent>
-                            <RestoreBackupDialog 
-                              backup={backup}
-                              onRestore={(domains) => {
-                                restoreMutation.mutate({ 
-                                  backup_id: backup.id, 
-                                  domains 
-                                });
-                              }}
-                              isRestoring={restoreMutation.isPending}
-                            />
+                            {selectedBackup && (
+                              <RestoreBackupDialog 
+                                backup={selectedBackup}
+                                onRestore={(domains) => {
+                                  restoreMutation.mutate({ 
+                                    backup_id: selectedBackup.id, 
+                                    domains: domains as ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences')[]
+                                  });
+                                  setRestoreDialogOpen(false);
+                                }}
+                                isRestoring={restoreMutation.isPending}
+                              />
+                            )}
                           </DialogContent>
                         </Dialog>
                         <Button

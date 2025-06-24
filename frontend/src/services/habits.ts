@@ -5,10 +5,11 @@ export interface Habit {
   id: number;
   name: string;
   description?: string;
-  category: string;
+  category: 'health' | 'productivity' | 'personal';
   target_frequency: number;
   target_value: number;
   completion_type: 'boolean' | 'count' | 'duration';
+  target_type?: 'daily' | 'weekly' | 'custom';
   active: boolean;
   created_at: string;
   updated_at?: string;
@@ -32,10 +33,11 @@ export interface HabitCompletion {
 export interface CreateHabitRequest {
   name: string;
   description?: string;
-  category: string;
+  category: 'health' | 'productivity' | 'personal';
   target_frequency: number;
   target_value: number;
   completion_type: 'boolean' | 'count' | 'duration';
+  target_type?: 'daily' | 'weekly' | 'custom';
 }
 
 export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
@@ -51,7 +53,7 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
     const { data } = await api.post(apiEndpoints.habits.create, habit);
     return data;
   },
-  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: number; active?: boolean }): Promise<Habit> => {
+  updateHabit: async ({ id, ...habit }: Partial<CreateHabitRequest> & { id: number; active?: boolean; target_type?: 'daily' | 'weekly' | 'custom' }): Promise<Habit> => {
     const { data } = await api.put(apiEndpoints.habits.update(id.toString()), habit);
     return data;
   },

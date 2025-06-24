@@ -515,9 +515,11 @@ export const ThemeCustomization: React.FC = () => {
                   onChange={importTheme}
                   className="hidden"
                 />
-                <Button variant="outline" as="span">
-                  <Upload className="h-4 w-4 mr-2" />
-                  Import Theme
+                <Button variant="outline" asChild>
+                  <span>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import Theme
+                  </span>
                 </Button>
               </label>
               <Button onClick={resetToDefault} variant="outline">

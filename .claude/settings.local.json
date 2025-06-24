@@ -11,7 +11,12 @@
       "Bash(npm ls:*)",
       "Bash(npm uninstall:*)",
       "Bash(rm:*)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx:*)",
+      "Bash(ls:*)",
+      "Bash(npm test)",
+      "Bash(encore db migrate:*)",
+      "Bash(timeout 10 npm run dev)"
     ],
     "deny": []
   }

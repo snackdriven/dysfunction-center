@@ -12,24 +12,27 @@ interface HabitFormProps {
 }
 
 const habitCategories = [
-  'Health & Fitness',
-  'Productivity',
-  'Learning',
-  'Mindfulness',
-  'Social',
-  'Creative',
-  'Personal Care',
-  'Finance',
-  'Other'
+  { label: 'Health & Fitness', value: 'health' },
+  { label: 'Productivity', value: 'productivity' },
+  { label: 'Personal Development', value: 'personal' },
+  { label: 'Learning', value: 'personal' },
+  { label: 'Mindfulness', value: 'health' },
+  { label: 'Social', value: 'personal' },
+  { label: 'Creative', value: 'personal' },
+  { label: 'Personal Care', value: 'health' },
+  { label: 'Finance', value: 'productivity' },
+  { label: 'Other', value: 'personal' }
 ];
 
-export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {  const [formData, setFormData] = React.useState({
+export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
+  const [formData, setFormData] = React.useState({
     name: habit?.name || '',
     description: habit?.description || '',
-    category: habit?.category || 'Health & Fitness',
+    category: habit?.category || 'health',
     target_frequency: habit?.target_frequency || 1,
     target_value: habit?.target_value || 1,
     completion_type: habit?.completion_type || 'boolean' as 'boolean' | 'count' | 'duration',
+    target_type: 'daily' as 'daily' | 'weekly' | 'custom',
     active: habit?.active ?? true,
   });
 
@@ -69,10 +72,11 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {  
       const habitData = {
         name: formData.name.trim(),
         description: formData.description.trim() || undefined,
-        category: formData.category,
+        category: formData.category as 'health' | 'productivity' | 'personal',
         target_frequency: formData.target_frequency,
         target_value: formData.target_value,
         completion_type: formData.completion_type,
+        target_type: formData.target_type,
       };
 
       if (isEditing) {        await updateHabit.mutateAsync({
@@ -143,8 +147,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {  
               </SelectTrigger>
               <SelectContent>
                 {habitCategories.map((category) => (
-                  <SelectItem key={category} value={category}>
-                    {category}
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
                   </SelectItem>
                 ))}
               </SelectContent>

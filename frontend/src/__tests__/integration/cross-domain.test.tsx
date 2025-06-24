@@ -596,8 +596,8 @@ describe('Cross-Domain Integration', () => {
 
     it('should handle export operations', async () => {
       const exportRequest = {
-        domains: ['tasks', 'habits'] as const,
-        format: 'json' as const,
+        domains: ['tasks', 'habits'] as ('tasks' | 'habits' | 'mood' | 'calendar')[],
+        format: 'json' as 'json' | 'csv',
         start_date: '2024-01-01',
         end_date: '2024-01-31',
       };

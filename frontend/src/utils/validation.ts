@@ -174,7 +174,7 @@ export const validateFormData = <T>(schema: z.ZodSchema<T>, data: unknown): { su
 export const validatePartialFormData = <T extends Record<string, any>>(schema: z.ZodObject<any>, data: unknown): { success: true; data: Partial<T> } | { success: false; errors: string[] } => {
   try {
     const partialSchema = schema.partial();
-    const validatedData = partialSchema.parse(data);
+    const validatedData = partialSchema.parse(data) as Partial<T>;
     return { success: true, data: validatedData };
   } catch (error) {
     if (error instanceof z.ZodError) {
