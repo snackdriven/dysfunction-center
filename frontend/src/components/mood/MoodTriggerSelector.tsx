@@ -263,7 +263,7 @@ export const MoodTriggerSelector: React.FC<MoodTriggerSelectorProps> = ({
                   </div>
                   <div className="flex items-center gap-2">
                     <Button
-                      variant={selectedTriggerIds.includes(trigger.id) ? "default" : "outline"}
+                      variant={selectedTriggerIds.includes(trigger.id) ? "primary" : "outline"}
                       size="sm"
                       onClick={() => handleTriggerToggle(trigger.id)}
                     >
