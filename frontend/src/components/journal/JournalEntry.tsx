@@ -88,7 +88,7 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
             Mood: {entry.mood_reference}
           </Badge>
         )}
-        {entry.tags.map((tag, index) => (
+        {Array.isArray(entry.tags) && entry.tags.map((tag, index) => (
           <Badge key={index} variant="secondary">
             #{tag}
           </Badge>
@@ -112,10 +112,10 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
           </p>
         )}
       </div>      {/* Related Items */}
-      {((entry.related_tasks && entry.related_tasks.length > 0) || 
-        (entry.related_habits && entry.related_habits.length > 0)) && (
+      {((entry.related_tasks && Array.isArray(entry.related_tasks) && entry.related_tasks.length > 0) || 
+        (entry.related_habits && Array.isArray(entry.related_habits) && entry.related_habits.length > 0)) && (
         <div className="mb-4">
-          {entry.related_tasks && entry.related_tasks.length > 0 && (
+          {entry.related_tasks && Array.isArray(entry.related_tasks) && entry.related_tasks.length > 0 && (
             <div className="mb-2">
               <span className="text-sm font-medium text-gray-600">Related Tasks:</span>
               <div className="flex flex-wrap gap-1 mt-1">
@@ -125,7 +125,7 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
               </div>
             </div>
           )}
-          {entry.related_habits && entry.related_habits.length > 0 && (
+          {entry.related_habits && Array.isArray(entry.related_habits) && entry.related_habits.length > 0 && (
             <div>
               <span className="text-sm font-medium text-gray-600">Related Habits:</span>
               <div className="flex flex-wrap gap-1 mt-1">

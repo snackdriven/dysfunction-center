@@ -21,16 +21,15 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
   onSubmit,
   onCancel,
   isLoading = false
-}) => {
-  const [formData, setFormData] = useState({
+}) => {  const [formData, setFormData] = useState({
     title: entry?.title || '',
     content: entry?.content || '',
     mood_reference: entry?.mood_reference || undefined,
-    tags: entry?.tags || [],
+    tags: (entry && Array.isArray(entry.tags)) ? entry.tags : [],
     privacy_level: entry?.privacy_level || 'private' as const,
     productivity_score: entry?.productivity_score || undefined,
-    related_tasks: entry?.related_tasks || [],
-    related_habits: entry?.related_habits || []
+    related_tasks: (entry && Array.isArray(entry.related_tasks)) ? entry.related_tasks : [],
+    related_habits: (entry && Array.isArray(entry.related_habits)) ? entry.related_habits : []
   });
 
   const [newTag, setNewTag] = useState('');

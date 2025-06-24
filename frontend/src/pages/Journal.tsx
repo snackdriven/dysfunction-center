@@ -59,12 +59,11 @@ export const Journal: React.FC = () => {
       }
     }
   };
-
   const filteredEntries = entries.filter(entry =>
     searchQuery === '' || 
     entry.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
     entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    entry.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    (Array.isArray(entry.tags) && entry.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   );
   if (isCreating) {
     return (

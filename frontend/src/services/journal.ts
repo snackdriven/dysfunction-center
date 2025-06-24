@@ -112,27 +112,41 @@ export interface UpdateJournalTemplateRequest {
   is_active?: boolean;
 }
 
+// Helper function to parse journal entry from API response
+const parseJournalEntry = (rawEntry: any): JournalEntry => {
+  return {
+    ...rawEntry,
+    tags: Array.isArray(rawEntry.tags) ? rawEntry.tags : 
+          (typeof rawEntry.tags === 'string' ? JSON.parse(rawEntry.tags || '[]') : []),
+    related_tasks: Array.isArray(rawEntry.related_tasks) ? rawEntry.related_tasks :
+                   (typeof rawEntry.related_tasks === 'string' ? JSON.parse(rawEntry.related_tasks || '[]') : []),
+    related_habits: Array.isArray(rawEntry.related_habits) ? rawEntry.related_habits :
+                    (typeof rawEntry.related_habits === 'string' ? JSON.parse(rawEntry.related_habits || '[]') : [])
+  };
+};
+
 // API functions
 export const journalApi = {
   // Journal Entries
   getJournalEntries: async (params?: GetJournalEntriesParams): Promise<JournalEntry[]> => {
     const { data } = await api.get(apiEndpoints.journal.list, { params });
-    return data.journal_entries || [];
+    const entries = data.journal_entries || [];
+    return entries.map(parseJournalEntry);
   },
 
   getJournalEntry: async (id: number): Promise<JournalEntry> => {
     const { data } = await api.get(apiEndpoints.journal.get(id.toString()));
-    return data.journal_entry;
+    return parseJournalEntry(data.journal_entry);
   },
 
   createJournalEntry: async (entry: CreateJournalEntryRequest): Promise<JournalEntry> => {
     const { data } = await api.post(apiEndpoints.journal.create, entry);
-    return data.journal_entry;
+    return parseJournalEntry(data.journal_entry);
   },
 
   updateJournalEntry: async ({ id, ...entry }: UpdateJournalEntryRequest & { id: number }): Promise<JournalEntry> => {
     const { data } = await api.put(apiEndpoints.journal.update(id.toString()), entry);
-    return data.journal_entry;
+    return parseJournalEntry(data.journal_entry);
   },
 
   deleteJournalEntry: async (id: number): Promise<void> => {
