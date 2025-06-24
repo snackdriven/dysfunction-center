@@ -1,33 +1,101 @@
-import React from 'react';
-import { cn } from '../../utils/cn';
+import * as React from "react";
+import * as ProgressPrimitive from "@radix-ui/react-progress";
+import { cva, type VariantProps } from "class-variance-authority";
+import { cn } from "../../utils/cn";
 
-interface ProgressProps {
-  value: number;
-  max?: number;
-  className?: string;
+const progressVariants = cva(
+  "relative h-4 w-full overflow-hidden rounded-full bg-secondary",
+  {
+    variants: {
+      variant: {
+        default: "bg-secondary",
+        success: "bg-success/20",
+        warning: "bg-warning/20",
+        error: "bg-error/20",
+      },
+      size: {
+        sm: "h-2",
+        md: "h-4",
+        lg: "h-6",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+      size: "md",
+    },
+  }
+);
+
+const progressIndicatorVariants = cva(
+  "h-full w-full flex-1 transition-all",
+  {
+    variants: {
+      variant: {
+        default: "bg-primary",
+        success: "bg-success",
+        warning: "bg-warning",
+        error: "bg-error",
+      },
+    },
+    defaultVariants: {
+      variant: "default",
+    },
+  }
+);
+
+export interface ProgressProps
+  extends React.ComponentPropsWithoutRef<typeof ProgressPrimitive.Root>,
+    VariantProps<typeof progressVariants> {
+  /**
+   * The progress value (0-100)
+   */
+  value?: number;
+  /**
+   * Whether to show the percentage text
+   */
+  showValue?: boolean;
+  /**
+   * Custom indicator class name
+   */
   indicatorClassName?: string;
 }
 
-export const Progress: React.FC<ProgressProps> = ({
-  value,
-  max = 100,
-  className,
-  indicatorClassName,
-}) => {
-  const percentage = Math.min(Math.max(0, (value / max) * 100), 100);
-
-  return (
-    <div className={cn(
-      'w-full bg-muted rounded-full overflow-hidden',
-      className
-    )}>
-      <div
+/**
+ * Progress component with animations and variants.
+ * 
+ * @example
+ * ```tsx
+ * <Progress value={75} variant="success" size="lg" showValue />
+ * ```
+ */
+const Progress = React.forwardRef<
+  React.ElementRef<typeof ProgressPrimitive.Root>,
+  ProgressProps
+>(({ className, variant, size, value, showValue, indicatorClassName, ...props }, ref) => (
+  <div className="relative">
+    <ProgressPrimitive.Root
+      ref={ref}
+      className={cn(progressVariants({ variant, size }), className)}
+      {...props}
+    >
+      <ProgressPrimitive.Indicator
         className={cn(
-          'h-full bg-primary transition-all duration-300 ease-in-out',
+          progressIndicatorVariants({ variant }),
           indicatorClassName
         )}
-        style={{ width: `${percentage}%` }}
+        style={{ transform: `translateX(-${100 - (value || 0)}%)` }}
       />
-    </div>
-  );
-};
+    </ProgressPrimitive.Root>
+    
+    {showValue && (
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-medium text-foreground/80">
+          {Math.round(value || 0)}%
+        </span>      </div>
+    )}
+  </div>
+));
+
+Progress.displayName = ProgressPrimitive.Root.displayName;
+
+export { Progress, progressVariants };

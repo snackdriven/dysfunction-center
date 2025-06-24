@@ -126,7 +126,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
         <CardContent className="space-y-4">
           {/* Completion Button */}
           <div className="flex items-center justify-center">
-            <Button              variant={isCompleted ? "default" : "outline"}
+            <Button              variant={isCompleted ? "primary" : "outline"}
               onClick={handleToggleCompletion}
               disabled={isLoading || !habit.active}
               className="w-full"

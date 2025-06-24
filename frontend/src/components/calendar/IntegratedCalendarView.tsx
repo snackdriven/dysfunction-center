@@ -497,10 +497,9 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
                                 Streak: {habit.streak_count} days
                               </div>
                             </div>
-                          </div>
-                          <Button 
+                          </div>                          <Button 
                             size="sm" 
-                            variant={habit.completed ? "default" : "outline"}
+                            variant={habit.completed ? "primary" : "outline"}
                           >
                             {habit.completed ? 'Completed' : 'Mark Done'}
                           </Button>
