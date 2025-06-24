@@ -5,7 +5,6 @@ import { Badge } from '../ui/Badge';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Checkbox } from '../ui/Checkbox';
-import { Slider } from '../ui/Slider';
 import { 
   Palette, 
   Type, 

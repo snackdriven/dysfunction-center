@@ -75,15 +75,17 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     id,
     ...props 
   }, ref) => {
-    const inputId = id || React.useId();
+    const inputId = React.useId();
     const hasError = !!error;
     const inputVariant = hasError ? "error" : variant;
+
+    const idToUse = id || inputId;
 
     return (
       <div className="w-full">
         {label && (
           <label 
-            htmlFor={inputId}
+            htmlFor={idToUse}
             className="block text-sm font-medium text-foreground mb-1"
           >
             {label}
@@ -99,7 +101,7 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           
           <input
             type={type}
-            id={inputId}
+            id={idToUse}
             className={cn(
               inputVariants({ variant: inputVariant, size, className }),
               startIcon && "pl-9",
@@ -171,15 +173,17 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     id,
     ...props 
   }, ref) => {
-    const textareaId = id || React.useId();
+    const textareaId = React.useId();
     const hasError = !!error;
     const textareaVariant = hasError ? "error" : variant;
+
+    const textareaIdToUse = id || textareaId;
 
     return (
       <div className="w-full">
         {label && (
           <label 
-            htmlFor={textareaId}
+            htmlFor={textareaIdToUse}
             className="block text-sm font-medium text-foreground mb-1"
           >
             {label}
@@ -187,7 +191,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         
         <textarea
-          id={textareaId}
+          id={textareaIdToUse}
           className={cn(
             inputVariants({ variant: textareaVariant, size, className }),
             "min-h-[80px] resize-vertical"

@@ -446,7 +446,6 @@ const RestoreBackupDialog: React.FC<RestoreBackupDialogProps> = ({
   isRestoring
 }) => {
   const [selectedDomains, setSelectedDomains] = useState<string[]>(backup.domains);
-  const [replaceExisting, setReplaceExisting] = useState(false);
 
   const domainOptions = [
     { id: 'tasks', label: 'Tasks' },
