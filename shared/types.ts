@@ -60,11 +60,17 @@ export interface DailyProductivityData {
     total: number;
     duration_minutes: number;
   };
+  journal: {
+    entries_count: number;
+    word_count: number;
+    productivity_score?: number;
+    tags: string[];
+  };
   productivity_score: number;
 }
 
 export interface CrossDomainCorrelation {
-  type: 'task_mood' | 'habit_mood' | 'task_habit' | 'schedule_productivity';
+  type: 'task_mood' | 'habit_mood' | 'task_habit' | 'schedule_productivity' | 'journal_mood' | 'journal_productivity' | 'journal_habits';
   factor: string;
   strength: number; // -1 to 1
   confidence: number; // 0 to 1
@@ -79,7 +85,7 @@ export interface ProductivityInsight {
   description: string;
   priority: 'high' | 'medium' | 'low';
   action_items: string[];
-  related_domains: ('tasks' | 'habits' | 'mood' | 'calendar')[];
+  related_domains: ('tasks' | 'habits' | 'mood' | 'calendar' | 'journal')[];
   created_at: TimestampString;
 }
 
@@ -110,7 +116,7 @@ export interface CalendarDataOverlay {
 
 // Export/Import types
 export interface DataExportRequest {
-  domains: ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences')[];
+  domains: ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences' | 'journal')[];
   format: 'json' | 'csv';
   start_date?: DateString;
   end_date?: DateString;
@@ -137,7 +143,7 @@ export interface BackupMetadata {
 
 export interface RestoreRequest {
   backup_id: string;
-  domains?: ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences')[];
+  domains?: ('tasks' | 'habits' | 'mood' | 'calendar' | 'preferences' | 'journal')[];
   replace_existing?: boolean;
 }
 

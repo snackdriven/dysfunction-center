@@ -13,20 +13,20 @@ export interface ApiInfoResponse {
     habits: string[];
     mood: string[];
     preferences: string[];
+    journal: string[];
   };
 }
 
 // Root endpoint - API information and health check
 export const getApiInfo = api(
   { method: "GET", path: "/", expose: true },
-  async (): Promise<ApiInfoResponse> => {
-    return {
+  async (): Promise<ApiInfoResponse> => {    return {
       name: "Executive Dysfunction Center API",
       version: "0.1.0",
-      description: "A productivity tracking application with task management, habit tracking, mood logging, and theme preferences",
+      description: "A productivity tracking application with task management, habit tracking, mood logging, journaling, and theme preferences",
       status: "healthy",
       timestamp: new Date().toISOString(),
-      services: ["tasks", "habits", "mood", "preferences"],
+      services: ["tasks", "habits", "mood", "preferences", "journal"],
       endpoints: {
         tasks: [
           "GET /tasks - List all tasks with optional filtering",
@@ -59,6 +59,20 @@ export const getApiInfo = api(
           "GET /theme - Get theme preferences",
           "POST /theme - Set theme preferences",
           "GET /theme/system - Get system theme info"
+        ],
+        journal: [
+          "GET /journal - List journal entries with filtering",
+          "POST /journal - Create a new journal entry",
+          "GET /journal/:id - Get a specific journal entry",
+          "PUT /journal/:id - Update a journal entry",
+          "DELETE /journal/:id - Delete a journal entry",
+          "GET /journal/search - Search journal entries",
+          "GET /journal/analytics - Get journal analytics and insights",
+          "GET /journal/templates - List journal templates",
+          "POST /journal/templates - Create a new journal template",
+          "PUT /journal/templates/:id - Update a journal template",
+          "DELETE /journal/templates/:id - Delete a journal template",
+          "GET /journal/export - Export journal entries (future feature)"
         ]
       }
     };

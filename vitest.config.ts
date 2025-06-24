@@ -4,10 +4,10 @@ export default defineConfig({
   test: {
     environment: 'jsdom',
     setupFiles: ['./frontend/src/setupTests.ts'],
-    globals: true,
-    include: [
+    globals: true,    include: [
       './frontend/src/**/*.test.{ts,tsx}',
       './habits/**/*.test.ts',
+      './journal/**/*.test.ts',
       './mood/**/*.test.ts',
       './preferences/**/*.test.ts',
       './tasks/**/*.test.ts'
