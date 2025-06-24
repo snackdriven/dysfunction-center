@@ -228,7 +228,7 @@ export const defaultRetryOptions: RetryOptions = {
   retryCondition: (error) => {
     // Retry on network errors and server errors, but not on client errors
     return error.type === 'network' || error.type === 'server' || 
-           (error.statusCode && error.statusCode >= 500);
+           (error.statusCode !== undefined && error.statusCode >= 500);
   },
 };
 
@@ -246,7 +246,7 @@ export async function withRetry<T>(
       lastError = parseApiError(error);
       
       // Log the error
-      errorLogger.log(lastError, { action: 'retry_attempt', attempt });
+      errorLogger.log(lastError, { action: 'retry_attempt', page: `attempt_${attempt}` });
 
       // Check if we should retry
       if (attempt === opts.maxAttempts || !opts.retryCondition?.(lastError)) {
@@ -330,7 +330,7 @@ export class CircuitBreaker {
 // Error boundary helpers
 export const handleAsyncError = (error: any, context?: string): void => {
   const apiError = parseApiError(error);
-  errorLogger.log(apiError, { action: context });
+  errorLogger.log(apiError, { action: context || 'async_error' });
   
   // You can add additional handling here, such as:
   // - Showing user notifications

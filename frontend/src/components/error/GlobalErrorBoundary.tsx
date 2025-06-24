@@ -63,8 +63,8 @@ export class GlobalErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
     // Log the error
     errorLogger.log(apiError, {
       action: 'component_error_boundary',
-      stackTrace: error.stack,
-      componentStack: errorInfo.componentStack,
+      page: window.location.pathname,
+      userAgent: navigator.userAgent,
     });
 
     // Call the onError prop if provided
@@ -355,7 +355,7 @@ export class GlobalErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
 export const useErrorHandler = () => {
   return (error: any, context?: string) => {
     const apiError = parseApiError(error);
-    errorLogger.log(apiError, { action: context });
+    errorLogger.log(apiError, { action: context || 'error_handler' });
     throw apiError;
   };
 };

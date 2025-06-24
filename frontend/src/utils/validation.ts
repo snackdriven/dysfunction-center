@@ -96,8 +96,21 @@ export const calendarEventSchema = z.object({
   }
 );
 
-export const createEventSchema = calendarEventSchema.omit({ id: true });
-export const updateEventSchema = calendarEventSchema.partial().extend({
+const baseEventSchema = z.object({
+  id: z.number().optional(),
+  title: z.string().min(1, 'Event title is required').max(200, 'Event title too long'),
+  description: z.string().max(1000, 'Description too long').optional(),
+  start_datetime: timestampStringSchema,
+  end_datetime: timestampStringSchema.optional(),
+  is_all_day: z.boolean().default(false),
+  location: z.string().max(200, 'Location too long').optional(),
+  color: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format').optional(),
+  recurrence_rule: z.string().max(500, 'Recurrence rule too long').optional(),
+  task_id: z.number().positive().optional(),
+});
+
+export const createEventSchema = baseEventSchema.omit({ id: true });
+export const updateEventSchema = baseEventSchema.partial().extend({
   id: z.number().positive(),
 });
 
@@ -158,7 +171,7 @@ export const validateFormData = <T>(schema: z.ZodSchema<T>, data: unknown): { su
   }
 };
 
-export const validatePartialFormData = <T>(schema: z.ZodSchema<T>, data: unknown): { success: true; data: Partial<T> } | { success: false; errors: string[] } => {
+export const validatePartialFormData = <T extends Record<string, any>>(schema: z.ZodObject<any>, data: unknown): { success: true; data: Partial<T> } | { success: false; errors: string[] } => {
   try {
     const partialSchema = schema.partial();
     const validatedData = partialSchema.parse(data);
@@ -283,3 +296,63 @@ export const createApiValidationError = (errors: ValidationError[]): ApiValidati
   errors,
   message: `Validation failed for ${errors.length} field${errors.length > 1 ? 's' : ''}`,
 });
+
+// Helper function for date validation
+const isValidDate = (dateStr: string): boolean => {
+  const date = new Date(dateStr);
+  return !isNaN(date.getTime()) && !!dateStr.match(/^\d{4}-\d{2}-\d{2}$/);
+};
+
+// Export/Import validation schemas
+export const createExportRequestSchema = z.object({
+  domains: z.array(z.enum(['tasks', 'habits', 'mood', 'calendar'])).min(1, 'At least one domain must be selected'),
+  format: z.enum(['csv', 'json']),
+  start_date: z.string().refine(isValidDate, 'Invalid start date format'),
+  end_date: z.string().refine(isValidDate, 'Invalid end date format'),
+  include_metadata: z.boolean().optional(),
+});
+
+export const backupRequestSchema = z.object({
+  domains: z.array(z.enum(['tasks', 'habits', 'mood', 'calendar'])).min(1, 'At least one domain must be selected'),
+  include_attachments: z.boolean().optional(),
+  description: z.string().optional(),
+  user_initiated: z.boolean().optional(),
+  version: z.string().optional(),
+});
+
+// Export validation with refined types
+const baseExportSchema = z.object({
+  domains: z.array(z.enum(['tasks', 'habits', 'mood', 'calendar'])).min(1, 'At least one domain must be selected'),
+  format: z.enum(['csv', 'json']),
+  start_date: z.string().refine(isValidDate, 'Invalid start date format'),
+  end_date: z.string().refine(isValidDate, 'Invalid end date format'),
+  include_metadata: z.boolean().optional(),
+});
+export const exportDataSchema = baseExportSchema.partial();
+
+// Backup validation
+const baseBackupSchema = z.object({
+  domains: z.array(z.enum(['tasks', 'habits', 'mood', 'calendar'])).min(1, 'At least one domain must be selected'),
+  include_attachments: z.boolean().optional(),
+  description: z.string().optional(),
+});
+export const backupDataSchema = baseBackupSchema.partial();
+
+// Theme validation
+const baseThemeSchema = z.object({
+  name: z.string().min(1, 'Theme name is required').max(50, 'Theme name too long'),
+  colors: z.object({
+    primary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    secondary: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    accent: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    background: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    foreground: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    muted: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+    border: z.string().regex(/^#[0-9A-Fa-f]{6}$/, 'Invalid color format'),
+  }),
+  font_size: z.enum(['small', 'medium', 'large']).optional(),
+  font_family: z.enum(['system', 'serif', 'mono']).optional(),
+  high_contrast: z.boolean().optional(),
+  reduce_motion: z.boolean().optional(),
+});
+export const themeDataSchema = baseThemeSchema.partial();
