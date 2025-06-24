@@ -105,7 +105,7 @@ export const TaskCategoryManager: React.FC<TaskCategoryManagerProps> = ({
       {/* Category Filter */}
       <div className="flex flex-wrap gap-2">
         <Button
-          variant={selectedCategoryId === undefined ? "default" : "outline"}
+          variant={selectedCategoryId === undefined ? "primary" : "outline"}
           size="sm"
           onClick={() => onCategorySelect?.(undefined)}
         >
@@ -114,7 +114,7 @@ export const TaskCategoryManager: React.FC<TaskCategoryManagerProps> = ({
         {categories.map((category) => (
           <Button
             key={category.id}
-            variant={selectedCategoryId === category.id ? "default" : "outline"}
+            variant={selectedCategoryId === category.id ? "primary" : "outline"}
             size="sm"
             onClick={() => onCategorySelect?.(category.id)}
             className="flex items-center gap-1"

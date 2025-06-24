@@ -123,7 +123,7 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
 
         <Button
           size="sm"
-          variant={activeEntry ? "destructive" : "default"}
+          variant={activeEntry ? "destructive" : "primary"}
           onClick={activeEntry ? handleStop : handleStart}
           disabled={startTimeEntry.isPending || stopTimeEntry.isPending}
         >

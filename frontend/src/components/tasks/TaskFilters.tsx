@@ -126,28 +126,28 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
       {/* Quick Filter Buttons */}
       <div className="flex flex-wrap gap-2">
         <Button
-          variant={filters.overdue ? "default" : "outline"}
+          variant={filters.overdue ? "primary" : "outline"}
           size="sm"
           onClick={() => handleFilterChange('overdue', filters.overdue ? undefined : true)}
         >
           Overdue
         </Button>
         <Button
-          variant={filters.completed === false ? "default" : "outline"}
+          variant={filters.completed === false ? "primary" : "outline"}
           size="sm"
           onClick={() => handleFilterChange('completed', filters.completed === false ? undefined : false)}
         >
           Active
         </Button>
         <Button
-          variant={filters.completed === true ? "default" : "outline"}
+          variant={filters.completed === true ? "primary" : "outline"}
           size="sm"
           onClick={() => handleFilterChange('completed', filters.completed === true ? undefined : true)}
         >
           Completed
         </Button>
         <Button
-          variant={filters.has_time_estimate ? "default" : "outline"}
+          variant={filters.has_time_estimate ? "primary" : "outline"}
           size="sm"
           onClick={() => handleFilterChange('has_time_estimate', filters.has_time_estimate ? undefined : true)}
         >
@@ -241,7 +241,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
                 {tags.map((tag) => (
                   <Button
                     key={tag.id}
-                    variant={filters.tag_ids?.includes(tag.id) ? "default" : "outline"}
+                    variant={filters.tag_ids?.includes(tag.id) ? "primary" : "outline"}
                     size="sm"
                     onClick={() => handleTagToggle(tag.id)}
                   >
