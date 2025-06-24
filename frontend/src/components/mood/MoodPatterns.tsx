@@ -35,31 +35,43 @@ export const MoodPatterns: React.FC = () => {
     
     const firstHalfAvg = firstHalf.reduce((sum, entry) => sum + entry.mood_score, 0) / firstHalf.length;
     const secondHalfAvg = secondHalf.reduce((sum, entry) => sum + entry.mood_score, 0) / secondHalf.length;
-    const trend = secondHalfAvg - firstHalfAvg;    // TODO: Re-enable Phase 2 features when backend support is ready
-    // Most common triggers
-    // const triggerCounts = recentEntries
-    //   .flatMap(entry => entry.triggers || [])
-    //   .reduce((acc, trigger) => {
-    //     acc[trigger.name] = (acc[trigger.name] || 0) + 1;
-    //     return acc;
-    //   }, {} as Record<string, number>);
+    const trend = secondHalfAvg - firstHalfAvg;    // Most common triggers
+    const triggerCounts = recentEntries
+      .flatMap(entry => entry.triggers || [])
+      .reduce((acc, trigger) => {
+        acc[trigger.name] = (acc[trigger.name] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
 
-    // const topTriggers = Object.entries(triggerCounts)
-    //   .sort(([,a], [,b]) => b - a)
-    //   .slice(0, 5)
-    //   .map(([trigger, count]) => ({ trigger, count }));
+    const topTriggers = Object.entries(triggerCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 5)
+      .map(([trigger, count]) => ({ trigger, count }));
 
     // Most common contexts
-    // const contextCounts = recentEntries
-    //   .filter(entry => entry.context_tags)
-    //   .reduce((acc, entry) => {
-    //     const contexts = entry.context_tags!;
-    //     // Handle context_tags properly
-    //     return acc;
-    //   }, {} as Record<string, number>);    // const topContexts = Object.entries(contextCounts)
-    //   .sort(([,a], [,b]) => b - a)
-    //   .slice(0, 3)
-    //   .map(([context, count]) => ({ context, count }));
+    const contextCounts = recentEntries
+      .filter(entry => entry.context_tags)
+      .reduce((acc, entry) => {
+        const contexts = entry.context_tags!;
+        // Combine all context arrays into a single list
+        const allContexts = [
+          ...(contexts.activities || []),
+          ...(contexts.people || []),
+          ...(contexts.emotions || []),
+          ...(contexts.locations || [])
+        ];
+        
+        allContexts.forEach(context => {
+          acc[context] = (acc[context] || 0) + 1;
+        });
+        
+        return acc;
+      }, {} as Record<string, number>);
+
+    const topContexts = Object.entries(contextCounts)
+      .sort(([,a], [,b]) => b - a)
+      .slice(0, 3)
+      .map(([context, count]) => ({ context, count }));
 
     // Day of week patterns
     const dayPatterns = recentEntries.reduce((acc, entry) => {
@@ -89,9 +101,8 @@ export const MoodPatterns: React.FC = () => {
       avgEnergy,
       avgStress,
       trend,
-      // TODO: Re-enable Phase 2 features when backend support is ready
-      // topTriggers,
-      // topContexts,
+      topTriggers,
+      topContexts,
       dayAverages,
       bestDay,
       worstDay,
@@ -228,12 +239,20 @@ export const MoodPatterns: React.FC = () => {
                 </div>
                 <div className="text-sm text-muted-foreground">                  {moodLabels[patterns.bestDay.mood_score - 1]} ({patterns.bestDay.mood_score}/5)
                 </div>
-                {/* TODO: Re-enable Phase 2 features when backend support is ready */}
-                {/* {patterns.bestDay.context_tags && (
-                  <Badge variant="secondary" className="mt-1 text-xs">
-                    {patterns.bestDay.context_tags}
-                  </Badge>
-                )} */}
+                {patterns.bestDay.context_tags && Object.values(patterns.bestDay.context_tags).some(arr => arr && arr.length > 0) && (
+                  <div className="flex flex-wrap gap-1 mt-1">
+                    {[
+                      ...(patterns.bestDay.context_tags.activities || []),
+                      ...(patterns.bestDay.context_tags.people || []),
+                      ...(patterns.bestDay.context_tags.emotions || []),
+                      ...(patterns.bestDay.context_tags.locations || [])
+                    ].slice(0, 2).map((context, index) => (
+                      <Badge key={index} variant="secondary" className="text-xs">
+                        {context}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
             </div>
           </CardContent>
@@ -259,8 +278,7 @@ export const MoodPatterns: React.FC = () => {
                 </div>                <div className="text-sm text-muted-foreground">
                   {moodLabels[patterns.worstDay.mood_score - 1]} ({patterns.worstDay.mood_score}/5)
                 </div>
-                {/* TODO: Re-enable Phase 2 features when backend support is ready */}
-                {/* {patterns.worstDay.triggers && patterns.worstDay.triggers.length > 0 && (
+                {patterns.worstDay.triggers && patterns.worstDay.triggers.length > 0 && (
                   <div className="flex flex-wrap gap-1 mt-1">
                     {patterns.worstDay.triggers.slice(0, 2).map((trigger) => (
                       <Badge key={trigger.id} variant="destructive" className="text-xs">
@@ -268,7 +286,7 @@ export const MoodPatterns: React.FC = () => {
                       </Badge>
                     ))}
                   </div>
-                )} */}
+                )}
               </div>
             </div>
           </CardContent>
@@ -311,9 +329,8 @@ export const MoodPatterns: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      )}      {/* TODO: Re-enable Phase 2 features when backend support is ready */}
-      {/* Top Triggers */}
-      {/* {patterns.topTriggers?.length > 0 && (
+      )}      {/* Top Triggers */}
+      {patterns.topTriggers?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -332,8 +349,8 @@ export const MoodPatterns: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      )} */}      {/* Top Contexts */}
-      {/* {patterns.topContexts?.length > 0 && (
+      )}      {/* Top Contexts */}
+      {patterns.topContexts?.length > 0 && (
         <Card>
           <CardHeader>
             <CardTitle>Most Common Contexts</CardTitle>
@@ -349,7 +366,7 @@ export const MoodPatterns: React.FC = () => {
             </div>
           </CardContent>
         </Card>
-      )} */}
+      )}
     </div>
   );
 };

@@ -4,6 +4,7 @@ import { Input } from '../components/ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select';
 import { TaskList } from '../components/tasks/TaskList';
 import { TaskForm } from '../components/tasks/TaskForm';
+import { TaskCategoryManager } from '../components/tasks/TaskCategoryManager';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
 import { Plus, Search } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
@@ -13,15 +14,17 @@ export const Tasks: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
+  const [categoryFilter, setCategoryFilter] = useState<number | undefined>();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: tasks, isLoading, error, refetch } = useQuery({
-    queryKey: ['tasks', { search: searchQuery, status: statusFilter, priority: priorityFilter }],
+    queryKey: ['tasks', { search: searchQuery, status: statusFilter, priority: priorityFilter, category: categoryFilter }],
     queryFn: () => tasksApi.getTasks({
       search: searchQuery || undefined,
       status: statusFilter !== 'all' ? statusFilter : undefined,
       priority: priorityFilter !== 'all' ? priorityFilter : undefined,
+      category_id: categoryFilter,
     }),
   });
 
@@ -90,6 +93,12 @@ export const Tasks: React.FC = () => {
           </SelectContent>
         </Select>
       </div>
+
+      {/* Category Management */}
+      <TaskCategoryManager
+        selectedCategoryId={categoryFilter}
+        onCategorySelect={setCategoryFilter}
+      />
 
       {/* Task List */}
       <TaskList 

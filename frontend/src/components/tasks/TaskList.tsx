@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { TaskCard } from './TaskCard';
+import { BulkTaskOperations } from './BulkTaskOperations';
 import { Task } from '../../services/tasks';
 import { LoadingSpinner } from '../common/LoadingSpinner';
 import { ErrorState } from '../common/ErrorState';
+import { Button } from '../ui/Button';
+import { CheckSquare, Square } from 'lucide-react';
 
 interface TaskListProps {
   tasks: Task[];
@@ -12,6 +15,33 @@ interface TaskListProps {
 }
 
 export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onRetry }) => {
+  const [selectionMode, setSelectionMode] = useState(false);
+  const [selectedTaskIds, setSelectedTaskIds] = useState<number[]>([]);
+
+  const handleSelectionChange = (taskId: number, selected: boolean) => {
+    if (selected) {
+      setSelectedTaskIds(prev => [...prev, taskId]);
+    } else {
+      setSelectedTaskIds(prev => prev.filter(id => id !== taskId));
+    }
+  };
+
+  const handleSelectAll = () => {
+    const allTaskIds = tasks.map(task => task.id);
+    setSelectedTaskIds(allTaskIds);
+  };
+
+  const handleClearSelection = () => {
+    setSelectedTaskIds([]);
+    setSelectionMode(false);
+  };
+
+  const toggleSelectionMode = () => {
+    setSelectionMode(!selectionMode);
+    if (!selectionMode) {
+      setSelectedTaskIds([]);
+    }
+  };
   const groupedTasks = React.useMemo(() => {
     if (!tasks || !Array.isArray(tasks)) {
       return {
@@ -94,7 +124,13 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onR
         </h3>
         <div className="space-y-3">
           {tasks.map((task) => (
-            <TaskCard key={task.id} task={task} />
+            <TaskCard 
+              key={task.id} 
+              task={task}
+              selectionMode={selectionMode}
+              isSelected={selectedTaskIds.includes(task.id)}
+              onSelectionChange={handleSelectionChange}
+            />
           ))}
         </div>
       </div>
@@ -102,12 +138,52 @@ export const TaskList: React.FC<TaskListProps> = ({ tasks, isLoading, error, onR
   };
 
   return (
-    <div className="space-y-8">
-      <TaskGroup title="Overdue" tasks={groupedTasks.overdue} variant="error" />
-      <TaskGroup title="Due Today" tasks={groupedTasks.today} />
-      <TaskGroup title="Upcoming" tasks={groupedTasks.upcoming} />
-      <TaskGroup title="No Due Date" tasks={groupedTasks.noDate} />
-      <TaskGroup title="Completed" tasks={groupedTasks.completed} variant="success" />
-    </div>
+    <>
+      <div className="space-y-8">
+        {/* Selection Toolbar */}
+        {tasks.length > 0 && (
+          <div className="flex items-center justify-between p-3 bg-muted/30 rounded-lg border">
+            <div className="flex items-center gap-2">
+              <Button
+                size="sm"
+                variant={selectionMode ? "default" : "outline"}
+                onClick={toggleSelectionMode}
+              >
+                {selectionMode ? <CheckSquare className="h-4 w-4 mr-1" /> : <Square className="h-4 w-4 mr-1" />}
+                {selectionMode ? 'Exit Selection' : 'Select Tasks'}
+              </Button>
+              
+              {selectionMode && (
+                <Button size="sm" variant="outline" onClick={handleSelectAll}>
+                  Select All
+                </Button>
+              )}
+            </div>
+            
+            {selectionMode && selectedTaskIds.length > 0 && (
+              <div className="text-sm text-muted-foreground">
+                {selectedTaskIds.length} of {tasks.length} tasks selected
+              </div>
+            )}
+          </div>
+        )}
+
+        <TaskGroup title="Overdue" tasks={groupedTasks.overdue} variant="error" />
+        <TaskGroup title="Due Today" tasks={groupedTasks.today} />
+        <TaskGroup title="Upcoming" tasks={groupedTasks.upcoming} />
+        <TaskGroup title="No Due Date" tasks={groupedTasks.noDate} />
+        <TaskGroup title="Completed" tasks={groupedTasks.completed} variant="success" />
+      </div>
+
+      {/* Bulk Operations */}
+      {selectionMode && (
+        <BulkTaskOperations
+          selectedTaskIds={selectedTaskIds}
+          tasks={tasks}
+          onClearSelection={handleClearSelection}
+          onSelectionChange={setSelectedTaskIds}
+        />
+      )}
+    </>
   );
 };

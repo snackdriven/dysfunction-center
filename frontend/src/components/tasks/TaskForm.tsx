@@ -8,6 +8,8 @@ import { DialogHeader, DialogTitle } from '../ui/Dialog';
 import { Task, useCreateTask, useUpdateTask, tasksApi } from '../../services/tasks';
 import { TaskTagInput } from './TaskTagInput';
 import { TaskTimeTracker } from './TaskTimeTracker';
+import { SubtaskList } from './SubtaskList';
+import { RecurrencePatternForm } from './RecurrencePatternForm';
 
 interface TaskFormProps {
   task?: Task;
@@ -25,6 +27,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     notes: task?.notes || '',
     estimated_minutes: task?.estimated_minutes || undefined as number | undefined,
     tag_ids: task?.tag_ids || [] as number[],
+    recurrence_pattern: task?.recurrence_pattern || undefined,
   });
 
   const { data: categories = [] } = useQuery({
@@ -79,6 +82,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
         notes: formData.notes.trim() || undefined,
         estimated_minutes: formData.estimated_minutes,
         tag_ids: formData.tag_ids.length > 0 ? formData.tag_ids : undefined,
+        recurrence_pattern: formData.recurrence_pattern,
       };
 
       if (isEditing) {
@@ -97,7 +101,7 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string | number | number[] | undefined) => {
+  const handleInputChange = (field: string, value: any) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -251,12 +255,31 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
           />
         </div>
 
+        {/* Recurrence Pattern */}
+        <RecurrencePatternForm
+          pattern={formData.recurrence_pattern}
+          onChange={(pattern) => handleInputChange('recurrence_pattern', pattern)}
+          startDate={formData.due_date}
+        />
+
         {/* Time Tracking (for editing existing tasks) */}
         {isEditing && (
           <div className="border-t pt-4">
             <TaskTimeTracker
               taskId={task.id}
               estimatedMinutes={formData.estimated_minutes}
+            />
+          </div>
+        )}
+
+        {/* Subtasks (for editing existing tasks) */}
+        {isEditing && (
+          <div className="border-t pt-4">
+            <SubtaskList
+              parentTaskId={task.id}
+              onSubtaskUpdate={() => {
+                // Optionally refresh parent task data or trigger callbacks
+              }}
             />
           </div>
         )}

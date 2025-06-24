@@ -4,8 +4,9 @@ import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { Badge } from '../ui/Badge';
+import { SavedSearches } from './SavedSearches';
 import { tasksApi } from '../../services/tasks';
-import { Search, Filter, X, Calendar, Tag, FolderOpen } from 'lucide-react';
+import { Search, Filter, X, Calendar, Tag, FolderOpen, Bookmark, ChevronDown } from 'lucide-react';
 
 interface TaskFiltersProps {
   filters: TaskFilterState;
@@ -16,12 +17,15 @@ export interface TaskFilterState {
   search: string;
   priority?: 'low' | 'medium' | 'high';
   completed?: boolean;
+  status?: 'pending' | 'in_progress' | 'completed';
   category_id?: number;
   tag_ids?: number[];
   due_before?: string;
   due_after?: string;
   has_time_estimate?: boolean;
   overdue?: boolean;
+  has_subtasks?: boolean;
+  has_notes?: boolean;
 }
 
 export const TaskFilters: React.FC<TaskFiltersProps> = ({
@@ -29,6 +33,7 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
   onFiltersChange
 }) => {
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [showSavedSearches, setShowSavedSearches] = React.useState(false);
 
   const { data: categories = [] } = useQuery({
     queryKey: ['task-categories'],
@@ -61,12 +66,15 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
       search: '',
       priority: undefined,
       completed: undefined,
+      status: undefined,
       category_id: undefined,
       tag_ids: undefined,
       due_before: undefined,
       due_after: undefined,
       has_time_estimate: undefined,
       overdue: undefined,
+      has_subtasks: undefined,
+      has_notes: undefined,
     });
   };
 
@@ -107,6 +115,17 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               {activeFilterCount}
             </Badge>
           )}
+        </Button>
+
+        {/* Saved Searches Toggle */}
+        <Button
+          variant="outline"
+          onClick={() => setShowSavedSearches(!showSavedSearches)}
+          className="flex items-center gap-2"
+        >
+          <Bookmark className="h-4 w-4" />
+          Saved
+          <ChevronDown className={`h-3 w-3 transition-transform ${showSavedSearches ? 'rotate-180' : ''}`} />
         </Button>
 
         {/* Clear Filters */}
@@ -153,6 +172,20 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
         >
           With Time Estimate
         </Button>
+        <Button
+          variant={filters.has_subtasks ? "primary" : "outline"}
+          size="sm"
+          onClick={() => handleFilterChange('has_subtasks', filters.has_subtasks ? undefined : true)}
+        >
+          Has Subtasks
+        </Button>
+        <Button
+          variant={filters.has_notes ? "primary" : "outline"}
+          size="sm"
+          onClick={() => handleFilterChange('has_notes', filters.has_notes ? undefined : true)}
+        >
+          Has Notes
+        </Button>
       </div>
 
       {/* Expanded Filters */}
@@ -173,6 +206,25 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
                 <SelectItem value="high">High</SelectItem>
                 <SelectItem value="medium">Medium</SelectItem>
                 <SelectItem value="low">Low</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {/* Status Filter */}
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Status</label>
+            <Select
+              value={filters.status || ''}
+              onValueChange={(value) => handleFilterChange('status', value || undefined)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Any status" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">Any status</SelectItem>
+                <SelectItem value="pending">Pending</SelectItem>
+                <SelectItem value="in_progress">In Progress</SelectItem>
+                <SelectItem value="completed">Completed</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -251,6 +303,19 @@ export const TaskFilters: React.FC<TaskFiltersProps> = ({
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* Saved Searches */}
+      {showSavedSearches && (
+        <div className="p-4 border rounded-lg bg-gray-50">
+          <SavedSearches
+            currentFilters={filters}
+            onApplySearch={(newFilters) => {
+              onFiltersChange(newFilters);
+              setShowSavedSearches(false);
+            }}
+          />
         </div>
       )}
 
