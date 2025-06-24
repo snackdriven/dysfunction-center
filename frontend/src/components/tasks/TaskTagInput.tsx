@@ -2,7 +2,6 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
 import { tasksApi, TaskTag, useCreateTag } from '../../services/tasks';
 import { X, Plus } from 'lucide-react';
 

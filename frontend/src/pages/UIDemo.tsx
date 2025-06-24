@@ -9,7 +9,6 @@ import {
   Input,
   Badge,
   Avatar,
-  AvatarImage,
   AvatarFallback,
   Separator,
   Skeleton,

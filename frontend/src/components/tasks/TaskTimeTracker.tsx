@@ -16,8 +16,6 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
   estimatedMinutes,
   onTimeUpdate
 }) => {
-  const [currentTime, setCurrentTime] = React.useState<Date>(new Date());
-
   // First, run the query without refetchInterval
   const { data: activeEntry, refetch: refetchActiveEntry } = useQuery<TimeEntry | null>({
     queryKey: ['active-time-entry', taskId],
@@ -40,15 +38,6 @@ export const TaskTimeTracker: React.FC<TaskTimeTrackerProps> = ({
 
   const startTimeEntry = useStartTimeEntry();
   const stopTimeEntry = useStopTimeEntry();
-
-  // Update current time every second
-  React.useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(interval);
-  }, []);
 
   const totalMinutes = timeEntries.reduce((sum, entry) => 
     sum + (entry.duration_minutes || 0), 0

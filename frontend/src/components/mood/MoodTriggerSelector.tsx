@@ -5,7 +5,7 @@ import { Input } from '../ui/Input';
 import { Badge } from '../ui/Badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { moodApi, MoodTrigger, useCreateTrigger, useDeleteTrigger } from '../../services/mood';
+import { moodApi, useCreateTrigger, useDeleteTrigger } from '../../services/mood';
 import { Plus, X, AlertTriangle, Settings, Trash2 } from 'lucide-react';
 
 interface MoodTriggerSelectorProps {
