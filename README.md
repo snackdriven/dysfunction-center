@@ -113,8 +113,8 @@ npm start
 ## Data Portability
 
 - See `DATA_PORTABILITY.md` for full details on data model, import/export, and backup.
-- To backup your data, simply copy the `mock-data/` directory to a safe location (external drive, cloud storage, etc.).
-- To restore, copy your backup files back into the `mock-data/` directory.
+- To backup your data, simply copy the `northstar-data/` directory to a safe location (external drive, cloud storage, etc.).
+- To restore, copy your backup files back into the `northstar-data/` directory.
 
 ## Contributing
 

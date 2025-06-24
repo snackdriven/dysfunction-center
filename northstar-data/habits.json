@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1,
+    "name": "Morning Meditation",
+    "description": "10 minutes of mindfulness meditation.",
+    "category": "personal",
+    "target_frequency": 1,
+    "active": true,
+    "created_at": "2025-06-20T07:00:00Z",
+    "updated_at": "2025-06-24T09:00:00Z"
+  },
+  {
+    "id": 2,
+    "name": "Daily Walk",
+    "description": "Walk at least 5,000 steps.",
+    "category": "health",
+    "target_frequency": 1,
+    "active": true,
+    "created_at": "2025-06-21T08:00:00Z",
+    "updated_at": "2025-06-24T09:00:00Z"
+  }
+]

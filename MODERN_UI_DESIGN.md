@@ -1,5 +1,7 @@
 # Executive Dysfunction Center Modern UI/UX Design
 
+> **Note:** The frontend is built with React 19 and TypeScript, bootstrapped with Create React App and heavily customized. It integrates with a modular Encore (TypeScript) backend, where each domain (tasks, habits, mood, calendar) is a separate service.
+
 ## 🎨 Design Philosophy
 
 **Modern Minimalism with Purposeful Complexity**
@@ -12,8 +14,8 @@
 
 ### Technology Stack
 ```
-Frontend Framework: React 18 with TypeScript
-State Management: Zustand + React Query (TanStack Query)
+Frontend Framework: React 19 with TypeScript (Create React App, customized)
+State Management: Zustand + TanStack Query
 Styling: Tailwind CSS + Radix UI primitives
 Charts: Recharts + D3.js for advanced visualizations  
 Calendar: FullCalendar with custom React wrapper
