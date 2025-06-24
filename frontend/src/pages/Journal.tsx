@@ -6,6 +6,7 @@ import { Button } from '../components/ui/Button';
 import { Input } from '../components/ui/Input';
 import { Badge } from '../components/ui/Badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../components/ui/Select';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../components/ui/Dialog';
 import {
   useJournalEntries,
   useCreateJournalEntry,
@@ -65,44 +66,6 @@ export const Journal: React.FC = () => {
     entry.content.toLowerCase().includes(searchQuery.toLowerCase()) ||
     (Array.isArray(entry.tags) && entry.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase())))
   );
-  if (isCreating) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">New Journal Entry</h1>
-            <p className="text-gray-600">Record your thoughts, experiences, and reflections.</p>
-          </div>
-          
-          <JournalEntryForm
-            onSubmit={handleCreateEntry}
-            onCancel={() => setIsCreating(false)}
-            isLoading={createMutation.isPending}
-          />
-        </div>
-      </div>
-    );
-  }
-
-  if (editingEntry) {
-    return (
-      <div className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Edit Journal Entry</h1>
-            <p className="text-gray-600">Update your journal entry.</p>
-          </div>
-          
-          <JournalEntryForm
-            entry={editingEntry}
-            onSubmit={handleUpdateEntry}
-            onCancel={() => setEditingEntry(null)}
-            isLoading={updateMutation.isPending}
-          />
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -234,6 +197,37 @@ export const Journal: React.FC = () => {
               </div>
             )}          </>
         )}
+        
+        {/* Create Entry Modal */}
+        <Dialog open={isCreating} onOpenChange={setIsCreating}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>New Journal Entry</DialogTitle>
+            </DialogHeader>
+            <JournalEntryForm
+              onSubmit={handleCreateEntry}
+              onCancel={() => setIsCreating(false)}
+              isLoading={createMutation.isPending}
+            />
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Entry Modal */}
+        <Dialog open={!!editingEntry} onOpenChange={() => setEditingEntry(null)}>
+          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle>Edit Journal Entry</DialogTitle>
+            </DialogHeader>
+            {editingEntry && (
+              <JournalEntryForm
+                entry={editingEntry}
+                onSubmit={handleUpdateEntry}
+                onCancel={() => setEditingEntry(null)}
+                isLoading={updateMutation.isPending}
+              />
+            )}
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );

@@ -53,17 +53,17 @@ export const calendarApi = {  getEvents: async (params?: { start?: string; end?:
 
   getDayEvents: async (date: string): Promise<CalendarEvent[]> => {
     const { data } = await api.get(apiEndpoints.calendar.day(date));
-    return data;
+    return data.events || [];
   },
 
   getWeekEvents: async (date: string): Promise<CalendarEvent[]> => {
     const { data } = await api.get(apiEndpoints.calendar.week(date));
-    return data;
+    return data.events || [];
   },
 
   getMonthEvents: async (year: number, month: number): Promise<CalendarEvent[]> => {
     const { data } = await api.get(apiEndpoints.calendar.month(year, month));
-    return data;
+    return data.events || [];
   },
 };
 

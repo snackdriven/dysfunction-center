@@ -13,6 +13,7 @@ import { Plus, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight, Clock,
 import { useQuery } from '@tanstack/react-query';
 import { calendarApi } from '../services/calendar';
 import { tasksApi } from '../services/tasks';
+import { ErrorBoundary } from '../components/common/ErrorBoundary';
 
 export const Calendar: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -93,7 +94,8 @@ export const Calendar: React.FC = () => {
   ];
 
   return (
-    <div className="space-y-6">
+    <ErrorBoundary>
+      <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -285,6 +287,7 @@ export const Calendar: React.FC = () => {
           />
         )}
       </div>
-    </div>
+      </div>
+    </ErrorBoundary>
   );
 };

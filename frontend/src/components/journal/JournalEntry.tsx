@@ -140,12 +140,20 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
 
       {/* Actions */}
       {(onEdit || onDelete) && (
-        <div className="flex gap-2 pt-3 border-t border-gray-200">
+        <div className="flex gap-2 pt-3 border-t border-gray-200 relative z-10">
           {onEdit && (
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onEdit(entry)}
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onEdit(entry);
+              }}
+              className="relative z-10 pointer-events-auto"
+              type="button"
+              role="button"
+              tabIndex={0}
             >
               Edit
             </Button>
@@ -154,8 +162,15 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
             <Button
               variant="outline"
               size="sm"
-              onClick={() => onDelete(entry.id)}
-              className="text-red-600 hover:text-red-800"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onDelete(entry.id);
+              }}
+              className="text-red-600 hover:text-red-800 relative z-10 pointer-events-auto"
+              type="button"
+              role="button"
+              tabIndex={0}
             >
               Delete
             </Button>
