@@ -4,6 +4,7 @@ import { Input } from '../ui/Input';
 import { Textarea } from '../ui/Textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { DialogHeader, DialogTitle } from '../ui/Dialog';
+import { DayOfWeekSelector, type DayOfWeek, type SchedulePattern } from '../ui/DayOfWeekSelector';
 import { Habit, useCreateHabit, useUpdateHabit } from '../../services/habits';
 
 interface HabitFormProps {
@@ -37,6 +38,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
     reminder_enabled: habit?.reminder_enabled || false,
     reminder_time: habit?.reminder_time || '',
     unit: habit?.unit || '',
+    schedule_pattern: habit?.schedule_pattern || 'daily' as SchedulePattern,
+    scheduled_days: habit?.scheduled_days || ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] as DayOfWeek[],
   });
 
   const [errors, setErrors] = React.useState<Record<string, string>>({});
@@ -83,6 +86,8 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
         reminder_enabled: formData.reminder_enabled,
         reminder_time: formData.reminder_enabled ? formData.reminder_time : undefined,
         unit: formData.completion_type !== 'boolean' ? formData.unit : undefined,
+        schedule_pattern: formData.schedule_pattern,
+        scheduled_days: formData.scheduled_days,
       };
 
       if (isEditing) {        await updateHabit.mutateAsync({
@@ -101,7 +106,7 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
     }
   };
 
-  const handleInputChange = (field: string, value: string | number | boolean) => {
+  const handleInputChange = (field: string, value: string | number | boolean | DayOfWeek[]) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) {
       setErrors(prev => ({ ...prev, [field]: '' }));
@@ -254,6 +259,53 @@ export const HabitForm: React.FC<HabitFormProps> = ({ habit, onSuccess }) => {
             />
           </div>
         )}
+
+        {/* Day-of-Week Scheduling */}
+        <div className="space-y-3 border-t pt-4">
+          <h4 className="font-medium">Schedule</h4>
+          
+          <div className="space-y-2">
+            <label className="text-sm font-medium">Schedule Pattern</label>
+            <Select
+              value={formData.schedule_pattern}
+              onValueChange={(value) => {
+                const pattern = value as SchedulePattern;
+                handleInputChange('schedule_pattern', pattern);
+                
+                // Auto-select appropriate days based on pattern
+                if (pattern === 'daily') {
+                  handleInputChange('scheduled_days', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday']);
+                } else if (pattern === 'weekdays') {
+                  handleInputChange('scheduled_days', ['monday', 'tuesday', 'wednesday', 'thursday', 'friday']);
+                } else if (pattern === 'weekends') {
+                  handleInputChange('scheduled_days', ['saturday', 'sunday']);
+                }
+              }}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="daily">Every Day</SelectItem>
+                <SelectItem value="weekdays">Weekdays Only</SelectItem>
+                <SelectItem value="weekends">Weekends Only</SelectItem>
+                <SelectItem value="custom">Custom Schedule</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
+          {formData.schedule_pattern === 'custom' && (
+            <div className="space-y-2">
+              <DayOfWeekSelector
+                selectedDays={formData.scheduled_days}
+                onChange={(days) => handleInputChange('scheduled_days', days)}
+                label="Select Days"
+                description="Choose which days to track this habit"
+                showSelectAll={true}
+              />
+            </div>
+          )}
+        </div>
 
         {/* Reminder Settings */}
         <div className="space-y-3 border-t pt-4">

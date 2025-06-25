@@ -73,65 +73,66 @@ export const MarkdownDisplay: React.FC<MarkdownDisplayProps> = ({
         }}
         components={{
           // Custom component overrides for better styling
-          h1: ({ children }) => (
-            <h1 className="text-2xl font-bold mb-4 mt-6 text-gray-900 border-b border-gray-200 pb-2">
+          h1: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+            <h1 {...props} className="text-2xl font-bold mb-4 mt-6 text-gray-900 border-b border-gray-200 pb-2">
               {children}
             </h1>
           ),
-          h2: ({ children }) => (
-            <h2 className="text-xl font-semibold mb-3 mt-5 text-gray-900">
+          h2: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+            <h2 {...props} className="text-xl font-semibold mb-3 mt-5 text-gray-900">
               {children}
             </h2>
           ),
-          h3: ({ children }) => (
-            <h3 className="text-lg font-medium mb-2 mt-4 text-gray-900">
+          h3: ({ children, ...props }: React.HTMLAttributes<HTMLHeadingElement>) => (
+            <h3 {...props} className="text-lg font-medium mb-2 mt-4 text-gray-900">
               {children}
             </h3>
           ),
-          p: ({ children }) => (
-            <p className="mb-3 text-gray-700 leading-relaxed">
+          p: ({ children, ...props }: React.HTMLAttributes<HTMLParagraphElement>) => (
+            <p {...props} className="mb-3 text-gray-700 leading-relaxed">
               {children}
             </p>
           ),
-          ul: ({ children }) => (
-            <ul className="mb-3 ml-6 list-disc space-y-1">
+          ul: ({ children, ...props }: React.HTMLAttributes<HTMLUListElement>) => (
+            <ul {...props} className="mb-3 ml-6 list-disc space-y-1">
               {children}
             </ul>
           ),
-          ol: ({ children }) => (
-            <ol className="mb-3 ml-6 list-decimal space-y-1">
+          ol: ({ children, ...props }: React.OlHTMLAttributes<HTMLOListElement>) => (
+            <ol {...props} className="mb-3 ml-6 list-decimal space-y-1">
               {children}
             </ol>
           ),
-          li: ({ children }) => (
-            <li className="text-gray-700">
+          li: ({ children, ...props }: React.LiHTMLAttributes<HTMLLIElement>) => (
+            <li {...props} className="text-gray-700">
               {children}
             </li>
           ),
-          blockquote: ({ children }) => (
-            <blockquote className="border-l-4 border-blue-200 pl-4 my-4 italic text-gray-600 bg-blue-50 py-2 rounded-r">
+          blockquote: ({ children, ...props }: React.BlockquoteHTMLAttributes<HTMLQuoteElement>) => (
+            <blockquote {...props} className="border-l-4 border-blue-200 pl-4 my-4 italic text-gray-600 bg-blue-50 py-2 rounded-r">
               {children}
             </blockquote>
           ),
-          code: ({ children, className }) => {
+          code: ({ children, className, ...props }: React.HTMLAttributes<HTMLElement>) => {
             // Inline code
             if (!className) {
               return (
-                <code className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono">
+                <code {...props} className="bg-gray-100 text-gray-800 px-1.5 py-0.5 rounded text-sm font-mono">
                   {children}
                 </code>
               );
             }
             // Block code (handled by pre)
-            return <code className={className}>{children}</code>;
+            return <code {...props} className={className}>{children}</code>;
           },
-          pre: ({ children }) => (
-            <pre className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4 text-sm">
+          pre: ({ children, ...props }: React.HTMLAttributes<HTMLPreElement>) => (
+            <pre {...props} className="bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-4 text-sm">
               {children}
             </pre>
           ),
-          a: ({ href, children }) => (
+          a: ({ href, children, ...props }: React.AnchorHTMLAttributes<HTMLAnchorElement>) => (
             <a 
+              {...props}
               href={href} 
               className="text-blue-600 hover:text-blue-800 underline hover:no-underline transition-colors"
               target="_blank"
@@ -140,33 +141,34 @@ export const MarkdownDisplay: React.FC<MarkdownDisplayProps> = ({
               {children}
             </a>
           ),
-          img: ({ src, alt }) => (
+          img: ({ src, alt, ...props }: React.ImgHTMLAttributes<HTMLImageElement>) => (
             <img 
+              {...props}
               src={src} 
               alt={alt}
               className="max-w-full h-auto rounded-lg shadow-sm my-4"
               loading="lazy"
             />
           ),
-          table: ({ children }) => (
+          table: ({ children, ...props }: React.TableHTMLAttributes<HTMLTableElement>) => (
             <div className="overflow-x-auto my-4">
-              <table className="min-w-full border border-gray-200 rounded-lg">
+              <table {...props} className="min-w-full border border-gray-200 rounded-lg">
                 {children}
               </table>
             </div>
           ),
-          thead: ({ children }) => (
-            <thead className="bg-gray-50">
+          thead: ({ children, ...props }: React.HTMLAttributes<HTMLTableSectionElement>) => (
+            <thead {...props} className="bg-gray-50">
               {children}
             </thead>
           ),
-          th: ({ children }) => (
-            <th className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b border-gray-200">
+          th: ({ children, ...props }: React.ThHTMLAttributes<HTMLTableHeaderCellElement>) => (
+            <th {...props} className="px-4 py-2 text-left text-sm font-medium text-gray-700 border-b border-gray-200">
               {children}
             </th>
           ),
-          td: ({ children }) => (
-            <td className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
+          td: ({ children, ...props }: React.TdHTMLAttributes<HTMLTableDataCellElement>) => (
+            <td {...props} className="px-4 py-2 text-sm text-gray-700 border-b border-gray-200">
               {children}
             </td>
           ),

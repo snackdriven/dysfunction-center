@@ -2,10 +2,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { CheckCircle, Circle, Edit, Trash2, MoreHorizontal, Flame, Target, Plus, Minus, Play, Pause, Bell } from 'lucide-react';
+import { CheckCircle, Circle, Edit, Trash2, MoreHorizontal, Flame, Target, Plus, Minus, Play, Pause, Bell, Calendar } from 'lucide-react';
 import { Habit, HabitCompletion, useLogHabitCompletion, useUpdateHabit, useDeleteHabit } from '../../services/habits';
 import { HabitForm } from './HabitForm';
 import { HabitReminderManager } from './HabitReminderManager';
+import { MultiCompletionProgress } from '../ui/MultiCompletionProgress';
 import { Dialog, DialogContent } from '../ui/Dialog';
 
 interface HabitCardProps {
@@ -25,21 +26,57 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
   const updateHabit = useUpdateHabit();
   const deleteHabit = useDeleteHabit();
 
-  const isCompleted = completion?.completed || false;
+  // Multi-completion support
+  const todayCompletions = habit.today_completions || [];
+  const todayTotalValue = habit.today_total_value || 0;
+  const isCompleted = todayTotalValue >= (habit.target_value || 1);
   const isLoading = logCompletion.isPending || updateHabit.isPending || deleteHabit.isPending;
+  
+  // Schedule pattern display
+  const getScheduleDisplay = () => {
+    if (!habit.schedule_pattern || habit.schedule_pattern === 'daily') {
+      return 'Daily';
+    }
+    if (habit.schedule_pattern === 'weekdays') {
+      return 'Weekdays only';
+    }
+    if (habit.schedule_pattern === 'weekends') {
+      return 'Weekends only';
+    }
+    if (habit.schedule_pattern === 'custom' && habit.scheduled_days) {
+      const dayAbbrevs = {
+        monday: 'Mon', tuesday: 'Tue', wednesday: 'Wed', thursday: 'Thu',
+        friday: 'Fri', saturday: 'Sat', sunday: 'Sun'
+      };
+      return habit.scheduled_days.map(day => dayAbbrevs[day]).join(', ');
+    }
+    return 'Custom';
+  };
 
-  const handleToggleCompletion = async () => {
+  const handleAddCompletion = async (value: number = 1, notes?: string) => {
     const today = new Date().toISOString().split('T')[0];
     
     try {
       await logCompletion.mutateAsync({
         habitId: habit.id,
         date: today,
-        completed: !isCompleted,
-        value: habit.completion_type === 'boolean' ? undefined : 1,
+        completed: false, // Will be calculated based on total value
+        value: value,
+        notes: notes,
+        completion_timestamp: new Date().toISOString(),
       });
     } catch (error) {
       console.error('Failed to log habit completion:', error);
+    }
+  };
+
+  const handleToggleCompletion = async () => {
+    if (habit.completion_type === 'boolean') {
+      // For boolean habits, toggle the completion status
+      await handleAddCompletion(1);
+    } else {
+      // For count/duration habits, add one unit
+      await handleAddCompletion(1);
     }
   };
 
@@ -178,8 +215,17 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
         </CardHeader>
 
         <CardContent className="space-y-4">
-          {/* Completion Interface - Type Specific */}
-          {habit.completion_type === 'boolean' ? (
+          {/* Multi-Completion Progress for count/duration types */}
+          {habit.completion_type !== 'boolean' && (habit.target_value || 0) > 1 ? (
+            <MultiCompletionProgress
+              completions={todayCompletions}
+              targetValue={habit.target_value || 1}
+              currentTotal={todayTotalValue}
+              unit={habit.unit}
+              completionType={habit.completion_type}
+              onAddCompletion={() => handleAddCompletion(1)}
+            />
+          ) : habit.completion_type === 'boolean' ? (
             // Boolean: Simple toggle button
             <div className="flex items-center justify-center">
               <Button
@@ -196,95 +242,24 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
                 {isCompleted ? 'Completed Today!' : 'Mark Complete'}
               </Button>
             </div>
-          ) : habit.completion_type === 'count' ? (
-            // Count: Increment/decrement with target
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Progress:</span>
-                <span className="text-sm font-medium">
-                  {currentValue} / {habit.target_value} {habit.unit}
-                </span>
-              </div>
-              
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCountChange(Math.max(0, currentValue - 1))}
-                  disabled={isLoading || !habit.active || currentValue === 0}
-                  className="h-10 w-10 p-0"
-                >
-                  <Minus className="h-4 w-4" />
-                </Button>
-                
-                <div className="flex-1 text-center">
-                  <span className="text-2xl font-bold">{currentValue}</span>
-                  {habit.unit && <span className="text-sm text-muted-foreground ml-1">{habit.unit}</span>}
-                </div>
-                
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => handleCountChange(currentValue + 1)}
-                  disabled={isLoading || !habit.active}
-                  className="h-10 w-10 p-0"
-                >
-                  <Plus className="h-4 w-4" />
-                </Button>
-              </div>
-              
-              {isCompleted && (
-                <div className="text-center">
-                  <Badge variant="default" className="bg-green-100 text-green-800">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Target Reached!
-                  </Badge>
-                </div>
-              )}
-            </div>
           ) : (
-            // Duration: Timer interface with target
+            // Simple count/duration interface for target_value = 1
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-muted-foreground">Progress:</span>
-                <span className="text-sm font-medium">
-                  {formatDuration(currentValue)} / {formatDuration(habit.target_value || 0)}
-                </span>
-              </div>
-              
               <div className="text-center">
-                <div className="text-2xl font-bold mb-2">
-                  {formatDuration(currentValue)}
-                </div>
-                
                 <Button
-                  variant={isTimerRunning ? "destructive" : "outline"}
-                  onClick={handleTimerToggle}
+                  variant={isCompleted ? "primary" : "outline"}
+                  onClick={handleToggleCompletion}
                   disabled={isLoading || !habit.active}
                   className="w-full"
                 >
-                  {isTimerRunning ? (
-                    <>
-                      <Pause className="h-4 w-4 mr-2" />
-                      Stop Timer
-                    </>
+                  {isCompleted ? (
+                    <CheckCircle className="h-4 w-4 mr-2" />
                   ) : (
-                    <>
-                      <Play className="h-4 w-4 mr-2" />
-                      Start Timer
-                    </>
+                    <Plus className="h-4 w-4 mr-2" />
                   )}
+                  {isCompleted ? 'Completed Today!' : `Add ${habit.unit || 'completion'}`}
                 </Button>
               </div>
-              
-              {isCompleted && (
-                <div className="text-center">
-                  <Badge variant="default" className="bg-green-100 text-green-800">
-                    <CheckCircle className="h-3 w-3 mr-1" />
-                    Target Reached!
-                  </Badge>
-                </div>
-              )}
             </div>
           )}
 
@@ -295,10 +270,16 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
               <Badge variant="secondary">{habit.category}</Badge>
             </div>
             
-            <div className="flex justify-between">
-              <span className="text-muted-foreground">Frequency:</span>
-              <span>{getFrequencyDisplay(habit.target_frequency.toString())}</span>
-            </div>
+            {/* Schedule Information */}
+            {habit.schedule_pattern && habit.schedule_pattern !== 'daily' && (
+              <div className="flex justify-between">
+                <span className="text-muted-foreground">Schedule:</span>
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-3 w-3" />
+                  <span className="text-xs">{getScheduleDisplay()}</span>
+                </div>
+              </div>
+            )}
             
             <div className="flex justify-between">
               <span className="text-muted-foreground">Type:</span>
@@ -308,7 +289,7 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
             {habit.target_value && habit.target_value > 1 && (
               <div className="flex justify-between">
                 <span className="text-muted-foreground">Target:</span>
-                <span>{habit.target_value}</span>
+                <span>{habit.target_value} {habit.unit}</span>
               </div>
             )}
           </div>

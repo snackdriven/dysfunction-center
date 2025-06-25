@@ -234,7 +234,8 @@ describe('DayOfWeekSelector', () => {
 
     // In compact mode, only first letter should show
     expect(screen.getByText('M')).toBeInTheDocument(); // Monday
-    expect(screen.getByText('T')).toBeInTheDocument(); // Tuesday
+    // Since T appears for both Tuesday and Thursday, check for multiple T's
+    expect(screen.getAllByText('T')).toHaveLength(2); // Tuesday and Thursday
   });
 
   it('supports different sizes', () => {

@@ -4,6 +4,7 @@ import { cn } from '../../utils/cn';
 
 // Day of week type
 export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type SchedulePattern = 'daily' | 'weekdays' | 'weekends' | 'custom';
 
 interface DayOfWeekSelectorProps {
   selectedDays: DayOfWeek[];
@@ -83,7 +84,7 @@ export const DayOfWeekSelector: React.FC<DayOfWeekSelectorProps> = ({
   const isWeekendsSelected = () => {
     const weekends: DayOfWeek[] = ['saturday', 'sunday'];
     return weekends.every(day => selectedDays.includes(day)) && 
-           !['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].some(day => selectedDays.includes(day));
+           !['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].some(day => selectedDays.includes(day as DayOfWeek));
   };
 
   const isAllSelected = () => selectedDays.length === DAYS_OF_WEEK.length;
@@ -188,7 +189,7 @@ export const DayOfWeekSelector: React.FC<DayOfWeekSelectorProps> = ({
             <Button
               key={day.key}
               type="button"
-              variant={isSelected ? 'default' : 'outline'}
+              variant={isSelected ? 'primary' : 'outline'}
               className={cn(
                 buttonClasses,
                 'relative transition-all',
@@ -249,6 +250,11 @@ export const DayOfWeekSelector: React.FC<DayOfWeekSelectorProps> = ({
 export const useDayOfWeekSelector = (initialDays: DayOfWeek[] = []) => {
   const [selectedDays, setSelectedDays] = React.useState<DayOfWeek[]>(initialDays);
 
+  // Update state when initialDays changes (for testing)
+  React.useEffect(() => {
+    setSelectedDays(initialDays);
+  }, [initialDays.join(',')]);
+
   const selectPattern = (pattern: 'all' | 'weekdays' | 'weekends' | 'none') => {
     switch (pattern) {
       case 'all':
@@ -285,10 +291,13 @@ export const useDayOfWeekSelector = (initialDays: DayOfWeek[] = []) => {
     const weekdays = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'];
     const weekends = ['saturday', 'sunday'];
     
-    const isWeekdays = weekdays.every(day => selectedDays.includes(day as DayOfWeek)) && 
-                      !weekends.some(day => selectedDays.includes(day as DayOfWeek));
-    const isWeekends = weekends.every(day => selectedDays.includes(day as DayOfWeek)) && 
-                      !weekdays.some(day => selectedDays.includes(day as DayOfWeek));
+    // Check if exactly weekdays are selected (no more, no less)
+    const isWeekdays = selectedDays.length === 5 && 
+                      weekdays.every(day => selectedDays.includes(day as DayOfWeek));
+    
+    // Check if exactly weekends are selected (no more, no less)
+    const isWeekends = selectedDays.length === 2 && 
+                      weekends.every(day => selectedDays.includes(day as DayOfWeek));
     
     if (isWeekdays) return 'Weekdays';
     if (isWeekends) return 'Weekends';

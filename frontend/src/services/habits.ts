@@ -1,6 +1,9 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { api, apiEndpoints } from './api';
 
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type SchedulePattern = 'daily' | 'weekdays' | 'weekends' | 'custom';
+
 export interface Habit {
   id: number;
   name: string;
@@ -23,6 +26,11 @@ export interface Habit {
   reminder_enabled?: boolean;
   reminder_time?: string;
   unit?: string;
+  // Multi-completion and scheduling features
+  schedule_pattern?: SchedulePattern;
+  scheduled_days?: DayOfWeek[];
+  today_completions?: HabitCompletion[];
+  today_total_value?: number;
 }
 
 export interface HabitTemplate {
@@ -53,6 +61,8 @@ export interface HabitCompletion {
   completed: boolean;
   value?: number;
   notes?: string;
+  completion_timestamp?: string; // For multi-completion support
+  completion_value?: number; // Individual completion value
 }
 
 export interface CreateHabitRequest {
@@ -67,6 +77,8 @@ export interface CreateHabitRequest {
   reminder_enabled?: boolean;
   reminder_time?: string;
   unit?: string;
+  schedule_pattern?: SchedulePattern;
+  scheduled_days?: DayOfWeek[];
 }
 
 export interface CreateHabitFromTemplateRequest {
@@ -104,7 +116,7 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
     return data;
   },
 
-  logCompletion: async (habitId: number, completion: { date: string; completed: boolean; value?: number; notes?: string }): Promise<HabitCompletion> => {
+  logCompletion: async (habitId: number, completion: { date: string; completed: boolean; value?: number; notes?: string; completion_timestamp?: string }): Promise<HabitCompletion> => {
     const { data } = await api.post(apiEndpoints.habits.completions(habitId.toString()), completion);
     return data;
   },
@@ -188,7 +200,7 @@ export const useLogHabitCompletion = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ habitId, ...completion }: { habitId: number; date: string; completed: boolean; value?: number; notes?: string }) =>
+    mutationFn: ({ habitId, ...completion }: { habitId: number; date: string; completed: boolean; value?: number; notes?: string; completion_timestamp?: string }) =>
       habitsApi.logCompletion(habitId, completion),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['habit-completions'] });

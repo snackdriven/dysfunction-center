@@ -249,7 +249,7 @@ export const MarkdownEditor = forwardRef<HTMLDivElement, MarkdownEditorProps>(
             preview={previewMode}
             height={height}
             hideToolbar={true} // We use our custom toolbar
-            visibleDragBar={false}
+            visibleDragbar={false}
             textareaProps={{
               placeholder,
               id,
