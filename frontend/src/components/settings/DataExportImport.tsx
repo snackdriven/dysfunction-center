@@ -26,7 +26,7 @@ import { DataExportRequest, DataImportRequest, BackupMetadata } from '../../../.
 import { cn } from '../../utils/cn';
 
 export const DataExportImport: React.FC = () => {
-  const [exportFormat, setExportFormat] = useState<'json' | 'markdown'>('json');
+  const [exportFormat, setExportFormat] = useState<'json' | 'csv' | 'markdown'>('json');
   const [selectedDomains, setSelectedDomains] = useState<string[]>(['tasks', 'habits', 'mood', 'calendar', 'journal']);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
   const [activeTab, setActiveTab] = useState<'export' | 'import' | 'backup'>('export');
@@ -246,7 +246,7 @@ export const DataExportImport: React.FC = () => {
               {/* Format Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Export Format</label>
-                <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as 'json' | 'markdown')}>
+                <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as 'json' | 'csv' | 'markdown')}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -255,6 +255,12 @@ export const DataExportImport: React.FC = () => {
                       <div className="flex items-center gap-2">
                         <FileJson className="h-4 w-4" />
                         JSON (Complete data with structure)
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="csv">
+                      <div className="flex items-center gap-2">
+                        <FileText className="h-4 w-4" />
+                        CSV (Tabular data format)
                       </div>
                     </SelectItem>
                     <SelectItem value="markdown">

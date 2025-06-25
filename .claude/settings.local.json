@@ -22,7 +22,9 @@
       "Bash(npm --version)",
       "Bash(chmod:*)",
       "Bash(sed:*)",
-      "Bash(timeout 30s npm run dev)"
+      "Bash(timeout 30s npm run dev)",
+      "Bash(node:*)",
+      "Bash(timeout 60s npm start)"
     ],
     "deny": []
   }
