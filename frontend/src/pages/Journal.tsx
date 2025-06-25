@@ -200,7 +200,7 @@ export const Journal: React.FC = () => {
         
         {/* Create Entry Modal */}
         <Dialog open={isCreating} onOpenChange={setIsCreating}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>New Journal Entry</DialogTitle>
             </DialogHeader>
@@ -214,7 +214,7 @@ export const Journal: React.FC = () => {
 
         {/* Edit Entry Modal */}
         <Dialog open={!!editingEntry} onOpenChange={() => setEditingEntry(null)}>
-          <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-4xl">
             <DialogHeader>
               <DialogTitle>Edit Journal Entry</DialogTitle>
             </DialogHeader>

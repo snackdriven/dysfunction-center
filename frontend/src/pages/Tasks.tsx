@@ -68,7 +68,7 @@ export const Tasks: React.FC = () => {
               Add Task
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-2xl">
             <TaskForm onSuccess={() => setIsCreateDialogOpen(false)} />
           </DialogContent>
         </Dialog>

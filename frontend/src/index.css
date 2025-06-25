@@ -207,29 +207,19 @@
     border-color: var(--color-border);
   }
   
-  /* Ensure modal content and buttons are interactive */
-  .modal-content {
-    position: relative;
-    z-index: 52;
-    pointer-events: auto;
-  }
-  
-  .modal-content button {
-    position: relative;
-    z-index: 53;
-    pointer-events: auto;
-  }
-  
-  /* Ensure dialog content has proper layering */
+  /* Ensure modal content has proper constraints */
   [data-radix-dialog-content] {
-    position: relative;
-    z-index: 52 !important;
-    pointer-events: auto !important;
+    max-height: 90vh !important;
+    overflow-y: auto !important;
   }
   
-  [data-radix-dialog-content] button {
-    position: relative;
-    z-index: 53 !important;
-    pointer-events: auto !important;
+  /* Mobile responsive adjustments */
+  @media (max-width: 768px) {
+    [data-radix-dialog-content] {
+      max-width: calc(100vw - 32px) !important;
+      max-height: calc(100vh - 32px) !important;
+      margin: 16px !important;
+    }
   }
 }
+/* End of CSS */

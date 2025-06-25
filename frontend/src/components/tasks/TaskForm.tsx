@@ -109,14 +109,14 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <div className="space-y-4">
       <DialogHeader>
         <DialogTitle>
           {isEditing ? 'Edit Task' : 'Create New Task'}
         </DialogTitle>
       </DialogHeader>
 
-      <div className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         {/* Title */}
         <div>
           <Input
@@ -290,32 +290,32 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
             {errors.submit}
           </div>
         )}
-      </div>
 
-      {/* Actions */}
-      <div className="flex justify-end gap-2 pt-4">
-        <Button 
-          type="button" 
-          variant="outline" 
-          onClick={onSuccess}
-          disabled={isLoading}
-        >
-          Cancel
-        </Button>
-        <Button 
-          type="submit" 
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <>
-              <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
-              {isEditing ? 'Updating...' : 'Creating...'}
-            </>
-          ) : (
-            isEditing ? 'Update Task' : 'Create Task'
-          )}
-        </Button>
-      </div>
-    </form>
+        {/* Actions */}
+        <div className="sticky-buttons flex justify-end gap-2">
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onSuccess}
+            disabled={isLoading}
+          >
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-current border-t-transparent mr-2" />
+                {isEditing ? 'Updating...' : 'Creating...'}
+              </>
+            ) : (
+              isEditing ? 'Update Task' : 'Create Task'
+            )}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };

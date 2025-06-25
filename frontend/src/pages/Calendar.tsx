@@ -130,7 +130,7 @@ export const Calendar: React.FC = () => {
               Add Event
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-lg">
             <EventForm onSuccess={() => setIsCreateDialogOpen(false)} />
           </DialogContent>
         </Dialog>

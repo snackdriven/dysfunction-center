@@ -49,7 +49,7 @@ export const Habits: React.FC = () => {
                 Create Custom
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-md">
+            <DialogContent className="max-w-2xl">
               <HabitForm onSuccess={() => setIsCreateDialogOpen(false)} />
             </DialogContent>
           </Dialog>

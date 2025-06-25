@@ -376,7 +376,7 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
       {/* Day Detail Modal */}
       {selectedDay && (
         <Dialog open={!!selectedDay} onOpenChange={() => setSelectedDay(null)}>
-          <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogContent className="max-w-2xl">
             <div className="space-y-6">
               {/* Day Header */}
               <div className="border-b pb-4">

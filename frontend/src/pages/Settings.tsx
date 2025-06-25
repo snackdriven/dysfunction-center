@@ -7,8 +7,7 @@ import { GeneralSettings } from '../components/settings/GeneralSettings';
 import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
 import { 
   Settings as SettingsIcon,
-  Palette,
-  Download,
+  Palette,  Download,
   User,
   Bell,
   Shield,
