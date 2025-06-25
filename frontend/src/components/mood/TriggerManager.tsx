@@ -91,7 +91,8 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
 
     try {
       // TODO: Implement updateTrigger functionality
-      console.log('Update trigger:', editingTrigger);
+      // Remove or comment out debug log
+      // console.log('Update trigger:', editingTrigger);
 
       setEditingTrigger(null);
     } catch (error) {
