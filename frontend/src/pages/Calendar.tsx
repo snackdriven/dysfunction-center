@@ -1,8 +1,6 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { CalendarMonthView } from '../components/calendar/CalendarMonthView';
-import { CalendarAgendaView } from '../components/calendar/CalendarAgendaView';
 import { CalendarAgendaViewEnhanced } from '../components/calendar/CalendarAgendaViewEnhanced';
 import { CalendarWeekView } from '../components/calendar/CalendarWeekView';
 import { CalendarDayView } from '../components/calendar/CalendarDayView';
@@ -11,9 +9,8 @@ import { Calendar2WeekView } from '../components/calendar/Calendar2WeekView';
 import { CalendarViewSelector, CalendarViewType } from '../components/calendar/CalendarViewSelector';
 import { EventForm } from '../components/calendar/EventForm';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
-import { Badge } from '../components/ui/Badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
-import { Plus, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight, Clock, AlertCircle, CheckCircle } from 'lucide-react';
+import { Card, CardContent } from '../components/ui/Card';
+import { Plus, Calendar as CalendarIcon, Clock, AlertCircle, CheckCircle } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { calendarApi } from '../services/calendar';
 import { tasksApi } from '../services/tasks';
@@ -91,26 +88,26 @@ export const Calendar: React.FC = () => {
     };
   }, [tasks, events, currentYear, currentMonth]);
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentDate(prev => {
-      const newDate = new Date(prev);
-      if (direction === 'prev') {
-        newDate.setMonth(prev.getMonth() - 1);
-      } else {
-        newDate.setMonth(prev.getMonth() + 1);
-      }
-      return newDate;
-    });
-  };
+  // const navigateMonth = (direction: 'prev' | 'next') => { // Commented out as unused
+  //   setCurrentDate(prev => {
+  //     const newDate = new Date(prev);
+  //     if (direction === 'prev') {
+  //       newDate.setMonth(prev.getMonth() - 1);
+  //     } else {
+  //       newDate.setMonth(prev.getMonth() + 1);
+  //     }
+  //     return newDate;
+  //   });
+  // };
 
-  const goToToday = () => {
-    setCurrentDate(new Date());
-  };
+  // const goToToday = () => { // Commented out as unused
+  //   setCurrentDate(new Date());
+  // };
 
-  const monthNames = [
-    'January', 'February', 'March', 'April', 'May', 'June',
-    'July', 'August', 'September', 'October', 'November', 'December'
-  ];
+  // const monthNames = [ // Commented out as unused
+  //   'January', 'February', 'March', 'April', 'May', 'June',
+  //   'July', 'August', 'September', 'October', 'November', 'December'
+  // ];
 
   return (
     <ErrorBoundary>

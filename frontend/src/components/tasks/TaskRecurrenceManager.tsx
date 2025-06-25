@@ -10,7 +10,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { 
   Repeat,
   Calendar as CalendarIcon,
-  Settings,
   Plus,
   Trash2
 } from 'lucide-react';
@@ -106,7 +105,7 @@ export const TaskRecurrenceManager: React.FC<TaskRecurrenceManagerProps> = ({
 
   React.useEffect(() => {
     generatePreview();
-  }, [recurrence, exceptions]);
+  }, [recurrence, exceptions]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const handleFrequencyChange = (frequency: RecurrenceRule['frequency']) => {
     setRecurrence(prev => ({

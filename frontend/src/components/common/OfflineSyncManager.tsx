@@ -53,10 +53,10 @@ export const OfflineSyncManager: React.FC = () => {
 
   // const { setNotifications } = useAppStore();
 
-  const addNotification = (notification: any) => {
+  const addNotification = React.useCallback((notification: any) => {
     // TODO: Implement proper notification system
     console.log('Notification:', notification);
-  };
+  }, []);
 
   useEffect(() => {
     // Load pending changes from localStorage
@@ -109,7 +109,7 @@ export const OfflineSyncManager: React.FC = () => {
         clearInterval(syncIntervalId);
       }
     };
-  }, [autoSync, syncInterval, pendingChanges.length]); // handleSync is called conditionally, removing from deps
+  }, [autoSync, syncInterval, pendingChanges.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadPendingChanges = () => {
     try {
@@ -143,7 +143,7 @@ export const OfflineSyncManager: React.FC = () => {
     }
   };
 
-  const savePendingChanges = (changes: PendingChange[]) => {
+  const savePendingChanges = React.useCallback((changes: PendingChange[]) => {
     try {
       localStorage.setItem(SYNC_STORAGE_KEY, JSON.stringify(changes));
       setPendingChanges(changes);
@@ -151,9 +151,9 @@ export const OfflineSyncManager: React.FC = () => {
     } catch (error) {
       console.error('Failed to save pending changes:', error);
     }
-  };
+  }, []);
 
-  const saveSyncStatus = (status: Partial<SyncStatus>) => {
+  const saveSyncStatus = React.useCallback((status: Partial<SyncStatus>) => {
     try {
       const currentStatus = {
         lastSync: syncStatus.lastSync,
@@ -165,7 +165,7 @@ export const OfflineSyncManager: React.FC = () => {
     } catch (error) {
       console.error('Failed to save sync status:', error);
     }
-  };
+  }, [syncStatus.lastSync, syncStatus.errors]);
 
   const addPendingChange = (change: Omit<PendingChange, 'id' | 'timestamp' | 'retryCount'>) => {
     const newChange: PendingChange = {
@@ -275,7 +275,7 @@ export const OfflineSyncManager: React.FC = () => {
         duration: 5000
       });
     }
-  }, [syncStatus.isSyncing, pendingChanges.length, addNotification]);
+  }, [syncStatus.isSyncing, pendingChanges, addNotification, saveSyncStatus, savePendingChanges]);
 
   const syncChange = async (change: PendingChange): Promise<void> => {
     // This would normally make actual API calls

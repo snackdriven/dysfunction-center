@@ -9,19 +9,15 @@ import {
   Palette, 
   Type, 
   Eye, 
-  Monitor, 
-  Smartphone, 
   Save,
   Download,
   Upload,
   RotateCcw,
   Sun,
-  Contrast,
-  Accessibility
+  Contrast
 } from 'lucide-react';
 import { useAppStore } from '../../stores/useAppStore';
 import { CustomTheme } from '../../../../shared/types';
-import { cn } from '../../utils/cn';
 
 const defaultColors = {
   primary: '#6366f1',
@@ -113,7 +109,8 @@ const presetThemes: CustomTheme[] = [
 ];
 
 export const ThemeCustomization: React.FC = () => {
-  const { theme, setTheme, customTheme, setCustomTheme, previewCustomTheme, clearThemePreview } = useAppStore();
+  const { customTheme, setCustomTheme, previewCustomTheme, clearThemePreview } = useAppStore();
+  // const { theme, setTheme } = useAppStore(); // Commented out as unused
   const [editingTheme, setEditingTheme] = useState<CustomTheme>(
     customTheme || {
       id: crypto.randomUUID(),

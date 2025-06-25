@@ -8,10 +8,10 @@ import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
 import { 
   Settings as SettingsIcon,
   Palette,  Download,
-  User,
+  // User, // Commented out as unused
   Bell,
   Shield,
-  Database
+  // Database // Commented out as unused
 } from 'lucide-react';
 
 export const Settings: React.FC = () => {

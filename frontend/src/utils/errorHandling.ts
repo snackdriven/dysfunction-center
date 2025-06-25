@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import { ApiValidationError, ValidationError } from './validation';
+import { /* ApiValidationError, */ ValidationError } from './validation';
 
 // Error types
 export interface ApiError {

@@ -2,8 +2,7 @@ import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
-import { Badge } from '../ui/Badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 import { tasksApi, TaskCategory, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../../services/tasks';
 import { Plus, Trash2 } from 'lucide-react';
 

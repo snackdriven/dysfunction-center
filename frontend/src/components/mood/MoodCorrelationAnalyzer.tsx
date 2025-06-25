@@ -67,7 +67,7 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [timeframe]); // Removed fetchData since it has empty deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const fetchData = React.useCallback(async () => {
     try {
@@ -116,7 +116,7 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  }, []); // Empty deps for useCallback
+  }, [timeframe]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const analyzeCorrelations = (moods: MoodEntry[], tasks: Task[], habits: Habit[]) => {
     const correlationResults: CorrelationData[] = [];

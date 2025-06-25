@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
-import { Badge } from '../ui/Badge';
 import { TaskFilterState } from './TaskFilters';
 import { Bookmark, Trash2, Search, Star } from 'lucide-react';
 

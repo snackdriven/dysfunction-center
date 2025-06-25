@@ -6,13 +6,12 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { 
   CheckCircle, 
   Circle, 
-  Trash2, 
   X, 
   Loader2,
   AlertTriangle
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { tasksApi, Task, TaskCategory, TaskTag } from '../../services/tasks';
+import { tasksApi, Task, TaskTag } from '../../services/tasks';
 
 interface BulkTaskOperationsProps {
   selectedTaskIds: number[];

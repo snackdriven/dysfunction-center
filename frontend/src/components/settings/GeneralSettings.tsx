@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Badge } from '../ui/Badge';
 import { 
   Clock, 
-  Calendar, 
   Globe, 
   Save,
   Settings as SettingsIcon,
@@ -17,7 +16,6 @@ import {
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { preferencesService } from '../../services/preferences';
-import { cn } from '../../utils/cn';
 
 export const GeneralSettings: React.FC = () => {
   const queryClient = useQueryClient();
