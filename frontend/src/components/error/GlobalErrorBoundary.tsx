@@ -13,7 +13,6 @@ import {
   CheckCircle
 } from 'lucide-react';
 import { ApiError, errorLogger, parseApiError, getUserFriendlyMessage } from '../../utils/errorHandling';
-import { cn } from '../../utils/cn';
 
 interface ErrorBoundaryState {
   hasError: boolean;

@@ -237,7 +237,7 @@ export async function withRetry<T>(
   options: Partial<RetryOptions> = {}
 ): Promise<T> {
   const opts = { ...defaultRetryOptions, ...options };
-  let lastError: ApiError;
+  let lastError: ApiError | undefined;
 
   for (let attempt = 1; attempt <= opts.maxAttempts; attempt++) {
     try {
@@ -263,7 +263,7 @@ export async function withRetry<T>(
     }
   }
 
-  throw lastError!;
+  throw new Error(lastError?.message || 'Operation failed after retries');
 }
 
 // Circuit breaker pattern for preventing cascading failures

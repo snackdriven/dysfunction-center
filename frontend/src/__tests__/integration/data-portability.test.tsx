@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, vi, MockedFunction } from 'vitest';
-import { render, screen, fireEvent, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { DataExportImport } from '../../components/settings/DataExportImport';
@@ -204,6 +204,8 @@ describe('Data Portability Integration Tests', () => {
       // Verify file is selected and validated
       await waitFor(() => {
         expect(screen.getByText('test-import.json')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getByText('File is valid')).toBeInTheDocument();
       });
 
@@ -254,7 +256,11 @@ describe('Data Portability Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Validation failed')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getByText('Invalid JSON format')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getByText('Missing required fields')).toBeInTheDocument();
       });
 
@@ -291,6 +297,8 @@ describe('Data Portability Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('File is valid')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getByText('Version mismatch: expected 1.0.0, got 0.9.0')).toBeInTheDocument();
       });
 
@@ -400,7 +408,11 @@ describe('Data Portability Integration Tests', () => {
 
       await waitFor(() => {
         expect(screen.getByText('Manual Backup')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getByText('Automatic Backup')).toBeInTheDocument();
+      });
+      await waitFor(() => {
         expect(screen.getAllByText('Restore')).toHaveLength(2);
       });
     });

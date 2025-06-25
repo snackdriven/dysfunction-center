@@ -238,13 +238,11 @@ describe('Cross-Domain Integration', () => {
       expect(screen.getByText('Complete project')).toBeInTheDocument();
 
       // Check for habit completion dots
-      const habitDots = screen.getAllByRole('generic').filter(el => 
-        el.className.includes('rounded-full') && el.className.includes('bg-green-500')
-      );
+      const habitDots = screen.getAllByTestId('habit-completion-dot');
       expect(habitDots.length).toBeGreaterThan(0);
 
       // Check for mood color indicator
-      const dayCell = screen.getByText('15').closest('div');
+      const dayCell = screen.getByTestId('calendar-day-15');
       expect(dayCell).toHaveStyle({ borderLeftColor: '#10b981' });
     });
 
@@ -298,7 +296,7 @@ describe('Cross-Domain Integration', () => {
 
       // Note: Full drag and drop testing requires more complex setup
       // This test verifies the task element is draggable
-      expect(taskElement.closest('[draggable="true"]')).toBeInTheDocument();
+      expect(taskElement).toHaveAttribute('draggable', 'true');
     });
   });
 
@@ -470,13 +468,17 @@ describe('Cross-Domain Integration', () => {
       await userEvent.click(oceanBlueTheme);
 
       // Click apply theme
-      const applyButton = within(oceanBlueTheme.closest('.p-3')!).getByText('Apply Theme');
+      const oceanBlueSection = screen.getByTestId('theme-ocean-blue');
+      const applyButton = within(oceanBlueSection).getByText('Apply Theme');
       await userEvent.click(applyButton);
 
       // Verify theme is applied to store
       await waitFor(() => {
         const customTheme = useAppStore.getState().customTheme;
         expect(customTheme?.name).toBe('Ocean Blue');
+      });
+      await waitFor(() => {
+        const customTheme = useAppStore.getState().customTheme;
         expect(customTheme?.colors.primary).toBe('#0ea5e9');
       });
     });
@@ -492,7 +494,7 @@ describe('Cross-Domain Integration', () => {
       });
 
       // Change primary color
-      const primaryColorInput = screen.getByLabelText('Primary').nextSibling as HTMLInputElement;
+      const primaryColorInput = screen.getByTestId('primary-color-input');
       await userEvent.clear(primaryColorInput);
       await userEvent.type(primaryColorInput, '#ff0000');
 
@@ -530,7 +532,7 @@ describe('Cross-Domain Integration', () => {
       expect(exportButton).toBeInTheDocument();
 
       // Check import input exists
-      const importInput = screen.getByDisplayValue('Import Theme').previousSibling as HTMLInputElement;
+      const importInput = screen.getByTestId('theme-import-input');
       expect(importInput).toHaveAttribute('type', 'file');
       expect(importInput).toHaveAttribute('accept', '.json');
     });
@@ -598,7 +600,7 @@ describe('Cross-Domain Integration', () => {
 
       const result = await integrationService.createExport(exportRequest);
       
-      expect(result.content).toBe('{\"test\": \"data\"}');
+      expect(result.content).toBe('{"test": "data"}');
       expect(result.filename).toBe('test-export.json');
       expect(result.contentType).toBe('application/json');
     });
@@ -684,7 +686,7 @@ describe('Store Integration', () => {
   });
 
   it('should manage productivity data cache', () => {
-    const { setDailyProductivityData, dailyProductivityData } = useAppStore.getState();
+    const { setDailyProductivityData } = useAppStore.getState();
     
     // Add productivity data
     setDailyProductivityData('2024-01-15', mockProductivityData);
@@ -694,7 +696,7 @@ describe('Store Integration', () => {
   });
 
   it('should manage custom theme state', () => {
-    const { setCustomTheme, customTheme } = useAppStore.getState();
+    const { setCustomTheme } = useAppStore.getState();
     
     const testTheme: CustomTheme = {
       id: 'test',

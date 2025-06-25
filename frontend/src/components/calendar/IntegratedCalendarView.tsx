@@ -1,26 +1,23 @@
 import React, { useState } from 'react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { Card, CardContent } from '../ui/Card';
+import { Card } from '../ui/Card';
 import { Dialog, DialogContent } from '../ui/Dialog';
 import { 
   CalendarIcon, 
   Clock, 
   AlertCircle, 
-  MapPin, 
   Target, 
   Smile,
   Plus,
   Zap
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
 import { CalendarEvent } from '../../services/calendar';
 import { Task } from '../../services/tasks';
 import { Habit } from '../../services/habits';
 import { MoodEntry } from '../../services/mood';
 import { integrationService } from '../../services/integration';
 import { useAppStore } from '../../stores/useAppStore';
-import { CalendarDataOverlay } from '../../../../shared/types';
 import { cn } from '../../utils/cn';
 
 interface IntegratedCalendarViewProps {
@@ -74,44 +71,17 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
 }) => {
   const [selectedDay, setSelectedDay] = useState<CalendarDayData | null>(null);
   const [draggedTask, setDraggedTask] = useState<Task | null>(null);
-  const { selectedDate, setSelectedDate } = useAppStore();
+  const { setSelectedDate } = useAppStore();
 
-  // Generate calendar days with integrated data
-  const calendarDays = React.useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    const firstDayOfMonth = new Date(year, month, 1);
-    const lastDayOfMonth = new Date(year, month + 1, 0);
-    const firstDayOfWeek = firstDayOfMonth.getDay();
-    const daysInMonth = lastDayOfMonth.getDate();
-    const today = new Date();
+  const getMoodColor = React.useCallback((moodScore?: number): string | undefined => {
+    if (!moodScore) return undefined;
+    if (moodScore >= 4.5) return '#10b981'; // green
+    if (moodScore >= 3.5) return '#f59e0b'; // yellow
+    if (moodScore >= 2.5) return '#f97316'; // orange
+    return '#ef4444'; // red
+  }, []);
 
-    const days: CalendarDayData[] = [];
-
-    // Add previous month days
-    for (let i = 0; i < firstDayOfWeek; i++) {
-      const date = new Date(year, month, -firstDayOfWeek + i + 1);
-      days.push(createDayData(date, false, false));
-    }
-
-    // Add current month days
-    for (let day = 1; day <= daysInMonth; day++) {
-      const date = new Date(year, month, day);
-      const isToday = date.toDateString() === today.toDateString();
-      days.push(createDayData(date, true, isToday));
-    }
-
-    // Add next month days to complete grid
-    const remainingCells = 42 - days.length;
-    for (let i = 1; i <= remainingCells; i++) {
-      const date = new Date(year, month + 1, i);
-      days.push(createDayData(date, false, false));
-    }
-
-    return days;
-  }, [currentDate, events, tasks, habits, moodEntries]);
-
-  function createDayData(date: Date, isCurrentMonth: boolean, isToday: boolean): CalendarDayData {
+  const createDayData = React.useCallback((date: Date, isCurrentMonth: boolean, isToday: boolean): CalendarDayData => {
     const dateStr = date.toISOString().split('T')[0];
     
     // Filter data for this day
@@ -177,15 +147,42 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
       isToday,
       productivityScore
     };
-  }
+  }, [events, tasks, habits, moodEntries, getMoodColor]);
 
-  function getMoodColor(moodScore?: number): string | undefined {
-    if (!moodScore) return undefined;
-    if (moodScore >= 4.5) return '#10b981'; // green
-    if (moodScore >= 3.5) return '#f59e0b'; // yellow
-    if (moodScore >= 2.5) return '#f97316'; // orange
-    return '#ef4444'; // red
-  }
+  // Generate calendar days with integrated data
+  const calendarDays = React.useMemo(() => {
+    const year = currentDate.getFullYear();
+    const month = currentDate.getMonth();
+    const firstDayOfMonth = new Date(year, month, 1);
+    const lastDayOfMonth = new Date(year, month + 1, 0);
+    const firstDayOfWeek = firstDayOfMonth.getDay();
+    const daysInMonth = lastDayOfMonth.getDate();
+    const today = new Date();
+
+    const days: CalendarDayData[] = [];
+
+    // Add previous month days
+    for (let i = 0; i < firstDayOfWeek; i++) {
+      const date = new Date(year, month, -firstDayOfWeek + i + 1);
+      days.push(createDayData(date, false, false));
+    }
+
+    // Add current month days
+    for (let day = 1; day <= daysInMonth; day++) {
+      const date = new Date(year, month, day);
+      const isToday = date.toDateString() === today.toDateString();
+      days.push(createDayData(date, true, isToday));
+    }
+
+    // Add next month days to complete grid
+    const remainingCells = 42 - days.length;
+    for (let i = 1; i <= remainingCells; i++) {
+      const date = new Date(year, month + 1, i);
+      days.push(createDayData(date, false, false));
+    }
+
+    return days;
+  }, [currentDate, createDayData]);
 
   const handleDayClick = (dayData: CalendarDayData) => {
     setSelectedDay(dayData);

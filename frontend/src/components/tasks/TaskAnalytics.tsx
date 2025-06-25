@@ -15,7 +15,8 @@ import {
   Filter,
   Download,
   PieChart,
-  Activity
+  Activity,
+  Zap
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { 

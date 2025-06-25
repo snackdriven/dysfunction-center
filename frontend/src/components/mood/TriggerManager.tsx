@@ -11,11 +11,7 @@ import {
   Plus, 
   Trash2, 
   BarChart3, 
-  TrendingUp, 
-  Activity,
-  Search,
-  Filter,
-  Calendar
+  Search
 } from 'lucide-react';
 import { moodApi, useCreateTrigger, useDeleteTrigger } from '../../services/mood';
 import { Edit } from 'lucide-react';
@@ -134,15 +130,15 @@ export const TriggerManager: React.FC<TriggerManagerProps> = ({
     }
   };
 
-  const getCategoryColor = (category?: string) => {
-    switch (category) {
-      case 'work': return 'border-blue-200 bg-blue-50';
-      case 'personal': return 'border-green-200 bg-green-50';
-      case 'health': return 'border-red-200 bg-red-50';
-      case 'social': return 'border-purple-200 bg-purple-50';
-      default: return 'border-gray-200 bg-gray-50';
-    }
-  };
+  // const getCategoryColor = (category?: string) => { // Commented out as unused
+  //   switch (category) {
+  //     case 'work': return 'border-blue-200 bg-blue-50';
+  //     case 'personal': return 'border-green-200 bg-green-50';
+  //     case 'health': return 'border-red-200 bg-red-50';
+  //     case 'social': return 'border-purple-200 bg-purple-50';
+  //     default: return 'border-gray-200 bg-gray-50';
+  //   }
+  // };
 
   const categoryStats = React.useMemo(() => {
     const stats = triggers.reduce((acc, trigger) => {

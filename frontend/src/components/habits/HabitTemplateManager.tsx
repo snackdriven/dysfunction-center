@@ -167,13 +167,13 @@ export const HabitTemplateManager: React.FC<HabitTemplateManagerProps> = ({ onTe
     queryFn: () => habitsApi.getTemplates()
   });
 
-  const createTemplate = useMutation({
-    mutationFn: habitsApi.createTemplate,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['habit-templates'] });
-      setIsCreateDialogOpen(false);
-    }
-  });
+  // const createTemplate = useMutation({ // Commented out as unused
+  //   mutationFn: habitsApi.createTemplate,
+  //   onSuccess: () => {
+  //     queryClient.invalidateQueries({ queryKey: ['habit-templates'] });
+  //     setIsCreateDialogOpen(false);
+  //   }
+  // });
 
   const deleteTemplate = useMutation({
     mutationFn: habitsApi.deleteTemplate,

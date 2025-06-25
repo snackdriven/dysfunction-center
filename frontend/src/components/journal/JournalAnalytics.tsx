@@ -2,11 +2,9 @@ import React from 'react';
 import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { 
-  BarChart3, 
   Calendar, 
   Target, 
-  BookOpen, 
-  Clock 
+  BookOpen
 } from 'lucide-react';
 import { useJournalAnalytics } from '../../services/journal';
 

@@ -7,7 +7,6 @@ import { Alert, AlertDescription } from '../ui/Alert';
 import { 
   Wifi,
   WifiOff,
-  Download,
   Upload,
   RefreshCw,
   CheckCircle,
@@ -16,7 +15,6 @@ import {
   Database,
   AlertTriangle
 } from 'lucide-react';
-import { useAppStore } from '../../stores/useAppStore';
 
 interface SyncStatus {
   isOnline: boolean;
@@ -51,7 +49,7 @@ export const OfflineSyncManager: React.FC = () => {
 
   const [pendingChanges, setPendingChanges] = useState<PendingChange[]>([]);
   const [autoSync, setAutoSync] = useState(true);
-  const [syncInterval, setSyncInterval] = useState(30000); // 30 seconds
+  const [syncInterval] = useState(30000); // 30 seconds - setSyncInterval removed as unused
 
   // const { setNotifications } = useAppStore();
 
@@ -111,7 +109,7 @@ export const OfflineSyncManager: React.FC = () => {
         clearInterval(syncIntervalId);
       }
     };
-  }, [autoSync, syncInterval, pendingChanges.length]);
+  }, [autoSync, syncInterval, pendingChanges.length]); // handleSync is called conditionally, removing from deps
 
   const loadPendingChanges = () => {
     try {
@@ -186,7 +184,7 @@ export const OfflineSyncManager: React.FC = () => {
     }
   };
 
-  const handleSync = async () => {
+  const handleSync = React.useCallback(async () => {
     if (!navigator.onLine || syncStatus.isSyncing || pendingChanges.length === 0) {
       return;
     }
@@ -277,7 +275,7 @@ export const OfflineSyncManager: React.FC = () => {
         duration: 5000
       });
     }
-  };
+  }, [syncStatus.isSyncing, pendingChanges.length, addNotification]);
 
   const syncChange = async (change: PendingChange): Promise<void> => {
     // This would normally make actual API calls

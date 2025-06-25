@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Badge } from '../ui/Badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
 import { 
   AlertTriangle, 
@@ -17,7 +16,7 @@ import {
 import { moodApi } from '../../services/mood';
 
 const moodEmojis = ['😢', '😔', '😐', '🙂', '😊'];
-const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'];
+// const moodLabels = ['Very Low', 'Low', 'Neutral', 'Good', 'Excellent']; // Commented out as unused
 
 export const TriggerAnalytics: React.FC = () => {
   const [timeRange, setTimeRange] = useState<'7days' | '30days' | '90days'>('30days');
@@ -145,7 +144,7 @@ export const TriggerAnalytics: React.FC = () => {
       topCombinations,
       totalTriggerOccurrences: triggerImpact.reduce((sum, item) => sum + item.count, 0)
     };
-  }, [entries, triggers, timeRange]);
+  }, [entries, triggers]); // Removed timeRange as it's not used in the calculation
 
   const selectedTriggerData = React.useMemo(() => {
     if (!selectedTrigger || !triggerAnalytics) return null;

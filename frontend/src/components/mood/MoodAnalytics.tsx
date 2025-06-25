@@ -32,10 +32,10 @@ export const MoodAnalytics: React.FC = () => {
     },
   });
 
-  const { data: patterns } = useQuery({
-    queryKey: ['mood', 'patterns'],
-    queryFn: () => moodApi.getMoodPatterns(),
-  });
+  // const { data: patterns } = useQuery({ // Commented out as unused
+  //   queryKey: ['mood', 'patterns'],
+  //   queryFn: () => moodApi.getMoodPatterns(),
+  // });
 
   const analyticsData = React.useMemo(() => {
     if (!monthlyMoods?.length) return null;

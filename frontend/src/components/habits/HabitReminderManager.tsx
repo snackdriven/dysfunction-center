@@ -2,7 +2,6 @@ import React, { useState, useEffect } from 'react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { Badge } from '../ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 import { 
@@ -10,7 +9,6 @@ import {
   Plus, 
   Trash2, 
   Clock, 
-  Calendar,
   Smartphone,
   Mail,
   Volume2,
@@ -18,7 +16,7 @@ import {
   BarChart3,
   TrendingUp
 } from 'lucide-react';
-import { Habit, useUpdateHabit } from '../../services/habits';
+import { Habit } from '../../services/habits';
 
 interface HabitReminder {
   id: string;
@@ -68,7 +66,7 @@ export const HabitReminderManager: React.FC<HabitReminderManagerProps> = ({
     enabled: true,
   });
 
-  const updateHabit = useUpdateHabit();
+  // const updateHabit = useUpdateHabit(); // Commented out as unused
 
   // Load reminders from localStorage for this habit
   useEffect(() => {

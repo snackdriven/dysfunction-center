@@ -7,7 +7,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { 
   CalendarIcon, 
   Target, 
-  CheckCircle, 
   Clock, 
   Smile,
   AlertCircle,
@@ -24,7 +23,6 @@ import { tasksApi } from '../../services/tasks';
 import { habitsApi } from '../../services/habits';
 import { moodApi } from '../../services/mood';
 import { calendarApi } from '../../services/calendar';
-import { DailyProductivityData, ProductivityInsight } from '../../../../shared/types';
 import { cn } from '../../utils/cn';
 
 export const UnifiedDashboard: React.FC = () => {
@@ -39,7 +37,7 @@ export const UnifiedDashboard: React.FC = () => {
   });
 
   // Fetch insights
-  const { data: insights, isLoading: insightsLoading } = useQuery({
+  const { data: insights } = useQuery({
     queryKey: ['productivity-insights'],
     queryFn: () => integrationService.getInsights(7),
   });

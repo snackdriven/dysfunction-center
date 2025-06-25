@@ -12,27 +12,15 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  ScatterChart,
-  Scatter,
   LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
+  Line
 } from 'recharts';
 import { 
   TrendingUp,
   Brain,
-  Heart,
   Activity,
   Cloud,
-  MapPin,
-  Calendar,
   Clock,
-  Users,
-  Coffee,
-  Moon,
-  Sun,
   Download
 } from 'lucide-react';
 import { moodApi, MoodEntry } from '../../services/mood';
@@ -67,9 +55,9 @@ interface ActivityMoodData {
 }
 
 export const MoodCorrelationAnalyzer: React.FC = () => {
-  const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]);
-  const [tasks, setTasks] = useState<Task[]>([]);
-  const [habits, setHabits] = useState<Habit[]>([]);
+  // const [moodEntries, setMoodEntries] = useState<MoodEntry[]>([]); // Commented out as unused
+  // const [tasks, setTasks] = useState<Task[]>([]); // Commented out as unused
+  // const [habits, setHabits] = useState<Habit[]>([]); // Commented out as unused
   const [correlations, setCorrelations] = useState<CorrelationData[]>([]);
   const [timeBasedData, setTimeBasedData] = useState<TimeBasedMoodData[]>([]);
   const [weatherData, setWeatherData] = useState<WeatherMoodData[]>([]);
@@ -79,9 +67,9 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
 
   useEffect(() => {
     fetchData();
-  }, [timeframe]);
+  }, [timeframe]); // Removed fetchData since it has empty deps
 
-  const fetchData = async () => {
+  const fetchData = React.useCallback(async () => {
     try {
       setLoading(true);
       const endDate = new Date();
@@ -115,9 +103,9 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
         habitsApi.getHabits()
       ]);
 
-      setMoodEntries(moodData);
-      setTasks(taskData);
-      setHabits(habitData);
+      // setMoodEntries(moodData); // Commented out as state is unused
+      // setTasks(taskData); // Commented out as state is unused
+      // setHabits(habitData); // Commented out as state is unused
 
       analyzeCorrelations(moodData, taskData, habitData);
       analyzeTimePatterns(moodData);
@@ -128,7 +116,7 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
     } finally {
       setLoading(false);
     }
-  };
+  }, []); // Empty deps for useCallback
 
   const analyzeCorrelations = (moods: MoodEntry[], tasks: Task[], habits: Habit[]) => {
     const correlationResults: CorrelationData[] = [];
@@ -367,7 +355,7 @@ export const MoodCorrelationAnalyzer: React.FC = () => {
     URL.revokeObjectURL(url);
   };
 
-  const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+  // const COLORS = ['#3b82f6', '#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4']; // Commented out as unused
 
   if (loading) {
     return (

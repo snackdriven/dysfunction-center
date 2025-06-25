@@ -5,18 +5,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { 
   TrendingUp, 
   Target, 
-  Calendar, 
   Award, 
   BarChart3, 
   Activity,
   Zap,
-  Clock,
   AlertCircle,
   CheckCircle,
   TrendingDown,
   Lightbulb,
-  Filter,
-  ChevronRight
+  Filter
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { habitsApi } from '../../services/habits';
