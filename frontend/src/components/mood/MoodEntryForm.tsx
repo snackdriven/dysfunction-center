@@ -29,10 +29,9 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
     stress_level: entry?.stress_level || 3,
     secondary_mood: entry?.secondary_mood || '',
     notes: entry?.notes || '',
-    location: entry?.location || '',
     weather: entry?.weather || '',
     trigger_ids: entry?.triggers?.map(t => t.id) || [] as number[],
-    context_tags: entry?.context_tags || { activities: [], people: [], emotions: [], locations: [] } as ContextTags,
+    context_tags: entry?.context_tags || { activities: [], people: [], locations: [] } as ContextTags,
     entry_date: entry?.entry_date || new Date().toISOString().split('T')[0],
   });
 
@@ -73,7 +72,6 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
         stress_level: formData.stress_level || undefined,
         secondary_mood: formData.secondary_mood || undefined,
         notes: formData.notes || undefined,
-        location: formData.location || undefined,
         weather: formData.weather || undefined,
         trigger_ids: formData.trigger_ids.length > 0 ? formData.trigger_ids : undefined,
         context_tags: Object.values(formData.context_tags).some(arr => arr && arr.length > 0) ? formData.context_tags : undefined,
@@ -107,7 +105,7 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
     <form onSubmit={handleSubmit} className="space-y-6">
       <DialogHeader>
         <DialogTitle>
-          {isEditing ? 'Edit Mood Entry' : 'Log Your Mood'}
+          {isEditing ? 'Edit Mood Entry' : 'Add New Mood Entry'}
         </DialogTitle>
       </DialogHeader>
 
@@ -214,14 +212,8 @@ export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }
               <p className="text-sm text-red-600">{errors.stress_level}</p>
             )}
           </div>
-        </div>        {/* Location & Weather */}
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            label="Location (optional)"
-            placeholder="Where are you?"
-            value={formData.location}
-            onChange={(e) => handleInputChange('location', e.target.value)}
-          />
+        </div>        {/* Weather */}
+        <div>
           <Select
             value={formData.weather}
             onValueChange={(value) => handleInputChange('weather', value)}

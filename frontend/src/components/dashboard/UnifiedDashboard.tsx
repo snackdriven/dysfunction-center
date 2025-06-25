@@ -64,9 +64,9 @@ export const UnifiedDashboard: React.FC = () => {
     queryFn: () => habitsApi.getHabits(),
   });
 
-  const { data: todayMood } = useQuery({
+  const { data: todayMoods } = useQuery({
     queryKey: ['mood', 'today'],
-    queryFn: () => moodApi.getTodayMood(),
+    queryFn: () => moodApi.getTodayMoods(),
   });
 
   const { data: upcomingEvents } = useQuery({
@@ -488,33 +488,73 @@ export const UnifiedDashboard: React.FC = () => {
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {todayMood ? (
-                  <div className="space-y-3">
+                {todayMoods && todayMoods.length > 0 ? (
+                  <div className="space-y-4">
                     <div className="flex items-center justify-between">
-                      <span className="font-medium">Today's Mood</span>
-                      <Badge variant="outline">{todayMood.mood_score}/5</Badge>
+                      <span className="font-medium">Today's Moods ({todayMoods.length})</span>
+                      {todayMoods.length > 0 && (
+                        <Badge variant="outline">
+                          Avg: {(todayMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / todayMoods.length).toFixed(1)}/5
+                        </Badge>
+                      )}
                     </div>
-                    <div className="grid grid-cols-3 gap-3 text-sm">
-                      <div className="text-center">
-                        <div className="font-semibold">{todayMood.energy_level}/5</div>
-                        <div className="text-muted-foreground">Energy</div>
+                    
+                    {/* Display latest mood details */}
+                    {todayMoods.length > 0 && (
+                      <div className="grid grid-cols-3 gap-3 text-sm">
+                        <div className="text-center">
+                          <div className="font-semibold">
+                            {todayMoods[todayMoods.length - 1].energy_level || 'N/A'}/5
+                          </div>
+                          <div className="text-muted-foreground">Energy</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold">
+                            {todayMoods[todayMoods.length - 1].stress_level || 'N/A'}/5
+                          </div>
+                          <div className="text-muted-foreground">Stress</div>
+                        </div>
+                        <div className="text-center">
+                          <div className="font-semibold">
+                            {todayMoods[todayMoods.length - 1].mood_category || 'N/A'}
+                          </div>
+                          <div className="text-muted-foreground">Latest</div>
+                        </div>
                       </div>
-                      <div className="text-center">
-                        <div className="font-semibold">{todayMood.stress_level}/5</div>
-                        <div className="text-muted-foreground">Stress</div>
-                      </div>
-                      <div className="text-center">
-                        <div className="font-semibold">{todayMood.mood_category || 'N/A'}</div>
-                        <div className="text-muted-foreground">Primary</div>
+                    )}
+
+                    {/* Display recent moods as a timeline */}
+                    <div className="space-y-2">
+                      <div className="text-xs font-medium text-muted-foreground">Recent entries:</div>
+                      <div className="flex gap-2 overflow-x-auto pb-2">
+                        {todayMoods.slice(-5).map((mood, index) => (
+                          <div 
+                            key={mood.id} 
+                            className="flex-shrink-0 p-2 border rounded-lg min-w-[80px] text-center"
+                          >
+                            <div className="text-lg font-semibold">
+                              {mood.mood_score}/5
+                            </div>
+                            <div className="text-xs text-muted-foreground">
+                              {new Date(mood.created_at).toLocaleTimeString('en-US', {
+                                hour: 'numeric',
+                                minute: '2-digit',
+                                hour12: true,
+                              })}
+                            </div>
+                          </div>
+                        ))}
                       </div>
                     </div>
+
                     <div className="flex gap-2">
                       <Button 
                         variant="outline" 
                         className="flex-1"
                         onClick={() => setIsMoodModalOpen(true)}
                       >
-                        Update Mood
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Entry
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -655,7 +695,7 @@ export const UnifiedDashboard: React.FC = () => {
       <Dialog open={isMoodModalOpen} onOpenChange={setIsMoodModalOpen}>
         <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Log Your Mood</DialogTitle>
+            <DialogTitle>Add New Mood Entry</DialogTitle>
           </DialogHeader>
           <MoodEntryForm onSuccess={handleMoodSuccess} />
         </DialogContent>

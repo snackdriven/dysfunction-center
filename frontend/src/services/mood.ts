@@ -12,7 +12,6 @@ export interface MoodTrigger {
 export interface ContextTags {
   activities?: string[];
   people?: string[];
-  emotions?: string[];
   locations?: string[];
 }
 
@@ -101,6 +100,19 @@ export const moodApi = {  getMoodEntries: async (params?: { limit?: number; star
         return null;
       }
       throw error;
+    }
+  },
+
+  getTodayMoods: async (): Promise<MoodEntry[]> => {
+    try {
+      const today = new Date().toISOString().split('T')[0];
+      const { data } = await api.get(apiEndpoints.mood.list, { 
+        params: { start_date: today, end_date: today } 
+      });
+      return data.mood_entries || [];
+    } catch (error: any) {
+      console.error('Failed to fetch today\'s moods:', error);
+      return [];
     }
   },
 

@@ -23,7 +23,6 @@ export interface CustomMood {
 export type ContextTags = {
   activities?: string[];
   people?: string[];
-  emotions?: string[];
   locations?: string[];
 };
 

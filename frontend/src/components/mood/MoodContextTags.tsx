@@ -3,7 +3,7 @@ import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { ContextTags } from '../../services/mood';
-import { MapPin, Users, Activity, Heart, Plus, X } from 'lucide-react';
+import { MapPin, Users, Activity, Plus, X } from 'lucide-react';
 
 interface MoodContextTagsProps {
   contextTags: ContextTags;
@@ -18,10 +18,6 @@ const defaultOptions = {
   people: [
     'Alone', 'With family', 'With friends', 'With partner', 'With colleagues',
     'With strangers', 'In a crowd', 'With pets'
-  ],
-  emotions: [
-    'Grateful', 'Hopeful', 'Motivated', 'Peaceful', 'Excited', 'Content',
-    'Anxious', 'Frustrated', 'Overwhelmed', 'Lonely', 'Restless', 'Worried'
   ],
   locations: [
     'Home', 'Work', 'Outdoors', 'Car', 'Public transport', 'Restaurant',
@@ -66,7 +62,6 @@ export const MoodContextTags: React.FC<MoodContextTagsProps> = ({
     switch (category) {
       case 'activities': return <Activity className="h-4 w-4" />;
       case 'people': return <Users className="h-4 w-4" />;
-      case 'emotions': return <Heart className="h-4 w-4" />;
       case 'locations': return <MapPin className="h-4 w-4" />;
     }
   };
@@ -75,7 +70,6 @@ export const MoodContextTags: React.FC<MoodContextTagsProps> = ({
     switch (category) {
       case 'activities': return 'border-blue-200 bg-blue-50 text-blue-700';
       case 'people': return 'border-green-200 bg-green-50 text-green-700';
-      case 'emotions': return 'border-purple-200 bg-purple-50 text-purple-700';
       case 'locations': return 'border-orange-200 bg-orange-50 text-orange-700';
     }
   };
@@ -83,7 +77,6 @@ export const MoodContextTags: React.FC<MoodContextTagsProps> = ({
   const categories: { key: keyof ContextTags; label: string }[] = [
     { key: 'activities', label: 'Activities' },
     { key: 'people', label: 'People' },
-    { key: 'emotions', label: 'Emotions' },
     { key: 'locations', label: 'Locations' }
   ];
 

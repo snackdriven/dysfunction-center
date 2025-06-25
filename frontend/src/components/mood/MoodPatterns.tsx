@@ -57,7 +57,6 @@ export const MoodPatterns: React.FC = () => {
         const allContexts = [
           ...(contexts.activities || []),
           ...(contexts.people || []),
-          ...(contexts.emotions || []),
           ...(contexts.locations || [])
         ];
         
@@ -244,7 +243,6 @@ export const MoodPatterns: React.FC = () => {
                     {[
                       ...(patterns.bestDay.context_tags.activities || []),
                       ...(patterns.bestDay.context_tags.people || []),
-                      ...(patterns.bestDay.context_tags.emotions || []),
                       ...(patterns.bestDay.context_tags.locations || [])
                     ].slice(0, 2).map((context, index) => (
                       <Badge key={index} variant="secondary" className="text-xs">
