@@ -182,33 +182,6 @@ export const setPreference = api(
   }
 );
 
-// Get all preferences for a user
-export const getAllPreferences = api(
-  { method: "GET", path: "/preferences", expose: true },
-  async (req: GetAllPreferencesRequest): Promise<GetAllPreferencesResponse> => {
-    try {
-      const user_id = req.user_id || 'default_user';
-
-      const generator = preferencesDB.query`
-        SELECT preference_key, preference_value 
-        FROM user_preferences 
-        WHERE user_id = ${user_id}
-      `;
-
-      const result = await collectResults(generator);
-      
-      const preferences: Record<string, string> = {};
-      result.forEach((row: any) => {
-        preferences[row.preference_key] = row.preference_value;
-      });
-
-      return { preferences };
-    } catch (error) {
-      throw new Error(`Failed to get preferences: ${error instanceof Error ? error.message : 'Unknown error'}`);
-    }
-  }
-);
-
 // Get theme preference and resolved theme
 export const getTheme = api(
   { method: "GET", path: "/theme", expose: true },

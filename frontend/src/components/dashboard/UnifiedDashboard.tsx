@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Progress } from '../ui/Progress';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 import { 
   CalendarIcon, 
   Target, 
@@ -14,20 +16,29 @@ import {
   Plus,
   ArrowRight,
   Star,
-  BarChart3
+  BarChart3,
+  ExternalLink
 } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '../../stores/useAppStore';
 import { integrationService } from '../../services/integration';
 import { tasksApi } from '../../services/tasks';
 import { habitsApi } from '../../services/habits';
 import { moodApi } from '../../services/mood';
 import { calendarApi } from '../../services/calendar';
+import { TaskForm } from '../tasks/TaskForm';
+import { HabitForm } from '../habits/HabitForm';
+import { MoodEntryForm } from '../mood/MoodEntryForm';
 import { cn } from '../../utils/cn';
 
 export const UnifiedDashboard: React.FC = () => {
+  const navigate = useNavigate();
+  const queryClient = useQueryClient();
   const { selectedDate, setSelectedDate } = useAppStore();
   const [activeTab, setActiveTab] = useState('overview');
+  const [isTaskModalOpen, setIsTaskModalOpen] = useState(false);
+  const [isHabitModalOpen, setIsHabitModalOpen] = useState(false);
+  const [isMoodModalOpen, setIsMoodModalOpen] = useState(false);
   const today = new Date().toISOString().split('T')[0];
 
   // Fetch unified productivity data
@@ -65,6 +76,96 @@ export const UnifiedDashboard: React.FC = () => {
       end: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] 
     }),
   });
+
+  // Fetch today's habit completions
+  const { data: todayCompletions } = useQuery({
+    queryKey: ['habit-completions', 'today'],
+    queryFn: () => habitsApi.getTodayCompletions(),
+  });
+
+  // Mutations for task operations
+  const updateTaskMutation = useMutation({
+    mutationFn: ({ id, completed }: { id: number; completed: boolean }) => 
+      tasksApi.updateTask({ id, completed }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['tasks'] });
+      queryClient.invalidateQueries({ queryKey: ['productivity-data'] });
+    },
+  });
+
+  // Mutations for habit operations
+  const logHabitCompletionMutation = useMutation({
+    mutationFn: ({ habitId, completed }: { habitId: number; completed: boolean }) => 
+      habitsApi.logCompletion(habitId, { 
+        date: today, 
+        completed,
+        value: completed ? 1 : 0 
+      }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habit-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['productivity-data'] });
+    },
+  });
+
+  // Helper functions for actions
+  const handleAddTask = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    console.log('handleAddTask called - opening task modal');
+    setIsTaskModalOpen(true);
+  };
+
+  const handleAddHabit = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    console.log('handleAddHabit called - opening habit modal');
+    setIsHabitModalOpen(true);
+  };
+
+  const handleLogMood = (e?: React.MouseEvent) => {
+    e?.preventDefault();
+    e?.stopPropagation();
+    console.log('handleLogMood called - opening mood modal');
+    setIsMoodModalOpen(true);
+  };
+
+  // Modal success handlers
+  const handleTaskSuccess = () => {
+    setIsTaskModalOpen(false);
+    queryClient.invalidateQueries({ queryKey: ['tasks'] });
+    queryClient.invalidateQueries({ queryKey: ['productivity-data'] });
+  };
+
+  const handleHabitSuccess = () => {
+    setIsHabitModalOpen(false);
+    queryClient.invalidateQueries({ queryKey: ['habits'] });
+    queryClient.invalidateQueries({ queryKey: ['productivity-data'] });
+  };
+
+  const handleMoodSuccess = () => {
+    setIsMoodModalOpen(false);
+    queryClient.invalidateQueries({ queryKey: ['mood'] });
+    queryClient.invalidateQueries({ queryKey: ['productivity-data'] });
+  };
+
+  // Helper functions
+  const handleTaskToggle = (taskId: number, completed: boolean) => {
+    updateTaskMutation.mutate({ id: taskId, completed: !completed });
+  };
+
+  const handleHabitToggle = (habitId: number) => {
+    const completion = todayCompletions?.find(c => c.habit_id === habitId);
+    const isCompleted = completion?.completed || false;
+    logHabitCompletionMutation.mutate({ habitId, completed: !isCompleted });
+  };
+
+  const isHabitCompleted = (habitId: number) => {
+    return todayCompletions?.find(c => c.habit_id === habitId)?.completed || false;
+  };
+
+  const getHabitStreak = (habit: any) => {
+    return habit.current_streak || habit.streak_count || 0;
+  };
 
   const formatTime = (dateTime: string) => {
     return new Date(dateTime).toLocaleTimeString('en-US', {
@@ -244,13 +345,27 @@ export const UnifiedDashboard: React.FC = () => {
                 <div className="space-y-3">
                   {todayTasks?.slice(0, 4).map((task) => (
                     <div key={task.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <input
-                        type="checkbox"
-                        checked={task.completed}
-                        className="h-4 w-4 rounded border"
-                      />
+                      <div className="relative">
+                        <input
+                          type="checkbox"
+                          checked={task.completed}
+                          onChange={() => handleTaskToggle(task.id, task.completed)}
+                          className="h-4 w-4 rounded border cursor-pointer"
+                          disabled={updateTaskMutation.isPending}
+                        />
+                        {updateTaskMutation.isPending && (
+                          <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="h-2 w-2 animate-spin rounded-full border border-primary border-t-transparent" />
+                          </div>
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate">{task.title}</h4>
+                        <h4 className={cn(
+                          "font-medium truncate",
+                          task.completed && "line-through text-muted-foreground"
+                        )}>
+                          {task.title}
+                        </h4>
                         <div className="flex items-center gap-2 mt-1">
                           <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
                             {task.priority}
@@ -264,10 +379,30 @@ export const UnifiedDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Task
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={(e) => {
+                        console.log('Add Task button clicked');
+                        handleAddTask(e);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Task
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="flex-1"
+                      onClick={() => {
+                        console.log('View All Tasks button clicked');
+                        navigate('/tasks');
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View All
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -283,7 +418,7 @@ export const UnifiedDashboard: React.FC = () => {
               <CardContent>
                 <div className="space-y-3">
                   {todayHabits?.slice(0, 4).map((habit) => {
-                    const isCompleted = false; // Placeholder - would check today's completion
+                    const isCompleted = isHabitCompleted(habit.id);
                     return (
                       <div key={habit.id} className="flex items-center gap-3 p-3 border rounded-lg">
                         <div className={cn(
@@ -291,22 +426,55 @@ export const UnifiedDashboard: React.FC = () => {
                           isCompleted ? "bg-green-500" : "bg-gray-300"
                         )} />
                         <div className="flex-1 min-w-0">
-                          <h4 className="font-medium truncate">{habit.name}</h4>
+                          <h4 className={cn(
+                            "font-medium truncate",
+                            isCompleted && "text-green-700"
+                          )}>
+                            {habit.name}
+                          </h4>
                           <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
                             <Zap className="h-3 w-3" />
-                            Streak: 0 days
+                            Streak: {getHabitStreak(habit)} days
                           </div>
                         </div>
-                        <Button size="sm" variant={isCompleted ? "primary" : "outline"}>
-                          {isCompleted ? 'Done' : 'Mark'}
+                        <Button 
+                          size="sm" 
+                          variant={isCompleted ? "primary" : "outline"}
+                          onClick={() => handleHabitToggle(habit.id)}
+                          disabled={logHabitCompletionMutation.isPending}
+                        >
+                          {logHabitCompletionMutation.isPending ? 
+                            <div className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" /> :
+                            (isCompleted ? 'Done' : 'Mark')
+                          }
                         </Button>
                       </div>
                     );
                   })}
-                  <Button variant="outline" className="w-full">
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Habit
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={(e) => {
+                        console.log('Add Habit button clicked');
+                        handleAddHabit(e);
+                      }}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Habit
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="flex-1"
+                      onClick={() => {
+                        console.log('View All Habits button clicked');
+                        navigate('/habits');
+                      }}
+                    >
+                      <ExternalLink className="h-4 w-4 mr-2" />
+                      View All
+                    </Button>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -340,9 +508,22 @@ export const UnifiedDashboard: React.FC = () => {
                         <div className="text-muted-foreground">Primary</div>
                       </div>
                     </div>
-                    <Button variant="outline" className="w-full">
-                      Update Mood
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => setIsMoodModalOpen(true)}
+                      >
+                        Update Mood
+                      </Button>
+                      <Button 
+                        variant="ghost" 
+                        className="flex-1"
+                        onClick={() => navigate('/mood')}
+                      >
+                        View History
+                      </Button>
+                    </div>
                   </div>
                 ) : (
                   <div className="text-center py-6">
@@ -350,7 +531,12 @@ export const UnifiedDashboard: React.FC = () => {
                     <p className="text-muted-foreground mb-4">
                       How are you feeling today?
                     </p>
-                    <Button>Log Mood</Button>
+                    <Button onClick={(e) => {
+                      console.log('Log Mood button clicked');
+                      handleLogMood(e);
+                    }}>
+                      Log Mood
+                    </Button>
                   </div>
                 )}
               </CardContent>
@@ -378,7 +564,11 @@ export const UnifiedDashboard: React.FC = () => {
                       </div>
                     </div>
                   ))}
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full"
+                    onClick={() => navigate('/calendar')}
+                  >
                     <Plus className="h-4 w-4 mr-2" />
                     Add Event
                   </Button>
@@ -394,9 +584,14 @@ export const UnifiedDashboard: React.FC = () => {
               <CardTitle>Task Management</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Detailed task management interface will be implemented here.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  View and manage your tasks in detail
+                </p>
+                <Button onClick={() => navigate('/tasks')}>
+                  Go to Tasks
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -407,9 +602,14 @@ export const UnifiedDashboard: React.FC = () => {
               <CardTitle>Habit Tracking</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Detailed habit tracking interface will be implemented here.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  Track your daily habits and build consistency
+                </p>
+                <Button onClick={() => navigate('/habits')}>
+                  Go to Habits
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -420,13 +620,46 @@ export const UnifiedDashboard: React.FC = () => {
               <CardTitle>Schedule Overview</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-muted-foreground">
-                Detailed schedule interface will be implemented here.
-              </p>
+              <div className="text-center py-8">
+                <p className="text-muted-foreground mb-4">
+                  View your calendar and upcoming events
+                </p>
+                <Button onClick={() => navigate('/calendar')}>
+                  Go to Calendar
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+
+      {/* Modal Dialogs */}
+      <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Task</DialogTitle>
+          </DialogHeader>
+          <TaskForm onSuccess={handleTaskSuccess} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isHabitModalOpen} onOpenChange={setIsHabitModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Add New Habit</DialogTitle>
+          </DialogHeader>
+          <HabitForm onSuccess={handleHabitSuccess} />
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={isMoodModalOpen} onOpenChange={setIsMoodModalOpen}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Log Your Mood</DialogTitle>
+          </DialogHeader>
+          <MoodEntryForm onSuccess={handleMoodSuccess} />
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
