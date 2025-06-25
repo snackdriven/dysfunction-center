@@ -76,6 +76,36 @@ export const getPreference = api(
       const result = await collectResults(generator);
 
       if (result.length === 0) {
+        // Return default value if preference doesn't exist
+        const defaultPrefs: { [key: string]: string } = {
+          'end_of_day_time': '23:59',
+          'start_of_week': 'monday',
+          'timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+          'date_format': 'YYYY-MM-DD',
+          'time_format': '24h',
+          'theme': 'system',
+          'auto_switch_theme': 'true',
+          'dark_hours_start': '18:00',
+          'dark_hours_end': '06:00',
+          'font_scale': '1.0',
+          'default_calendar_view': 'week',
+          'show_weekend': 'true',
+          'habit_streak_grace_period': '0'
+        };
+
+        const defaultValue = defaultPrefs[key];
+        if (defaultValue) {
+          const preference: UserPreference = {
+            id: 0, // Indicates this is a default value
+            user_id: user_id,
+            preference_key: key,
+            preference_value: defaultValue,
+            created_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
+          };
+          return { preference };
+        }
+        
         throw new Error("Preference not found");
       }
 

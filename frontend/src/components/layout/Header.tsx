@@ -37,6 +37,8 @@ export const Header: React.FC = () => {
             </div>
           )}
 
+          {/* App Name in Header */}
+          <span className="font-bold text-xl ml-4 hidden md:inline-block">Executive Dysfunction Center</span>
           {/* Search */}
           <div className="flex-1 max-w-md">
             <div className="relative">

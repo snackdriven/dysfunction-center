@@ -350,7 +350,7 @@ export const TaskCard: React.FC<TaskCardProps> = ({
 
       {/* Edit Dialog */}
       <Dialog open={isEditing} onOpenChange={setIsEditing}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-lg w-full p-4 rounded-lg max-h-[90vh] overflow-y-auto">
           <TaskForm 
             task={task} 
             onSuccess={() => setIsEditing(false)} 

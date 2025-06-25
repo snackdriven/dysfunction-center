@@ -7,9 +7,8 @@ import { TaskList } from '../components/tasks/TaskList';
 import { TaskForm } from '../components/tasks/TaskForm';
 import { TaskCategoryManager } from '../components/tasks/TaskCategoryManager';
 import { TaskKanbanView } from '../components/tasks/TaskKanbanView';
-import { TaskCalendarView } from '../components/tasks/TaskCalendarView';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
-import { Plus, Search, List, Columns, Calendar, Filter } from 'lucide-react';
+import { Plus, Search, List, Columns, Filter } from 'lucide-react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { tasksApi, Task } from '../services/tasks';
 
@@ -19,7 +18,7 @@ export const Tasks: React.FC = () => {
   const [priorityFilter, setPriorityFilter] = useState<string>('all');
   const [categoryFilter, setCategoryFilter] = useState<number | undefined>();
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [currentView, setCurrentView] = useState<'list' | 'kanban' | 'calendar'>('list');
+  const [currentView, setCurrentView] = useState<'list' | 'kanban'>('list');
   const queryClient = useQueryClient();
 
   const { data: tasks, isLoading, error, refetch } = useQuery({
@@ -68,7 +67,7 @@ export const Tasks: React.FC = () => {
               Add Task
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-2xl">
+          <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <TaskForm onSuccess={() => setIsCreateDialogOpen(false)} />
           </DialogContent>
         </Dialog>
@@ -77,7 +76,7 @@ export const Tasks: React.FC = () => {
       {/* View Modes and Filters */}
       <div className="space-y-4">
         {/* View Mode Tabs */}
-        <Tabs value={currentView} defaultValue="list" onValueChange={(value) => setCurrentView(value as 'list' | 'kanban' | 'calendar')}>
+        <Tabs value={currentView} defaultValue="list" onValueChange={(value) => setCurrentView(value as 'list' | 'kanban')}>
           <div className="flex items-center justify-between">
             <TabsList>
               <TabsTrigger value="list" className="flex items-center gap-2">
@@ -87,10 +86,6 @@ export const Tasks: React.FC = () => {
               <TabsTrigger value="kanban" className="flex items-center gap-2">
                 <Columns className="h-4 w-4" />
                 Kanban
-              </TabsTrigger>
-              <TabsTrigger value="calendar" className="flex items-center gap-2">
-                <Calendar className="h-4 w-4" />
-                Calendar
               </TabsTrigger>
             </TabsList>
             
@@ -152,14 +147,6 @@ export const Tasks: React.FC = () => {
 
           <TabsContent value="kanban" className="space-y-4">
             <TaskKanbanView
-              tasks={tasks || []}
-              onTaskUpdate={handleTaskUpdate}
-              onTaskCreate={handleTaskCreate}
-            />
-          </TabsContent>
-
-          <TabsContent value="calendar" className="space-y-4">
-            <TaskCalendarView
               tasks={tasks || []}
               onTaskUpdate={handleTaskUpdate}
               onTaskCreate={handleTaskCreate}

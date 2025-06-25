@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavLink, useLocation } from 'react-router-dom';
+import { NavLink, useLocation, Link } from 'react-router-dom';
 import { cn } from '../../utils/cn';
 import { 
   LayoutDashboard, 
@@ -11,6 +11,8 @@ import {
   BarChart3, 
   Settings 
 } from 'lucide-react';
+import { useQuery } from '@tanstack/react-query';
+import { preferencesService } from '../../services/preferences';
 
 const navigationItems = [
   {
@@ -71,25 +73,33 @@ export interface SidebarProps {
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) => {
   const location = useLocation();
 
+  // Fetch user preferences for avatar
+  const { data: preferences } = useQuery({
+    queryKey: ['preferences'],
+    queryFn: () => preferencesService.getAllPreferences(),
+  });
+  const avatarUrl = preferences?.preferences?.avatar_url || '';
+  const displayName = preferences?.preferences?.display_name || '';
+
   return (
     <div className={cn(
       "flex flex-col bg-card border-r border-border transition-all duration-200 ease-in-out",
       isOpen ? "w-64" : "w-16",
       className
     )}>
-      {/* Logo */}
+      {/* Avatar and Display Name as Dashboard Link */}
       <div className="p-6 border-b border-border">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center flex-shrink-0">
-            <span className="text-primary-foreground font-bold text-sm">EDC</span>
-          </div>
-          {isOpen && (
-            <div className="overflow-hidden">
-              <h1 className="font-semibold text-lg truncate">Executive Dysfunction Center</h1>
-              <p className="text-xs text-muted-foreground">Productivity Tracker</p>
-            </div>
+        <Link to="/" className="flex items-center gap-2 group">
+          <img
+            src={avatarUrl || 'https://ui-avatars.com/api/?name=User&background=random'}
+            alt="User Avatar"
+            className="w-10 h-10 rounded-full border flex-shrink-0 group-hover:ring-2 group-hover:ring-primary transition"
+            style={{ cursor: 'pointer' }}
+          />
+          {isOpen && displayName && (
+            <span className="font-semibold text-base truncate group-hover:text-primary transition">{displayName}</span>
           )}
-        </div>
+        </Link>
       </div>
 
       {/* Navigation */}

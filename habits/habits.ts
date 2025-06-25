@@ -44,23 +44,33 @@ async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
 // Get user's End of Day time setting from preferences
 async function getEndOfDayTime(userId: string = 'default_user'): Promise<string> {
   try {
-    // In a real implementation, we'd call the preferences service
-    // For now, we'll use a direct database query to the preferences table
-    const generator = habitDB.query`
-      SELECT preference_value 
-      FROM user_preferences 
-      WHERE user_id = ${userId} AND preference_key = 'end_of_day_time'
-    `;
-    const result = await collectResults(generator);
+    // Try to call the preferences service
+    const { preferences } = await import("~encore/clients");
+    const response = await preferences.getPreference({
+      key: 'end_of_day_time',
+      user_id: userId
+    });
     
-    if (result.length > 0) {
-      return result[0].preference_value;
+    return response.preference.preference_value || '23:59';
+  } catch (serviceError) {
+    // If preferences service is not available, try to get from shared database
+    try {
+      const generator = habitDB.query`
+        SELECT preference_value 
+        FROM user_preferences 
+        WHERE user_id = ${userId} AND preference_key = 'end_of_day_time'
+      `;
+      const result = await collectResults(generator);
+      
+      if (result.length > 0) {
+        return result[0].preference_value;
+      }
+    } catch (dbError) {
+      // Database table might not exist yet, that's okay
     }
     
+    // Fall back to default - this is expected during initial setup
     return '23:59'; // Default End of Day time
-  } catch (error) {
-    console.warn('Could not fetch end_of_day_time preference, using default:', error);
-    return '23:59';
   }
 }
 

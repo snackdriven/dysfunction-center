@@ -4,7 +4,6 @@ import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
 import { Progress } from '../ui/Progress';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '../ui/Tabs';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '../ui/Dialog';
 import { 
   CalendarIcon, 
@@ -30,6 +29,7 @@ import { TaskForm } from '../tasks/TaskForm';
 import { HabitForm } from '../habits/HabitForm';
 import { MoodEntryForm } from '../mood/MoodEntryForm';
 import { cn } from '../../utils/cn';
+import { preferencesService } from '../../services/preferences';
 
 export const UnifiedDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -189,6 +189,14 @@ export const UnifiedDashboard: React.FC = () => {
     return 'bg-red-100';
   };
 
+  // Fetch user preferences for avatar and display name
+  const { data: preferences } = useQuery({
+    queryKey: ['preferences'],
+    queryFn: () => preferencesService.getAllPreferences(),
+  });
+  const displayName = preferences?.preferences?.display_name || '';
+  const avatarUrl = preferences?.preferences?.avatar_url || '';
+
   if (productivityLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -205,23 +213,15 @@ export const UnifiedDashboard: React.FC = () => {
       {/* Header with Date Selection */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Productivity Dashboard</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {displayName ? `Welcome, ${displayName}!` : 'Productivity Dashboard'}
+          </h1>
           <p className="text-muted-foreground">
             Your unified view across tasks, habits, mood, and calendar
           </p>
         </div>
         <div className="flex items-center gap-4">
-          <input
-            type="date"
-            value={selectedDate}
-            onChange={(e) => setSelectedDate(e.target.value)}
-            className="px-3 py-2 border rounded-lg"
-          />
-          {selectedDate !== today && (
-            <Button variant="outline" onClick={() => setSelectedDate(today)}>
-              Today
-            </Button>
-          )}
+          <span className="text-lg font-semibold">{new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
       </div>
 
@@ -322,356 +322,293 @@ export const UnifiedDashboard: React.FC = () => {
         </Card>
       )}
 
-      {/* Main Content Tabs */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="overview">
-        <TabsList className="grid w-full grid-cols-4">
-          <TabsTrigger value="overview">Today's Focus</TabsTrigger>
-          <TabsTrigger value="tasks">Tasks</TabsTrigger>
-          <TabsTrigger value="habits">Habits</TabsTrigger>
-          <TabsTrigger value="schedule">Schedule</TabsTrigger>
-        </TabsList>
-
-        <TabsContent value="overview" className="space-y-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            {/* Priority Tasks */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <AlertCircle className="h-5 w-5" />
-                  Priority Tasks
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {todayTasks?.slice(0, 4).map((task) => (
-                    <div key={task.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <div className="relative">
-                        <input
-                          type="checkbox"
-                          checked={task.completed}
-                          onChange={() => handleTaskToggle(task.id, task.completed)}
-                          className="h-4 w-4 rounded border cursor-pointer"
-                          disabled={updateTaskMutation.isPending}
-                        />
-                        {updateTaskMutation.isPending && (
-                          <div className="absolute inset-0 flex items-center justify-center">
-                            <div className="h-2 w-2 animate-spin rounded-full border border-primary border-t-transparent" />
-                          </div>
+      {/* Overview Content */}
+      <div className="space-y-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Priority Tasks */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5" />
+                Priority Tasks
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {todayTasks?.slice(0, 4).map((task) => (
+                  <div key={task.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <div className="relative">
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => handleTaskToggle(task.id, task.completed)}
+                        className="h-4 w-4 rounded border cursor-pointer"
+                        disabled={updateTaskMutation.isPending}
+                      />
+                      {updateTaskMutation.isPending && (
+                        <div className="absolute inset-0 flex items-center justify-center">
+                          <div className="h-2 w-2 animate-spin rounded-full border border-primary border-t-transparent" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className={cn(
+                        "font-medium truncate",
+                        task.completed && "line-through text-muted-foreground"
+                      )}>
+                        {task.title}
+                      </h4>
+                      <div className="flex items-center gap-2 mt-1">
+                        <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
+                          {task.priority}
+                        </Badge>
+                        {task.due_date && (
+                          <span className="text-xs text-muted-foreground">
+                            Due: {new Date(task.due_date).toLocaleDateString()}
+                          </span>
                         )}
                       </div>
+                    </div>
+                  </div>
+                ))}
+                <div className="flex gap-2">
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={(e) => {
+                      console.log('Add Task button clicked');
+                      handleAddTask(e);
+                    }}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Task
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="flex-1"
+                    onClick={() => {
+                      console.log('View All Tasks button clicked');
+                      navigate('/tasks');
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View All
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Today's Habits */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Target className="h-5 w-5" />
+                Today's Habits
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {todayHabits?.slice(0, 4).map((habit) => {
+                  const isCompleted = isHabitCompleted(habit.id);
+                  return (
+                    <div key={habit.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                      <div className={cn(
+                        "w-4 h-4 rounded-full",
+                        isCompleted ? "bg-green-500" : "bg-gray-300"
+                      )} />
                       <div className="flex-1 min-w-0">
                         <h4 className={cn(
                           "font-medium truncate",
-                          task.completed && "line-through text-muted-foreground"
+                          isCompleted && "text-green-700"
                         )}>
-                          {task.title}
+                          {habit.name}
                         </h4>
-                        <div className="flex items-center gap-2 mt-1">
-                          <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
-                            {task.priority}
-                          </Badge>
-                          {task.due_date && (
-                            <span className="text-xs text-muted-foreground">
-                              Due: {new Date(task.due_date).toLocaleDateString()}
-                            </span>
-                          )}
+                        <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                          <Zap className="h-3 w-3" />
+                          Streak: {getHabitStreak(habit)} days
                         </div>
                       </div>
-                    </div>
-                  ))}
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex-1"
-                      onClick={(e) => {
-                        console.log('Add Task button clicked');
-                        handleAddTask(e);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Task
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="flex-1"
-                      onClick={() => {
-                        console.log('View All Tasks button clicked');
-                        navigate('/tasks');
-                      }}
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View All
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Today's Habits */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Target className="h-5 w-5" />
-                  Today's Habits
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {todayHabits?.slice(0, 4).map((habit) => {
-                    const isCompleted = isHabitCompleted(habit.id);
-                    return (
-                      <div key={habit.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                        <div className={cn(
-                          "w-4 h-4 rounded-full",
-                          isCompleted ? "bg-green-500" : "bg-gray-300"
-                        )} />
-                        <div className="flex-1 min-w-0">
-                          <h4 className={cn(
-                            "font-medium truncate",
-                            isCompleted && "text-green-700"
-                          )}>
-                            {habit.name}
-                          </h4>
-                          <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
-                            <Zap className="h-3 w-3" />
-                            Streak: {getHabitStreak(habit)} days
-                          </div>
-                        </div>
-                        <Button 
-                          size="sm" 
-                          variant={isCompleted ? "primary" : "outline"}
-                          onClick={() => handleHabitToggle(habit.id)}
-                          disabled={logHabitCompletionMutation.isPending}
-                        >
-                          {logHabitCompletionMutation.isPending ? 
-                            <div className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" /> :
-                            (isCompleted ? 'Done' : 'Mark')
-                          }
-                        </Button>
-                      </div>
-                    );
-                  })}
-                  <div className="flex gap-2">
-                    <Button 
-                      variant="outline" 
-                      className="flex-1"
-                      onClick={(e) => {
-                        console.log('Add Habit button clicked');
-                        handleAddHabit(e);
-                      }}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Habit
-                    </Button>
-                    <Button 
-                      variant="ghost" 
-                      className="flex-1"
-                      onClick={() => {
-                        console.log('View All Habits button clicked');
-                        navigate('/habits');
-                      }}
-                    >
-                      <ExternalLink className="h-4 w-4 mr-2" />
-                      View All
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Mood Check-in */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <Smile className="h-5 w-5" />
-                  Mood Check-in
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                {todayMoods && todayMoods.length > 0 ? (
-                  <div className="space-y-4">
-                    <div className="flex items-center justify-between">
-                      <span className="font-medium">Today's Moods ({todayMoods.length})</span>
-                      {todayMoods.length > 0 && (
-                        <Badge variant="outline">
-                          Avg: {(todayMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / todayMoods.length).toFixed(1)}/5
-                        </Badge>
-                      )}
-                    </div>
-                    
-                    {/* Display latest mood details */}
-                    {todayMoods.length > 0 && (
-                      <div className="grid grid-cols-3 gap-3 text-sm">
-                        <div className="text-center">
-                          <div className="font-semibold">
-                            {todayMoods[todayMoods.length - 1].energy_level || 'N/A'}/5
-                          </div>
-                          <div className="text-muted-foreground">Energy</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold">
-                            {todayMoods[todayMoods.length - 1].stress_level || 'N/A'}/5
-                          </div>
-                          <div className="text-muted-foreground">Stress</div>
-                        </div>
-                        <div className="text-center">
-                          <div className="font-semibold">
-                            {todayMoods[todayMoods.length - 1].mood_category || 'N/A'}
-                          </div>
-                          <div className="text-muted-foreground">Latest</div>
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Display recent moods as a timeline */}
-                    <div className="space-y-2">
-                      <div className="text-xs font-medium text-muted-foreground">Recent entries:</div>
-                      <div className="flex gap-2 overflow-x-auto pb-2">
-                        {todayMoods.slice(-5).map((mood, index) => (
-                          <div 
-                            key={mood.id} 
-                            className="flex-shrink-0 p-2 border rounded-lg min-w-[80px] text-center"
-                          >
-                            <div className="text-lg font-semibold">
-                              {mood.mood_score}/5
-                            </div>
-                            <div className="text-xs text-muted-foreground">
-                              {new Date(mood.created_at).toLocaleTimeString('en-US', {
-                                hour: 'numeric',
-                                minute: '2-digit',
-                                hour12: true,
-                              })}
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-
-                    <div className="flex gap-2">
                       <Button 
-                        variant="outline" 
-                        className="flex-1"
-                        onClick={() => setIsMoodModalOpen(true)}
+                        size="sm" 
+                        variant={isCompleted ? "primary" : "outline"}
+                        onClick={() => handleHabitToggle(habit.id)}
+                        disabled={logHabitCompletionMutation.isPending}
                       >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Entry
-                      </Button>
-                      <Button 
-                        variant="ghost" 
-                        className="flex-1"
-                        onClick={() => navigate('/mood')}
-                      >
-                        View History
+                        {logHabitCompletionMutation.isPending ? 
+                          <div className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" /> :
+                          (isCompleted ? 'Done' : 'Mark')
+                        }
                       </Button>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <Smile className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <p className="text-muted-foreground mb-4">
-                      How are you feeling today?
-                    </p>
-                    <Button onClick={(e) => {
-                      console.log('Log Mood button clicked');
-                      handleLogMood(e);
-                    }}>
-                      Log Mood
-                    </Button>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-
-            {/* Upcoming Events */}
-            <Card>
-              <CardHeader className="pb-3">
-                <CardTitle className="flex items-center gap-2">
-                  <CalendarIcon className="h-5 w-5" />
-                  Upcoming Events
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-3">
-                  {upcomingEvents?.slice(0, 4).map((event) => (
-                    <div key={event.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                      <Clock className="h-4 w-4 text-muted-foreground" />
-                      <div className="flex-1 min-w-0">
-                        <h4 className="font-medium truncate">{event.title}</h4>
-                        <div className="text-sm text-muted-foreground">
-                          {event.is_all_day ? 'All Day' : formatTime(event.start_datetime)}
-                          {event.location && ` • ${event.location}`}
-                        </div>
-                      </div>
-                    </div>
-                  ))}
+                  );
+                })}
+                <div className="flex gap-2">
                   <Button 
                     variant="outline" 
-                    className="w-full"
-                    onClick={() => navigate('/calendar')}
+                    className="flex-1"
+                    onClick={(e) => {
+                      console.log('Add Habit button clicked');
+                      handleAddHabit(e);
+                    }}
                   >
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Event
+                    Add Habit
+                  </Button>
+                  <Button 
+                    variant="ghost" 
+                    className="flex-1"
+                    onClick={() => {
+                      console.log('View All Habits button clicked');
+                      navigate('/habits');
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4 mr-2" />
+                    View All
                   </Button>
                 </div>
-              </CardContent>
-            </Card>
-          </div>
-        </TabsContent>
+              </div>
+            </CardContent>
+          </Card>
 
-        <TabsContent value="tasks">
+          {/* Mood Check-in */}
           <Card>
-            <CardHeader>
-              <CardTitle>Task Management</CardTitle>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <Smile className="h-5 w-5" />
+                Mood Check-in
+              </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
-                  View and manage your tasks in detail
-                </p>
-                <Button onClick={() => navigate('/tasks')}>
-                  Go to Tasks
+              {todayMoods && todayMoods.length > 0 ? (
+                <div className="space-y-4">
+                  <div className="flex items-center justify-between">
+                    <span className="font-medium">Today's Moods ({todayMoods.length})</span>
+                    {todayMoods.length > 0 && (
+                      <Badge variant="outline">
+                        Avg: {(todayMoods.reduce((sum, mood) => sum + mood.mood_score, 0) / todayMoods.length).toFixed(1)}/5
+                      </Badge>
+                    )}
+                  </div>
+                  
+                  {/* Display latest mood details */}
+                  {todayMoods.length > 0 && (
+                    <div className="grid grid-cols-3 gap-3 text-sm">
+                      <div className="text-center">
+                        <div className="font-semibold">
+                          {todayMoods[todayMoods.length - 1].energy_level || 'N/A'}/5
+                        </div>
+                        <div className="text-muted-foreground">Energy</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold">
+                          {todayMoods[todayMoods.length - 1].stress_level || 'N/A'}/5
+                        </div>
+                        <div className="text-muted-foreground">Stress</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold">
+                          {todayMoods[todayMoods.length - 1].mood_category || 'N/A'}
+                        </div>
+                        <div className="text-muted-foreground">Latest</div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Display recent moods as a timeline */}
+                  <div className="space-y-2">
+                    <div className="text-xs font-medium text-muted-foreground">Recent entries:</div>
+                    <div className="flex gap-2 overflow-x-auto pb-2">
+                      {todayMoods.slice(-5).map((mood, index) => (
+                        <div 
+                          key={mood.id} 
+                          className="flex-shrink-0 p-2 border rounded-lg min-w-[80px] text-center"
+                        >
+                          <div className="text-lg font-semibold">
+                            {mood.mood_score}/5
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {new Date(mood.created_at).toLocaleTimeString('en-US', {
+                              hour: 'numeric',
+                              minute: '2-digit',
+                              hour12: true,
+                            })}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <Button 
+                      variant="outline" 
+                      className="flex-1"
+                      onClick={() => setIsMoodModalOpen(true)}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Entry
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      className="flex-1"
+                      onClick={() => navigate('/mood')}
+                    >
+                      View History
+                    </Button>
+                  </div>
+                </div>
+              ) : (
+                <div className="text-center py-6">
+                  <Smile className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+                  <p className="text-muted-foreground mb-4">
+                    How are you feeling today?
+                  </p>
+                  <Button onClick={(e) => {
+                    console.log('Log Mood button clicked');
+                    handleLogMood(e);
+                  }}>
+                    Log Mood
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Upcoming Events */}
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="flex items-center gap-2">
+                <CalendarIcon className="h-5 w-5" />
+                Upcoming Events
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {upcomingEvents?.slice(0, 4).map((event) => (
+                  <div key={event.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <Clock className="h-4 w-4 text-muted-foreground" />
+                    <div className="flex-1 min-w-0">
+                      <h4 className="font-medium truncate">{event.title}</h4>
+                      <div className="text-sm text-muted-foreground">
+                        {event.is_all_day ? 'All Day' : formatTime(event.start_datetime)}
+                        {event.location && ` • ${event.location}`}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                <Button 
+                  variant="outline" 
+                  className="w-full"
+                  onClick={() => navigate('/calendar')}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add Event
                 </Button>
               </div>
             </CardContent>
           </Card>
-        </TabsContent>
-
-        <TabsContent value="habits">
-          <Card>
-            <CardHeader>
-              <CardTitle>Habit Tracking</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
-                  Track your daily habits and build consistency
-                </p>
-                <Button onClick={() => navigate('/habits')}>
-                  Go to Habits
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        <TabsContent value="schedule">
-          <Card>
-            <CardHeader>
-              <CardTitle>Schedule Overview</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-center py-8">
-                <p className="text-muted-foreground mb-4">
-                  View your calendar and upcoming events
-                </p>
-                <Button onClick={() => navigate('/calendar')}>
-                  Go to Calendar
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       {/* Modal Dialogs */}
       <Dialog open={isTaskModalOpen} onOpenChange={setIsTaskModalOpen}>

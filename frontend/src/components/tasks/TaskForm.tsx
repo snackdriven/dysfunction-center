@@ -43,6 +43,9 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
   const isEditing = !!task;
   const isLoading = createTask.isPending || updateTask.isPending;
 
+  // Add state for editing category
+  const [isEditingCategory, setIsEditingCategory] = React.useState(false);
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
 
@@ -192,31 +195,58 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
         <div className="grid grid-cols-2 gap-4">
           <div className="space-y-2">
             <label className="text-sm font-medium">Category</label>
-            <Select
-              value={formData.category_id?.toString() || ''}
-              onValueChange={(value) => 
-                handleInputChange('category_id', value ? parseInt(value) : undefined)
-              }
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select category..." />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="">No category</SelectItem>
-                {categories.map((category) => (
-                  <SelectItem key={category.id} value={category.id.toString()}>
-                    <div className="flex items-center gap-2">
-                      <span 
-                        className="w-3 h-3 rounded-full"
-                        style={{ backgroundColor: category.color }}
-                      />
-                      <span>{category.icon}</span>
-                      {category.name}
-                    </div>
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            {isEditing && !isEditingCategory ? (
+              <div className="flex items-center gap-2">
+                {/* Show current category badge */}
+                {categories.length > 0 && formData.category_id ? (
+                  (() => {
+                    const cat = categories.find(c => c.id === formData.category_id);
+                    return cat ? (
+                      <div className="flex items-center gap-1 text-xs px-2 py-1 rounded-full" style={{ backgroundColor: `${cat.color}20`, color: cat.color }}>
+                        <span>{cat.icon}</span>
+                        <span>{cat.name}</span>
+                      </div>
+                    ) : null;
+                  })()
+                ) : (
+                  <span className="text-xs text-muted-foreground">No category</span>
+                )}
+                <Button type="button" size="sm" variant="outline" onClick={() => setIsEditingCategory(true)}>
+                  Edit
+                </Button>
+              </div>
+            ) : (
+              <>
+                <Select
+                  value={formData.category_id?.toString() || ''}
+                  onValueChange={(value) => {
+                    handleInputChange('category_id', value ? parseInt(value) : undefined);
+                    setIsEditingCategory(false);
+                  }}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category..." />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="">No category</SelectItem>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id.toString()}>
+                        <div className="flex items-center gap-2">
+                          <span className="w-3 h-3 rounded-full" style={{ backgroundColor: category.color }} />
+                          <span>{category.icon}</span>
+                          {category.name}
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {isEditing && (
+                  <Button type="button" size="sm" variant="ghost" onClick={() => setIsEditingCategory(false)}>
+                    Cancel
+                  </Button>
+                )}
+              </>
+            )}
           </div>
 
           <div className="space-y-2">

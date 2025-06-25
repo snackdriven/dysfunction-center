@@ -25,6 +25,8 @@ export const GeneralSettings: React.FC = () => {
   const [timeFormat, setTimeFormat] = useState('24h');
   const [defaultCalendarView, setDefaultCalendarView] = useState('week');
   const [streakGracePeriod, setStreakGracePeriod] = useState('0');
+  const [displayName, setDisplayName] = useState('');
+  const [avatarUrl, setAvatarUrl] = useState('');
 
   // Fetch current preferences
   const { data: preferences, isLoading } = useQuery({
@@ -41,6 +43,8 @@ export const GeneralSettings: React.FC = () => {
       setTimeFormat(preferences.preferences.time_format || '24h');
       setDefaultCalendarView(preferences.preferences.default_calendar_view || 'week');
       setStreakGracePeriod(preferences.preferences.habit_streak_grace_period || '0');
+      setDisplayName(preferences.preferences.display_name || '');
+      setAvatarUrl(preferences.preferences.avatar_url || '');
     }
   }, [preferences]);
 
@@ -64,7 +68,9 @@ export const GeneralSettings: React.FC = () => {
       date_format: dateFormat,
       time_format: timeFormat,
       default_calendar_view: defaultCalendarView,
-      habit_streak_grace_period: streakGracePeriod
+      habit_streak_grace_period: streakGracePeriod,
+      display_name: displayName,
+      avatar_url: avatarUrl
     };
     savePreferencesMutation.mutate(prefsToSave);
   };
@@ -240,9 +246,26 @@ export const GeneralSettings: React.FC = () => {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium">Display Name</label>
-              <p className="text-sm text-muted-foreground mt-1">
-                Coming soon - User profiles will be implemented in a future update.
-              </p>
+              <Input
+                type="text"
+                value={displayName}
+                onChange={e => setDisplayName(e.target.value)}
+                placeholder="Enter your display name"
+                className="w-64"
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium">Avatar URL</label>
+              <Input
+                type="url"
+                value={avatarUrl}
+                onChange={e => setAvatarUrl(e.target.value)}
+                placeholder="Paste an image URL or leave blank for default"
+                className="w-64"
+              />
+              {avatarUrl && (
+                <img src={avatarUrl} alt="Avatar Preview" className="mt-2 w-16 h-16 rounded-full border" />
+              )}
             </div>
             <div>
               <label className="text-sm font-medium">Time Zone</label>
