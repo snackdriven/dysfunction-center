@@ -9,83 +9,78 @@ import { DataExportRequest } from "../shared/types";
 
 export default new Service("api");
 
-// Simple export endpoint that works with mock data for now
+// Export endpoint that uses real data from other services
 export const exportData = api(
   { method: "POST", path: "/export", expose: true },
   async (req: DataExportRequest): Promise<{ content: string; filename: string; contentType: string }> => {
-    // For now, create mock data structure
     const exportData: any = {};
     
-    // Mock data for testing - replace with actual API calls later
-    if (req.domains.includes('tasks')) {
-      exportData.tasks = [
-        {
-          id: 1,
-          title: "Sample Task",
-          description: "This is a sample task for export testing",
-          priority: "medium",
-          completed: false,
-          created_at: new Date().toISOString()
+    // Collect data from requested domains using internal HTTP calls
+    for (const domain of req.domains) {
+      try {
+        switch (domain) {
+          case 'tasks':
+            // Call tasks service
+            const tasksResponse = await fetch('http://localhost:4000/tasks');
+            if (tasksResponse.ok) {
+              const tasksData = await tasksResponse.json() as any;
+              exportData.tasks = tasksData.tasks || [];
+            }
+            break;
+
+          case 'habits':
+            // Call habits service
+            const habitsResponse = await fetch('http://localhost:4000/habits');
+            if (habitsResponse.ok) {
+              const habitsData = await habitsResponse.json() as any;
+              exportData.habits = habitsData.habits || [];
+            }
+            break;
+
+          case 'mood':
+            // Call mood service
+            const moodResponse = await fetch('http://localhost:4000/mood');
+            if (moodResponse.ok) {
+              const moodData = await moodResponse.json() as any;
+              exportData.mood = moodData.mood_entries || [];
+            }
+            break;
+
+          case 'calendar':
+            // Call calendar service
+            const calendarResponse = await fetch('http://localhost:4000/calendar/events');
+            if (calendarResponse.ok) {
+              const calendarData = await calendarResponse.json() as any;
+              exportData.calendar = calendarData.events || [];
+            }
+            break;
+
+          case 'journal':
+            // Call journal service
+            const journalResponse = await fetch('http://localhost:4000/journal');
+            if (journalResponse.ok) {
+              const journalData = await journalResponse.json() as any;
+              exportData.journal = journalData.journal_entries || [];
+            }
+            break;
+
+          case 'preferences':
+            // Call preferences service
+            const preferencesResponse = await fetch('http://localhost:4000/preferences');
+            if (preferencesResponse.ok) {
+              const preferencesData = await preferencesResponse.json() as any;
+              exportData.preferences = Object.entries(preferencesData.preferences || {}).map(([key, value]) => ({
+                preference_key: key,
+                preference_value: value,
+              }));
+            }
+            break;
         }
-      ];
-    }
-    
-    if (req.domains.includes('habits')) {
-      exportData.habits = [
-        {
-          id: 1,
-          name: "Sample Habit",
-          description: "This is a sample habit for export testing",
-          category: "health",
-          active: true,
-          created_at: new Date().toISOString()
-        }
-      ];
-    }
-    
-    if (req.domains.includes('mood')) {
-      exportData.mood = [
-        {
-          id: 1,
-          mood_score: 7,
-          mood_category: "happy",
-          entry_date: new Date().toISOString().split('T')[0],
-          created_at: new Date().toISOString()
-        }
-      ];
-    }
-    
-    if (req.domains.includes('journal')) {
-      exportData.journal = [
-        {
-          id: 1,
-          title: "Sample Journal Entry",
-          content: "This is a sample journal entry for export testing",
-          created_at: new Date().toISOString()
-        }
-      ];
-    }
-    
-    if (req.domains.includes('calendar')) {
-      exportData.calendar = [
-        {
-          id: 1,
-          title: "Sample Event",
-          description: "This is a sample calendar event for export testing",
-          start_datetime: new Date().toISOString(),
-          end_datetime: new Date(Date.now() + 3600000).toISOString(),
-          created_at: new Date().toISOString()
-        }
-      ];
-    }
-    
-    if (req.domains.includes('preferences')) {
-      exportData.preferences = [
-        {
-          preference_key: "theme",
-          preference_value: "dark"
-        }
-      ];
+      } catch (error) {
+        console.error(`Error exporting ${domain}:`, error);
+        // Initialize empty array if error occurs
+        exportData[domain] = [];
+      }
     }
 
     // Create versioned export
