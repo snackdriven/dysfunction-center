@@ -96,6 +96,56 @@ export const getPreference = api(
   }
 );
 
+// Get all preferences with support for End of Day settings
+export const getAllPreferences = api(
+  { method: "GET", path: "/preferences", expose: true },
+  async (req: GetAllPreferencesRequest): Promise<GetAllPreferencesResponse> => {
+    try {
+      const user_id = req.user_id || 'default_user';
+
+      const generator = preferencesDB.query`
+        SELECT * FROM user_preferences 
+        WHERE user_id = ${user_id}
+        ORDER BY preference_key
+      `;
+
+      const result = await collectResults(generator);
+      const preferences: { [key: string]: string } = {};
+      
+      result.forEach(row => {
+        preferences[row.preference_key] = row.preference_value;
+      });
+
+      // Add default preferences if they don't exist
+      const defaultPrefs = {
+        'end_of_day_time': '23:59',
+        'start_of_week': 'monday',
+        'timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
+        'date_format': 'YYYY-MM-DD',
+        'time_format': '24h',
+        'theme': 'system',
+        'auto_switch_theme': 'true',
+        'dark_hours_start': '18:00',
+        'dark_hours_end': '06:00',
+        'font_scale': '1.0',
+        'default_calendar_view': 'week',
+        'show_weekend': 'true',
+        'habit_streak_grace_period': '0'
+      };
+
+      Object.entries(defaultPrefs).forEach(([key, value]) => {
+        if (!(key in preferences)) {
+          preferences[key] = value;
+        }
+      });
+
+      return { preferences };
+    } catch (error) {
+      throw new Error(`Failed to get preferences: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
 // Set a preference (create or update)
 export const setPreference = api(
   { method: "POST", path: "/preferences", expose: true },

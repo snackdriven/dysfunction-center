@@ -57,3 +57,69 @@ export function createErrorResponse(error: string, details?: string, code?: stri
     code
   };
 }
+
+/**
+ * Gets the current "app day" based on End of Day time setting
+ * If current time is before end of day, returns today's date
+ * If current time is after end of day, returns tomorrow's date
+ */
+export function getCurrentAppDay(endOfDayTime: string = '23:59'): string {
+  const now = new Date();
+  const currentTime = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+  
+  // If current time is after end of day, the app day is tomorrow
+  if (currentTime > endOfDayTime) {
+    const tomorrow = new Date(now);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    return tomorrow.toISOString().split('T')[0];
+  }
+  
+  return now.toISOString().split('T')[0];
+}
+
+/**
+ * Gets the app day for a given timestamp considering End of Day time
+ */
+export function getAppDayForTimestamp(timestamp: string, endOfDayTime: string = '23:59'): string {
+  const date = new Date(timestamp);
+  const timeString = `${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+  
+  // If time is after end of day, the app day is tomorrow
+  if (timeString > endOfDayTime) {
+    const nextDay = new Date(date);
+    nextDay.setDate(nextDay.getDate() + 1);
+    return nextDay.toISOString().split('T')[0];
+  }
+  
+  return date.toISOString().split('T')[0];
+}
+
+/**
+ * Checks if a given date/time falls within the current app day
+ */
+export function isWithinCurrentAppDay(timestamp: string, endOfDayTime: string = '23:59'): boolean {
+  const appDay = getAppDayForTimestamp(timestamp, endOfDayTime);
+  const currentAppDay = getCurrentAppDay(endOfDayTime);
+  return appDay === currentAppDay;
+}
+
+/**
+ * Gets the start and end timestamps for a given app day
+ */
+export function getAppDayBounds(appDay: string, endOfDayTime: string = '23:59'): { start: string; end: string } {
+  const [hours, minutes] = endOfDayTime.split(':').map(Number);
+  
+  // App day starts at (end of day + 1 minute) of previous calendar day
+  const startDate = new Date(appDay);
+  startDate.setDate(startDate.getDate() - 1);
+  startDate.setHours(hours, minutes + 1, 0, 0);
+  
+  // App day ends at end of day time of the current calendar day
+  const endDate = new Date(appDay);
+  endDate.setHours(hours, minutes, 59, 999);
+  
+  return {
+    start: startDate.toISOString(),
+    end: endDate.toISOString()
+  };
+}

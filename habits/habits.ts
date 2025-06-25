@@ -22,7 +22,10 @@ import {
   sanitizeString, 
   isValidDateString, 
   isValidHabitCategory,
-  getCurrentDateString
+  getCurrentDateString,
+  getCurrentAppDay,
+  getAppDayForTimestamp,
+  getAppDayBounds
 } from "../shared/utils";
 
 // Helper function to collect database results
@@ -34,32 +37,83 @@ async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
   return results;
 }
 
-// Calculate streak for a habit
-async function calculateStreak(habitId: number, asOfDate: string = getCurrentDateString()): Promise<number> {
+// Get user's End of Day time setting from preferences
+async function getEndOfDayTime(userId: string = 'default_user'): Promise<string> {
+  try {
+    // In a real implementation, we'd call the preferences service
+    // For now, we'll use a direct database query to the preferences table
+    const generator = habitDB.query`
+      SELECT preference_value 
+      FROM user_preferences 
+      WHERE user_id = ${userId} AND preference_key = 'end_of_day_time'
+    `;
+    const result = await collectResults(generator);
+    
+    if (result.length > 0) {
+      return result[0].preference_value;
+    }
+    
+    return '23:59'; // Default End of Day time
+  } catch (error) {
+    console.warn('Could not fetch end_of_day_time preference, using default:', error);
+    return '23:59';
+  }
+}
+
+// Calculate streak for a habit using End of Day time logic
+async function calculateStreak(habitId: number, userId: string = 'default_user', asOfDate?: string): Promise<number> {
+  const endOfDayTime = await getEndOfDayTime(userId);
+  const currentAppDay = asOfDate || getCurrentAppDay(endOfDayTime);
+  
   const generator = habitDB.query`
-    SELECT completion_date, completed 
+    SELECT completion_date, completed, created_at
     FROM habit_completions 
-    WHERE habit_id = ${habitId} AND completion_date <= ${asOfDate}
+    WHERE habit_id = ${habitId} AND completion_date <= ${currentAppDay}
     ORDER BY completion_date DESC
   `;
   
   const completions = await collectResults(generator);
   
   let streak = 0;
-  let currentDate = new Date(asOfDate);
+  let checkDate = currentAppDay;
+  
+  // Track completions by app day (considering End of Day time)
+  const completionsByAppDay = new Map<string, boolean>();
   
   for (const completion of completions) {
-    const completionDate = new Date(completion.completion_date);
-    const daysDiff = Math.floor((currentDate.getTime() - completionDate.getTime()) / (1000 * 60 * 60 * 24));
+    const appDay = getAppDayForTimestamp(completion.created_at, endOfDayTime);
     
-    if (daysDiff === streak && completion.completed) {
+    // For each app day, we only care if it was completed at least once
+    if (!completionsByAppDay.has(appDay) || (!completionsByAppDay.get(appDay) && completion.completed)) {
+      completionsByAppDay.set(appDay, completion.completed);
+    }
+  }
+  
+  // Calculate streak by checking consecutive days backward from current day
+  let currentDate = new Date(checkDate);
+  
+  while (true) {
+    const dateString = currentDate.toISOString().split('T')[0];
+    const wasCompleted = completionsByAppDay.get(dateString);
+    
+    if (wasCompleted === true) {
       streak++;
-    } else if (daysDiff === streak && !completion.completed) {
-      // Gap in streak, but continue checking for potential earlier streak
+      // Go to previous day
+      currentDate.setDate(currentDate.getDate() - 1);
+    } else if (wasCompleted === false) {
+      // Explicitly marked as not completed - streak breaks
       break;
-    } else if (daysDiff > streak) {
-      // Gap found, streak ends
-      break;
+    } else {
+      // No entry for this day - could be before habit started or a missed day
+      // Check if there are any completions before this date
+      const hasEarlierCompletions = Array.from(completionsByAppDay.keys()).some(day => day < dateString);
+      if (hasEarlierCompletions) {
+        // This is a missed day - streak breaks
+        break;
+      } else {
+        // No earlier completions - habit probably didn't exist yet
+        break;
+      }
     }
   }
   
@@ -89,14 +143,15 @@ async function calculateCompletionRate(habitId: number): Promise<number> {
   return Math.round((stats.completed_count / stats.total) * 100);
 }
 
-// Check if habit was completed today
-async function isCompletedToday(habitId: number): Promise<boolean> {
-  const today = getCurrentDateString();
+// Check if habit was completed in current app day
+async function isCompletedToday(habitId: number, userId: string = 'default_user'): Promise<boolean> {
+  const endOfDayTime = await getEndOfDayTime(userId);
+  const currentAppDay = getCurrentAppDay(endOfDayTime);
   
   const generator = habitDB.query`
     SELECT completed 
     FROM habit_completions 
-    WHERE habit_id = ${habitId} AND completion_date = ${today}
+    WHERE habit_id = ${habitId} AND completion_date = ${currentAppDay}
   `;
   
   const result = await collectResults(generator);

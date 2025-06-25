@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { DataExportImport } from '../components/settings/DataExportImport';
 import { ThemeCustomization } from '../components/settings/ThemeCustomization';
+import { GeneralSettings } from '../components/settings/GeneralSettings';
 import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
 import { 
   Settings as SettingsIcon,
@@ -43,36 +44,7 @@ export const Settings: React.FC = () => {
 
         {/* General Settings */}
         <TabsContent value="general" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <User className="h-5 w-5" />
-                Profile Settings
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium">Display Name</label>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Coming soon - User profiles will be implemented in a future update.
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Time Zone</label>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Currently using browser time zone: {Intl.DateTimeFormat().resolvedOptions().timeZone}
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium">Language</label>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Currently: English (US) - Additional languages coming soon.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <GeneralSettings />
         </TabsContent>
 
         {/* Theme Settings */}

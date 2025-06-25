@@ -3,8 +3,12 @@ import { Button } from '../components/ui/Button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
 import { CalendarMonthView } from '../components/calendar/CalendarMonthView';
 import { CalendarAgendaView } from '../components/calendar/CalendarAgendaView';
+import { CalendarAgendaViewEnhanced } from '../components/calendar/CalendarAgendaViewEnhanced';
 import { CalendarWeekView } from '../components/calendar/CalendarWeekView';
 import { CalendarDayView } from '../components/calendar/CalendarDayView';
+import { Calendar3DayView } from '../components/calendar/Calendar3DayView';
+import { Calendar2WeekView } from '../components/calendar/Calendar2WeekView';
+import { CalendarViewSelector, CalendarViewType } from '../components/calendar/CalendarViewSelector';
 import { EventForm } from '../components/calendar/EventForm';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
 import { Badge } from '../components/ui/Badge';
@@ -13,12 +17,14 @@ import { Plus, Calendar as CalendarIcon, List, ChevronLeft, ChevronRight, Clock,
 import { useQuery } from '@tanstack/react-query';
 import { calendarApi } from '../services/calendar';
 import { tasksApi } from '../services/tasks';
+import { habitsApi } from '../services/habits';
+import { moodApi } from '../services/mood';
 import { ErrorBoundary } from '../components/common/ErrorBoundary';
 
 export const Calendar: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [activeView, setActiveView] = useState<'3day' | 'week' | '2week' | 'month' | 'agenda'>('month');
+  const [activeView, setActiveView] = useState<CalendarViewType>('week');
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
@@ -31,6 +37,19 @@ export const Calendar: React.FC = () => {
   const { data: tasks } = useQuery({
     queryKey: ['tasks', 'calendar'],
     queryFn: () => tasksApi.getTasks({ has_due_date: true }),
+  });
+
+  const { data: habits } = useQuery({
+    queryKey: ['habits', 'calendar'],
+    queryFn: habitsApi.getHabits,
+  });
+
+  const { data: moodEntries } = useQuery({
+    queryKey: ['mood', 'calendar', currentYear, currentMonth],
+    queryFn: () => moodApi.getMoodEntries({
+      start_date: new Date(currentYear, currentMonth, 1).toISOString().split('T')[0],
+      end_date: new Date(currentYear, currentMonth + 1, 0).toISOString().split('T')[0]
+    }),
   });
 
   // Calculate summary stats
@@ -186,70 +205,31 @@ export const Calendar: React.FC = () => {
         </Card>
       </div>
 
-      {/* Calendar Navigation */}
-      <div className="flex items-center justify-between p-4 bg-card rounded-lg border">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateMonth('prev')}
-            >
-              <ChevronLeft className="h-4 w-4" />
-            </Button>
-            <h2 className="text-xl font-semibold min-w-[200px] text-center">
-              {monthNames[currentMonth]} {currentYear}
-            </h2>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigateMonth('next')}
-            >
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-          
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={goToToday}
-          >
-            Today
-          </Button>
-        </div>
-
-        <Tabs value={activeView} onValueChange={(value) => setActiveView(value as '3day' | 'week' | '2week' | 'month' | 'agenda')} defaultValue="month">
-          <TabsList>
-            <TabsTrigger value="3day" className="flex items-center gap-2">
-              3 Days
-            </TabsTrigger>
-            <TabsTrigger value="week" className="flex items-center gap-2">
-              Week
-            </TabsTrigger>
-            <TabsTrigger value="2week" className="flex items-center gap-2">
-              2 Weeks
-            </TabsTrigger>
-            <TabsTrigger value="month" className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4" />
-              Month
-            </TabsTrigger>
-            <TabsTrigger value="agenda" className="flex items-center gap-2">
-              <List className="h-4 w-4" />
-              Agenda
-            </TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+      {/* Calendar Navigation and View Selector */}
+      <CalendarViewSelector
+        currentView={activeView}
+        onViewChange={setActiveView}
+        currentDate={currentDate}
+        onDateChange={setCurrentDate}
+      />
 
       {/* Calendar Views */}
       <div className="min-h-[600px]">
-        {activeView === '3day' && (
+        {activeView === 'day' && (
           <CalendarDayView 
             currentDate={currentDate}
             events={events || []}
             tasks={tasks || []}
             isLoading={isLoading}
-            daysToShow={3}
+          />
+        )}
+        {activeView === '3day' && (
+          <Calendar3DayView 
+            currentDate={currentDate}
+            events={events || []}
+            tasks={tasks || []}
+            habits={habits || []}
+            moodEntries={moodEntries || []}
           />
         )}
         {activeView === 'week' && (
@@ -258,16 +238,15 @@ export const Calendar: React.FC = () => {
             events={events || []}
             tasks={tasks || []}
             isLoading={isLoading}
-            weeksToShow={1}
           />
         )}
         {activeView === '2week' && (
-          <CalendarWeekView 
+          <Calendar2WeekView 
             currentDate={currentDate}
             events={events || []}
             tasks={tasks || []}
-            isLoading={isLoading}
-            weeksToShow={2}
+            habits={habits || []}
+            moodEntries={moodEntries || []}
           />
         )}
         {activeView === 'month' && (
@@ -279,11 +258,13 @@ export const Calendar: React.FC = () => {
           />
         )}
         {activeView === 'agenda' && (
-          <CalendarAgendaView 
+          <CalendarAgendaViewEnhanced 
             currentDate={currentDate}
             events={events || []}
             tasks={tasks || []}
-            isLoading={isLoading}
+            habits={habits || []}
+            moodEntries={moodEntries || []}
+            onAddEvent={() => setIsCreateDialogOpen(true)}
           />
         )}
       </div>
