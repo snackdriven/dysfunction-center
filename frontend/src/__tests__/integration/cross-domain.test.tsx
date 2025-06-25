@@ -202,19 +202,47 @@ describe('Cross-Domain Integration', () => {
           start_datetime: '2024-01-15T09:00:00Z',
           end_datetime: '2024-01-15T10:00:00Z',
           is_all_day: false,
+          created_at: '2024-01-15T08:00:00Z',
         },
       ];
 
       const mockTasks = [
-        { id: 1, title: 'Complete project', priority: 'high', completed: false, due_date: '2024-01-15' },
+        { 
+          id: 1, 
+          title: 'Complete project', 
+          priority: 'high' as const, 
+          completed: false, 
+          due_date: '2024-01-15',
+          created_at: '2024-01-15T08:00:00Z',
+        },
       ];
 
       const mockHabits = [
-        { id: 1, name: 'Exercise', current_streak: 7, completions: [{ date: '2024-01-15', completed: true }] },
+        { 
+          id: 1, 
+          name: 'Exercise', 
+          category: 'health' as any,
+          target_frequency: 1,
+          active: true,
+          created_at: '2024-01-15T08:00:00Z',
+          updated_at: '2024-01-15T08:00:00Z',
+          target_type: 'daily' as any,
+          completion_type: 'boolean' as any,
+          target_value: 1,
+          reminder_enabled: false,
+          current_streak: 7, 
+          completions: [{ date: '2024-01-15', completed: true }] 
+        },
       ];
 
       const mockMoodEntries = [
-        { id: 1, date: '2024-01-15', primary_mood: 'happy', mood_score: 4 },
+        { 
+          id: 1, 
+          entry_date: '2024-01-15', 
+          primary_mood: 'happy', 
+          mood_score: 4,
+          created_at: '2024-01-15T08:00:00Z',
+        },
       ];
 
       renderWithProviders(
@@ -275,7 +303,14 @@ describe('Cross-Domain Integration', () => {
 
     it('should support drag and drop task scheduling', async () => {
       const mockTasks = [
-        { id: 1, title: 'Complete project', priority: 'high', completed: false, due_date: '2024-01-16' },
+        { 
+          id: 1, 
+          title: 'Complete project', 
+          priority: 'high' as const, 
+          completed: false, 
+          due_date: '2024-01-16',
+          created_at: '2024-01-15T08:00:00Z',
+        },
       ];
 
       renderWithProviders(

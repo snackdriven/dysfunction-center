@@ -1,13 +1,11 @@
-/// <reference types="react-scripts" />
-
 declare module 'lucide-react' {
   import { ComponentType, SVGAttributes } from 'react';
   
-  interface IconProps extends SVGAttributes<SVGElement> {
+  type IconProps = SVGAttributes<SVGElement> & {
     size?: string | number;
     color?: string;
     strokeWidth?: string | number;
-  }
+  };
   
   export const Calendar: ComponentType<IconProps>;
   export const CheckCircle: ComponentType<IconProps>;
@@ -128,94 +126,9 @@ declare module 'lucide-react' {
   export const BarChart: ComponentType<IconProps>;
   export const LineChart: ComponentType<IconProps>;
   
-  // Additional missing icons
-  export const Smile: ComponentType<IconProps>;
-  export const CalendarIcon: ComponentType<IconProps>;
-  export const CalendarRange: ComponentType<IconProps>;
-  export const CalendarX2: ComponentType<IconProps>;
-  export const CalendarClock: ComponentType<IconProps>;
-  export const Repeat: ComponentType<IconProps>;
-  export const Link: ComponentType<IconProps>;
-  export const Database: ComponentType<IconProps>;
-  export const Award: ComponentType<IconProps>;
-  export const LinkIcon: ComponentType<IconProps>;
-  export const CheckSquare: ComponentType<IconProps>;
-  export const Trophy: ComponentType<IconProps>;
-  export const Bug: ComponentType<IconProps>;
-  export const Lightbulb: ComponentType<IconProps>;
-  export const Coffee: ComponentType<IconProps>;
-  export const Heart2: ComponentType<IconProps>;
-  export const Brain: ComponentType<IconProps>;
-  export const Dumbbell: ComponentType<IconProps>;
-  export const Book: ComponentType<IconProps>;
-  export const Mindfulness: ComponentType<IconProps>;
-  export const PartyPopper: ComponentType<IconProps>;
-  export const Paintbrush: ComponentType<IconProps>;
-  export const Scissors: ComponentType<IconProps>;
-  export const DollarSign2: ComponentType<IconProps>;
-  export const ShieldCheck: ComponentType<IconProps>;
-  export const Zap2: ComponentType<IconProps>;
-  export const Cloud: ComponentType<IconProps>;
-  export const FileJson: ComponentType<IconProps>;
-  export const FileCheck: ComponentType<IconProps>;
-  export const Contrast: ComponentType<IconProps>;
-  export const GripVertical: ComponentType<IconProps>;
-  export const Timer: ComponentType<IconProps>;
-  export const PlayCircle: ComponentType<IconProps>;
-  export const Square: ComponentType<IconProps>;
-  export const Sparkles: ComponentType<IconProps>;
-  export const History: ComponentType<IconProps>;
-  export const Shield: ComponentType<IconProps>;
-  export const Columns: ComponentType<IconProps>;
-  export const Droplets: ComponentType<IconProps>;
-  export const Apple: ComponentType<IconProps>;
-  export const LayoutDashboard: ComponentType<IconProps>;
-}
-
-declare module 'date-fns' {
-  export function format(date: Date | number, format: string): string;
-  export function formatDistanceToNow(date: Date | number, options?: { addSuffix?: boolean }): string;
-  export function parseISO(dateString: string): Date;
-  export function startOfDay(date: Date | number): Date;
-  export function endOfDay(date: Date | number): Date;
-  export function startOfWeek(date: Date | number): Date;
-  export function endOfWeek(date: Date | number): Date;
-  export function startOfMonth(date: Date | number): Date;
-  export function endOfMonth(date: Date | number): Date;
-  export function addDays(date: Date | number, amount: number): Date;
-  export function subDays(date: Date | number, amount: number): Date;
-  export function addWeeks(date: Date | number, amount: number): Date;
-  export function addMonths(date: Date | number, amount: number): Date;
-  export function isSameDay(dateLeft: Date | number, dateRight: Date | number): boolean;
-  export function isToday(date: Date | number): boolean;
-  export function isThisWeek(date: Date | number): boolean;
-  export function isThisMonth(date: Date | number): boolean;
-}
-
-declare module '@uiw/react-md-editor' {
-  import { ComponentType } from 'react';
-  
-  export interface MDEditorProps {
-    value?: string;
-    onChange?: (val?: string) => void;
-    preview?: 'edit' | 'preview' | 'live';
-    height?: number;
-    hideToolbar?: boolean;
-    visibleDragbar?: boolean;
-    textareaProps?: any;
-    'data-color-mode'?: string;
-  }
-  
-  export interface MarkdownProps {
-    source?: string;
-    'data-color-mode'?: string;
-    style?: React.CSSProperties;
-    components?: any;
-  }
-  
-  const MDEditor: ComponentType<MDEditorProps> & {
-    Markdown: ComponentType<MarkdownProps>;
+  // Default export (might be used in some places)
+  const lucideReact: {
+    [key: string]: ComponentType<IconProps>;
   };
-  
-  export default MDEditor;
+  export default lucideReact;
 }
