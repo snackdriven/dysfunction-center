@@ -9,6 +9,9 @@ export * from './avatar';
 export * from './separator';
 export * from './skeleton';
 export * from './Progress';
+export * from './MarkdownEditor';
+export * from './MarkdownDisplay';
+export * from './DayOfWeekSelector';
 
 // Existing components (to be updated)
 export * from './Checkbox';

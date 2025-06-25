@@ -3,6 +3,7 @@ import { JournalEntry as JournalEntryType } from '../../services/journal';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
+import { MarkdownDisplay } from '../ui/MarkdownDisplay';
 import { formatDistanceToNow } from 'date-fns';
 
 interface JournalEntryProps {
@@ -98,18 +99,40 @@ export const JournalEntry: React.FC<JournalEntryProps> = ({
       {/* Content */}
       <div className="mb-4">
         {expanded ? (
-          <div className="prose max-w-none">
-            <p className="text-gray-700 whitespace-pre-wrap">
-              {entry.content}
-            </p>
-          </div>
+          <MarkdownDisplay 
+            content={entry.content}
+            className="prose max-w-none"
+          />
         ) : (
-          <p 
-            className="text-gray-700 line-clamp-3 cursor-pointer"
+          <div 
+            className="cursor-pointer"
             onClick={toggleExpanded}
           >
-            {entry.content}
-          </p>
+            <MarkdownDisplay 
+              content={entry.content}
+              isPreview={true}
+              className="text-gray-700"
+            />
+          </div>
+        )}
+        
+        {/* Show expand/collapse hint */}
+        {!expanded && entry.content && entry.content.length > 200 && (
+          <button
+            onClick={toggleExpanded}
+            className="text-blue-600 hover:text-blue-800 text-sm mt-2 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          >
+            Read more...
+          </button>
+        )}
+        
+        {expanded && (
+          <button
+            onClick={toggleExpanded}
+            className="text-blue-600 hover:text-blue-800 text-sm mt-2 underline focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 rounded"
+          >
+            Show less
+          </button>
         )}
       </div>      {/* Related Items */}
       {((entry.related_tasks && Array.isArray(entry.related_tasks) && entry.related_tasks.length > 0) || 

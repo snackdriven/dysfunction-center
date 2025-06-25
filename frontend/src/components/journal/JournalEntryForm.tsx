@@ -3,7 +3,7 @@ import { JournalEntry, JournalTemplate, CreateJournalEntryRequest, UpdateJournal
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
-import { Textarea } from '../ui/Textarea';
+import { MarkdownEditor } from '../ui/MarkdownEditor';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select'; 
 import { Badge } from '../ui/Badge';
 
@@ -126,15 +126,26 @@ export const JournalEntryForm: React.FC<JournalEntryFormProps> = ({
         <div>
           <label htmlFor="content" className="block text-sm font-medium text-gray-700 mb-2">
             Content
+            <span className="text-xs text-gray-500 ml-2">
+              (Supports Markdown formatting)
+            </span>
           </label>
-          <Textarea
+          <MarkdownEditor
             id="content"
             value={formData.content}
-            onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
-            placeholder="Write your journal entry..."
-            rows={8}
+            onChange={(value) => setFormData(prev => ({ ...prev, content: value }))}
+            placeholder="Write your journal entry using markdown formatting..."
+            height={400}
+            maxLength={50000}
+            showCharacterCount={true}
+            autoFocus={!entry} // Auto-focus for new entries
             required
+            aria-label="Journal entry content editor"
+            aria-describedby="content-help"
           />
+          <div id="content-help" className="sr-only">
+            Rich markdown editor for writing journal entries. Use the toolbar buttons or keyboard shortcuts for formatting.
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">          <div>

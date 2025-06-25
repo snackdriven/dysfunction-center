@@ -24,7 +24,8 @@
       "Bash(sed:*)",
       "Bash(timeout 30s npm run dev)",
       "Bash(node:*)",
-      "Bash(timeout 60s npm start)"
+      "Bash(timeout 60s npm start)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

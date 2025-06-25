@@ -28,6 +28,10 @@ export interface HabitStreak {
 export type TargetType = 'daily' | 'weekly' | 'custom';
 export type CompletionType = 'boolean' | 'count' | 'duration';
 
+// Day of week scheduling
+export type DayOfWeek = 'monday' | 'tuesday' | 'wednesday' | 'thursday' | 'friday' | 'saturday' | 'sunday';
+export type SchedulePattern = 'daily' | 'weekdays' | 'weekends' | 'custom';
+
 // Enhanced Habit interface
 export interface Habit {
   id: number;
@@ -47,6 +51,9 @@ export interface Habit {
   template?: HabitTemplate;
   reminder_enabled: boolean;
   reminder_time?: string; // TIME format
+  // Day-of-week scheduling
+  schedule_pattern?: SchedulePattern;
+  scheduled_days?: DayOfWeek[]; // For custom scheduling
 }
 
 // Enhanced Habit completion interface
@@ -59,6 +66,8 @@ export interface HabitCompletion {
   created_at: TimestampString;
   // Phase 2 enhancements
   completion_value: number;
+  // Multi-completion support
+  completion_timestamp: TimestampString; // Exact timestamp for multiple completions per day
 }
 
 // Enhanced Habit with completion data
@@ -71,6 +80,9 @@ export interface HabitWithCompletion extends Habit {
   longest_streak: number;
   average_completion_value?: number;
   consistency_score: number; // 0-100 based on regularity
+  // Multi-completion support
+  today_completions?: HabitCompletion[]; // All completions for today
+  today_total_value?: number; // Sum of all completion values for today
 }
 
 // Enhanced Request/Response types
@@ -87,6 +99,9 @@ export interface CreateHabitRequest {
   template_id?: number;
   reminder_enabled?: boolean;
   reminder_time?: string;
+  // Day-of-week scheduling
+  schedule_pattern?: SchedulePattern;
+  scheduled_days?: DayOfWeek[];
 }
 
 export interface CreateHabitResponse {
@@ -108,6 +123,9 @@ export interface UpdateHabitRequest {
   template_id?: number;
   reminder_enabled?: boolean;
   reminder_time?: string;
+  // Day-of-week scheduling
+  schedule_pattern?: SchedulePattern;
+  scheduled_days?: DayOfWeek[];
 }
 
 export interface UpdateHabitResponse {
@@ -150,11 +168,48 @@ export interface LogHabitCompletionRequest {
   notes?: string;
   // Phase 2 enhancements
   completion_value?: number;
+  // Multi-completion support
+  completion_timestamp?: TimestampString; // Specific timestamp for this completion
 }
 
 export interface LogHabitCompletionResponse {
   completion: HabitCompletion;
   updated_streak: number;
+  // Multi-completion support
+  daily_total_value?: number; // Total completion value for the day
+  target_progress?: number; // Progress towards daily target (0-100%)
+}
+
+// New interface for getting daily completions
+export interface GetDailyCompletionsRequest {
+  habit_id: number;
+  date?: DateString; // Defaults to today
+}
+
+export interface GetDailyCompletionsResponse {
+  completions: HabitCompletion[];
+  total_value: number;
+  target_value: number;
+  progress_percentage: number;
+  is_target_met: boolean;
+}
+
+// New interface for bulk completion logging (for multi-count habits)
+export interface LogMultipleCompletionsRequest {
+  habit_id: number;
+  completions: Array<{
+    completion_value?: number;
+    notes?: string;
+    completion_timestamp?: TimestampString;
+  }>;
+  completion_date?: DateString;
+}
+
+export interface LogMultipleCompletionsResponse {
+  completions: HabitCompletion[];
+  daily_total_value: number;
+  updated_streak: number;
+  target_progress: number;
 }
 
 export interface GetHabitHistoryRequest {

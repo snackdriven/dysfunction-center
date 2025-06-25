@@ -16,7 +16,11 @@ import {
   LogHabitCompletionRequest,
   LogHabitCompletionResponse,
   GetHabitHistoryRequest,
-  GetHabitHistoryResponse
+  GetHabitHistoryResponse,
+  GetDailyCompletionsRequest,
+  GetDailyCompletionsResponse,
+  LogMultipleCompletionsRequest,
+  LogMultipleCompletionsResponse
 } from "./types";
 import { 
   sanitizeString, 
@@ -60,16 +64,30 @@ async function getEndOfDayTime(userId: string = 'default_user'): Promise<string>
   }
 }
 
-// Calculate streak for a habit using End of Day time logic
+// Calculate streak for a habit using End of Day time logic and target completion
 async function calculateStreak(habitId: number, userId: string = 'default_user', asOfDate?: string): Promise<number> {
   const endOfDayTime = await getEndOfDayTime(userId);
   const currentAppDay = asOfDate || getCurrentAppDay(endOfDayTime);
   
+  // Get habit details to check target value and type
+  const habitGenerator = habitDB.query`
+    SELECT target_value, target_type, completion_type
+    FROM habits 
+    WHERE id = ${habitId}
+  `;
+  const habitResult = await collectResults(habitGenerator);
+  
+  if (habitResult.length === 0) return 0;
+  
+  const habit = habitResult[0];
+  const targetValue = habit.target_value || 1;
+  
+  // Get all completions for this habit
   const generator = habitDB.query`
-    SELECT completion_date, completed, created_at
+    SELECT completion_date, completed, completion_value, completion_timestamp
     FROM habit_completions 
     WHERE habit_id = ${habitId} AND completion_date <= ${currentAppDay}
-    ORDER BY completion_date DESC
+    ORDER BY completion_date DESC, completion_timestamp DESC
   `;
   
   const completions = await collectResults(generator);
@@ -77,15 +95,23 @@ async function calculateStreak(habitId: number, userId: string = 'default_user',
   let streak = 0;
   let checkDate = currentAppDay;
   
-  // Track completions by app day (considering End of Day time)
-  const completionsByAppDay = new Map<string, boolean>();
+  // Track daily completion status considering multiple completions and target values
+  const dailyCompletionStatus = new Map<string, { completed: boolean; totalValue: number }>();
   
+  // Process completions and aggregate by day
   for (const completion of completions) {
-    const appDay = getAppDayForTimestamp(completion.created_at, endOfDayTime);
+    const appDay = getAppDayForTimestamp(completion.completion_timestamp || completion.created_at, endOfDayTime);
     
-    // For each app day, we only care if it was completed at least once
-    if (!completionsByAppDay.has(appDay) || (!completionsByAppDay.get(appDay) && completion.completed)) {
-      completionsByAppDay.set(appDay, completion.completed);
+    if (!dailyCompletionStatus.has(appDay)) {
+      dailyCompletionStatus.set(appDay, { completed: false, totalValue: 0 });
+    }
+    
+    const dayData = dailyCompletionStatus.get(appDay)!;
+    
+    if (completion.completed) {
+      dayData.totalValue += completion.completion_value || 1;
+      // Check if target is met for this day
+      dayData.completed = dayData.totalValue >= targetValue;
     }
   }
   
@@ -94,19 +120,18 @@ async function calculateStreak(habitId: number, userId: string = 'default_user',
   
   while (true) {
     const dateString = currentDate.toISOString().split('T')[0];
-    const wasCompleted = completionsByAppDay.get(dateString);
+    const dayData = dailyCompletionStatus.get(dateString);
     
-    if (wasCompleted === true) {
+    if (dayData?.completed === true) {
       streak++;
       // Go to previous day
       currentDate.setDate(currentDate.getDate() - 1);
-    } else if (wasCompleted === false) {
-      // Explicitly marked as not completed - streak breaks
+    } else if (dayData !== undefined) {
+      // Day has completions but target not met - streak breaks
       break;
     } else {
-      // No entry for this day - could be before habit started or a missed day
-      // Check if there are any completions before this date
-      const hasEarlierCompletions = Array.from(completionsByAppDay.keys()).some(day => day < dateString);
+      // No completions for this day - check if habit existed
+      const hasEarlierCompletions = Array.from(dailyCompletionStatus.keys()).some(day => day < dateString);
       if (hasEarlierCompletions) {
         // This is a missed day - streak breaks
         break;
@@ -143,19 +168,78 @@ async function calculateCompletionRate(habitId: number): Promise<number> {
   return Math.round((stats.completed_count / stats.total) * 100);
 }
 
-// Check if habit was completed in current app day
+// Check if habit target was met in current app day (considering multiple completions)
 async function isCompletedToday(habitId: number, userId: string = 'default_user'): Promise<boolean> {
   const endOfDayTime = await getEndOfDayTime(userId);
   const currentAppDay = getCurrentAppDay(endOfDayTime);
   
+  // Get habit target value
+  const habitGenerator = habitDB.query`
+    SELECT target_value
+    FROM habits 
+    WHERE id = ${habitId}
+  `;
+  const habitResult = await collectResults(habitGenerator);
+  
+  if (habitResult.length === 0) return false;
+  
+  const targetValue = habitResult[0].target_value || 1;
+  
+  // Get all completions for today
   const generator = habitDB.query`
-    SELECT completed 
+    SELECT completed, completion_value
     FROM habit_completions 
     WHERE habit_id = ${habitId} AND completion_date = ${currentAppDay}
   `;
   
+  const completions = await collectResults(generator);
+  
+  if (completions.length === 0) return false;
+  
+  // Calculate total completion value for today
+  let totalValue = 0;
+  for (const completion of completions) {
+    if (completion.completed) {
+      totalValue += completion.completion_value || 1;
+    }
+  }
+  
+  return totalValue >= targetValue;
+}
+
+// Get today's completions for a habit
+async function getTodayCompletions(habitId: number, userId: string = 'default_user'): Promise<HabitCompletion[]> {
+  const endOfDayTime = await getEndOfDayTime(userId);
+  const currentAppDay = getCurrentAppDay(endOfDayTime);
+  
+  const generator = habitDB.query`
+    SELECT *
+    FROM habit_completions 
+    WHERE habit_id = ${habitId} AND completion_date = ${currentAppDay}
+    ORDER BY completion_timestamp DESC
+  `;
+  
   const result = await collectResults(generator);
-  return result.length > 0 && result[0].completed;
+  
+  return result.map((row: any) => ({
+    id: row.id,
+    habit_id: row.habit_id,
+    completion_date: row.completion_date,
+    completed: row.completed,
+    notes: row.notes,
+    created_at: row.created_at,
+    completion_value: row.completion_value || 1,
+    completion_timestamp: row.completion_timestamp || row.created_at
+  }));
+}
+
+// Calculate today's total completion value
+async function getTodayTotalValue(habitId: number, userId: string = 'default_user'): Promise<number> {
+  const completions = await getTodayCompletions(habitId, userId);
+  
+  return completions.reduce((total, completion) => {
+    return total + (completion.completed ? completion.completion_value : 0);
+  }, 0);
 }
 
 // Create a new habit
@@ -253,6 +337,10 @@ export const getHabits = api(
           const currentStreak = await calculateStreak(habitRow.id);
           const completionRate = await calculateCompletionRate(habitRow.id);
           
+          // Get today's completions and total value for multi-completion support
+          const todayCompletions = req.include_today ? await getTodayCompletions(habitRow.id) : [];
+          const todayTotalValue = req.include_today ? await getTodayTotalValue(habitRow.id) : 0;
+          
           return {
             id: habitRow.id,
             name: habitRow.name,
@@ -277,7 +365,10 @@ export const getHabits = api(
             current_streak: currentStreak,
             completion_rate: completionRate,
             longest_streak: currentStreak,
-            consistency_score: Math.min(100, completionRate)
+            consistency_score: Math.min(100, completionRate),
+            // Multi-completion support
+            today_completions: req.include_today ? todayCompletions : undefined,
+            today_total_value: req.include_today ? todayTotalValue : undefined
           };
         })
       );
@@ -453,7 +544,7 @@ export const deleteHabit = api(
   }
 );
 
-// Log habit completion
+// Log habit completion (supports multiple completions per day)
 export const logHabitCompletion = api(
   { method: "POST", path: "/habits/:habit_id/completions", expose: true },
   async (req: LogHabitCompletionRequest): Promise<LogHabitCompletionResponse> => {
@@ -462,31 +553,51 @@ export const logHabitCompletion = api(
       const completion_date = req.completion_date || getCurrentDateString();
       const completed = req.completed !== undefined ? req.completed : true;
       const notes = req.notes ? sanitizeString(req.notes, 500) : null;
+      const completion_value = req.completion_value || 1;
+      const completion_timestamp = req.completion_timestamp || new Date().toISOString();
 
       // Validate completion date
       if (!isValidDateString(completion_date)) {
         throw new Error("Invalid completion date format. Use YYYY-MM-DD");
       }
 
-      // Check if habit exists
+      // Check if habit exists and get target value
       const habitGenerator = habitDB.query`
-        SELECT id FROM habits WHERE id = ${habit_id} AND active = true
+        SELECT id, target_value FROM habits WHERE id = ${habit_id} AND active = true
       `;
       const habitResult = await collectResults(habitGenerator);
       
-      if (habitResult.length === 0) {        throw new Error("Habit not found or inactive");
+      if (habitResult.length === 0) {
+        throw new Error("Habit not found or inactive");
       }
 
-      // Insert or update completion record using database timestamps
-      const upsertGenerator = habitDB.query`
-        INSERT INTO habit_completions (habit_id, completion_date, completed, notes, created_at)
-        VALUES (${habit_id}, ${completion_date}, ${completed}, ${notes}, CURRENT_TIMESTAMP)
-        ON CONFLICT (habit_id, completion_date) 
-        DO UPDATE SET completed = ${completed}, notes = ${notes}
+      const habit = habitResult[0];
+      const targetValue = habit.target_value || 1;
+
+      // Insert new completion record (no conflict handling - allow multiple per day)
+      const insertGenerator = habitDB.query`
+        INSERT INTO habit_completions (
+          habit_id, 
+          completion_date, 
+          completed, 
+          notes, 
+          completion_value,
+          completion_timestamp,
+          created_at
+        )
+        VALUES (
+          ${habit_id}, 
+          ${completion_date}, 
+          ${completed}, 
+          ${notes}, 
+          ${completion_value},
+          ${completion_timestamp},
+          CURRENT_TIMESTAMP
+        )
         RETURNING *
       `;
 
-      const result = await collectResults(upsertGenerator);
+      const result = await collectResults(insertGenerator);
       const completionRow = result[0];
 
       const completion: HabitCompletion = {
@@ -496,15 +607,22 @@ export const logHabitCompletion = api(
         completed: completionRow.completed,
         notes: completionRow.notes,
         created_at: completionRow.created_at,
-        completion_value: completionRow.completion_value || 1
+        completion_value: completionRow.completion_value || 1,
+        completion_timestamp: completionRow.completion_timestamp
       };
 
+      // Calculate daily total and progress
+      const dailyTotalValue = await getTodayTotalValue(habit_id);
+      const targetProgress = Math.round((dailyTotalValue / targetValue) * 100);
+
       // Calculate updated streak
-      const updatedStreak = await calculateStreak(habit_id, completion_date);
+      const updatedStreak = await calculateStreak(habit_id, 'default_user', completion_date);
 
       return { 
         completion,
-        updated_streak: updatedStreak
+        updated_streak: updatedStreak,
+        daily_total_value: dailyTotalValue,
+        target_progress: targetProgress
       };
     } catch (error) {
       throw new Error(`Failed to log habit completion: ${error instanceof Error ? error.message : 'Unknown error'}`);
@@ -603,6 +721,164 @@ export const getHabitHistory = api(
       };
     } catch (error) {
       throw new Error(`Failed to get habit history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get daily completions for a habit
+export const getDailyCompletions = api(
+  { method: "GET", path: "/habits/:habit_id/daily-completions", expose: true },
+  async (req: GetDailyCompletionsRequest): Promise<GetDailyCompletionsResponse> => {
+    try {
+      const { habit_id, date } = req;
+      const targetDate = date || getCurrentDateString();
+
+      // Validate date
+      if (!isValidDateString(targetDate)) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD");
+      }
+
+      // Check if habit exists and get target value
+      const habitGenerator = habitDB.query`
+        SELECT id, target_value FROM habits WHERE id = ${habit_id}
+      `;
+      const habitResult = await collectResults(habitGenerator);
+      
+      if (habitResult.length === 0) {
+        throw new Error("Habit not found");
+      }
+
+      const habit = habitResult[0];
+      const targetValue = habit.target_value || 1;
+
+      // Get all completions for the specified date
+      const generator = habitDB.query`
+        SELECT *
+        FROM habit_completions 
+        WHERE habit_id = ${habit_id} AND completion_date = ${targetDate}
+        ORDER BY completion_timestamp DESC
+      `;
+
+      const result = await collectResults(generator);
+      
+      const completions: HabitCompletion[] = result.map((row: any) => ({
+        id: row.id,
+        habit_id: row.habit_id,
+        completion_date: row.completion_date,
+        completed: row.completed,
+        notes: row.notes,
+        created_at: row.created_at,
+        completion_value: row.completion_value || 1,
+        completion_timestamp: row.completion_timestamp || row.created_at
+      }));
+
+      // Calculate total value
+      const totalValue = completions.reduce((total, completion) => {
+        return total + (completion.completed ? completion.completion_value : 0);
+      }, 0);
+
+      const progressPercentage = Math.round((totalValue / targetValue) * 100);
+      const isTargetMet = totalValue >= targetValue;
+
+      return {
+        completions,
+        total_value: totalValue,
+        target_value: targetValue,
+        progress_percentage: progressPercentage,
+        is_target_met: isTargetMet
+      };
+    } catch (error) {
+      throw new Error(`Failed to get daily completions: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Log multiple completions at once (for bulk operations)
+export const logMultipleCompletions = api(
+  { method: "POST", path: "/habits/:habit_id/multiple-completions", expose: true },
+  async (req: LogMultipleCompletionsRequest): Promise<LogMultipleCompletionsResponse> => {
+    try {
+      const { habit_id, completions: completionRequests, completion_date } = req;
+      const targetDate = completion_date || getCurrentDateString();
+
+      // Validate date
+      if (!isValidDateString(targetDate)) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD");
+      }
+
+      // Check if habit exists and get target value
+      const habitGenerator = habitDB.query`
+        SELECT id, target_value FROM habits WHERE id = ${habit_id} AND active = true
+      `;
+      const habitResult = await collectResults(habitGenerator);
+      
+      if (habitResult.length === 0) {
+        throw new Error("Habit not found or inactive");
+      }
+
+      const habit = habitResult[0];
+      const targetValue = habit.target_value || 1;
+
+      const insertedCompletions: HabitCompletion[] = [];
+
+      // Insert each completion
+      for (const completionReq of completionRequests) {
+        const completion_value = completionReq.completion_value || 1;
+        const notes = completionReq.notes ? sanitizeString(completionReq.notes, 500) : null;
+        const completion_timestamp = completionReq.completion_timestamp || new Date().toISOString();
+
+        const insertGenerator = habitDB.query`
+          INSERT INTO habit_completions (
+            habit_id, 
+            completion_date, 
+            completed, 
+            notes, 
+            completion_value,
+            completion_timestamp,
+            created_at
+          )
+          VALUES (
+            ${habit_id}, 
+            ${targetDate}, 
+            ${true}, 
+            ${notes}, 
+            ${completion_value},
+            ${completion_timestamp},
+            CURRENT_TIMESTAMP
+          )
+          RETURNING *
+        `;
+
+        const result = await collectResults(insertGenerator);
+        const completionRow = result[0];
+
+        insertedCompletions.push({
+          id: completionRow.id,
+          habit_id: completionRow.habit_id,
+          completion_date: completionRow.completion_date,
+          completed: completionRow.completed,
+          notes: completionRow.notes,
+          created_at: completionRow.created_at,
+          completion_value: completionRow.completion_value || 1,
+          completion_timestamp: completionRow.completion_timestamp
+        });
+      }
+
+      // Calculate daily total and progress
+      const dailyTotalValue = await getTodayTotalValue(habit_id);
+      const targetProgress = Math.round((dailyTotalValue / targetValue) * 100);
+
+      // Calculate updated streak
+      const updatedStreak = await calculateStreak(habit_id, 'default_user', targetDate);
+
+      return {
+        completions: insertedCompletions,
+        daily_total_value: dailyTotalValue,
+        updated_streak: updatedStreak,
+        target_progress: targetProgress
+      };
+    } catch (error) {
+      throw new Error(`Failed to log multiple completions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 );
