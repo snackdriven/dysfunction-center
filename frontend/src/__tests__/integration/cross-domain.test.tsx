@@ -24,6 +24,7 @@ const mockProductivityData: DailyProductivityData = {
   habits: { total: 4, completed: 2, streak_count: 7 },
   mood: { score: 4, energy_level: 3, stress_level: 2 },
   events: { total: 2, duration_minutes: 180 },
+  journal: { entries_count: 2, word_count: 500, productivity_score: 80, tags: ['reflection', 'goals'] },
   productivity_score: 75,
 };
 
@@ -87,13 +88,11 @@ const server = setupServer(
   }),
   
   // Export endpoints
-  rest.post('/integration/export', (req, res, ctx) => {
+  rest.post('/export', (req, res, ctx) => {
     return res(ctx.json({
-      export_id: 'export123',
-      download_url: '/download/export123',
-      expires_at: new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString(),
-      file_size_bytes: 1024,
-      record_count: 100,
+      content: '{"test": "data"}',
+      filename: 'test-export.json',
+      contentType: 'application/json',
     }));
   }),
   
@@ -250,7 +249,6 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should open day detail modal when clicking on a day', async () => {
-      const user = userEvent.setup();
       
       renderWithProviders(
         <IntegratedCalendarView
@@ -266,7 +264,7 @@ describe('Cross-Domain Integration', () => {
 
       // Click on day 15
       const day15 = screen.getByText('15');
-      await user.click(day15);
+      await userEvent.click(day15);
 
       // Check modal appears
       await waitFor(() => {
@@ -338,8 +336,6 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should allow navigation between date ranges', async () => {
-      const user = userEvent.setup();
-      
       renderWithProviders(<UnifiedDashboard />);
 
       // Find date input
@@ -347,8 +343,8 @@ describe('Cross-Domain Integration', () => {
       expect(dateInput).toBeInTheDocument();
 
       // Change date
-      await user.clear(dateInput);
-      await user.type(dateInput, '2024-01-16');
+      await userEvent.clear(dateInput);
+      await userEvent.type(dateInput, '2024-01-16');
 
       // Verify store is updated
       await waitFor(() => {
@@ -359,8 +355,6 @@ describe('Cross-Domain Integration', () => {
 
   describe('Data Export and Import', () => {
     it('should export data with selected domains and format', async () => {
-      const user = userEvent.setup();
-      
       renderWithProviders(<DataExportImport />);
 
       // Wait for component to load
@@ -374,17 +368,17 @@ describe('Cross-Domain Integration', () => {
 
       // Uncheck some domains
       const habitsCheckbox = screen.getByLabelText('Habits');
-      await user.click(habitsCheckbox);
+      await userEvent.click(habitsCheckbox);
 
       // Set date range
       const startDateInput = screen.getByPlaceholderText('Start date');
       const endDateInput = screen.getByPlaceholderText('End date');
-      await user.type(startDateInput, '2024-01-01');
-      await user.type(endDateInput, '2024-01-31');
+      await userEvent.type(startDateInput, '2024-01-01');
+      await userEvent.type(endDateInput, '2024-01-31');
 
       // Click export button
       const exportButton = screen.getByText('Export Data');
-      await user.click(exportButton);
+      await userEvent.click(exportButton);
 
       // Wait for export to complete
       await waitFor(() => {
@@ -393,13 +387,13 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should create and manage backups', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<DataExportImport />);
 
       // Switch to backup tab
       const backupTab = screen.getByText('Backup & Restore');
-      await user.click(backupTab);
+      await userEvent.click(backupTab);
 
       // Wait for backup list to load
       await waitFor(() => {
@@ -411,7 +405,7 @@ describe('Cross-Domain Integration', () => {
 
       // Create new backup
       const createBackupButton = screen.getByText('Create Backup');
-      await user.click(createBackupButton);
+      await userEvent.click(createBackupButton);
 
       // Wait for backup creation
       await waitFor(() => {
@@ -420,13 +414,13 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should restore from backup with domain selection', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<DataExportImport />);
 
       // Switch to backup tab
       const backupTab = screen.getByText('Backup & Restore');
-      await user.click(backupTab);
+      await userEvent.click(backupTab);
 
       // Wait for backup list
       await waitFor(() => {
@@ -435,7 +429,7 @@ describe('Cross-Domain Integration', () => {
 
       // Click restore button
       const restoreButton = screen.getByText('Restore');
-      await user.click(restoreButton);
+      await userEvent.click(restoreButton);
 
       // Wait for restore dialog
       await waitFor(() => {
@@ -449,11 +443,11 @@ describe('Cross-Domain Integration', () => {
 
       // Uncheck mood
       const moodCheckbox = screen.getByLabelText('Mood');
-      await user.click(moodCheckbox);
+      await userEvent.click(moodCheckbox);
 
       // Click restore data button
       const restoreDataButton = screen.getByText('Restore Data');
-      await user.click(restoreDataButton);
+      await userEvent.click(restoreDataButton);
 
       // Verify warning and confirmation
       expect(screen.getByText(/This action cannot be undone/)).toBeInTheDocument();
@@ -462,7 +456,7 @@ describe('Cross-Domain Integration', () => {
 
   describe('Theme Customization', () => {
     it('should apply preset themes', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<ThemeCustomization />);
 
@@ -473,11 +467,11 @@ describe('Cross-Domain Integration', () => {
 
       // Click on ocean blue preset
       const oceanBlueTheme = screen.getByText('Ocean Blue');
-      await user.click(oceanBlueTheme);
+      await userEvent.click(oceanBlueTheme);
 
       // Click apply theme
       const applyButton = within(oceanBlueTheme.closest('.p-3')!).getByText('Apply Theme');
-      await user.click(applyButton);
+      await userEvent.click(applyButton);
 
       // Verify theme is applied to store
       await waitFor(() => {
@@ -488,7 +482,7 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should customize theme colors', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<ThemeCustomization />);
 
@@ -499,19 +493,19 @@ describe('Cross-Domain Integration', () => {
 
       // Change primary color
       const primaryColorInput = screen.getByLabelText('Primary').nextSibling as HTMLInputElement;
-      await user.clear(primaryColorInput);
-      await user.type(primaryColorInput, '#ff0000');
+      await userEvent.clear(primaryColorInput);
+      await userEvent.type(primaryColorInput, '#ff0000');
 
       // Preview theme
       const previewButton = screen.getByText('Preview Theme');
-      await user.click(previewButton);
+      await userEvent.click(previewButton);
 
       // Check preview mode badge
       expect(screen.getByText('Preview Mode Active')).toBeInTheDocument();
 
       // Save theme
       const saveButton = screen.getByText('Save Theme');
-      await user.click(saveButton);
+      await userEvent.click(saveButton);
 
       // Verify theme is saved
       await waitFor(() => {
@@ -521,7 +515,7 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should export and import themes', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<ThemeCustomization />);
 
@@ -542,7 +536,7 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should generate high contrast theme', async () => {
-      const user = userEvent.setup();
+      
       
       renderWithProviders(<ThemeCustomization />);
 
@@ -553,7 +547,7 @@ describe('Cross-Domain Integration', () => {
 
       // Click generate high contrast
       const highContrastButton = screen.getByText('Generate High Contrast');
-      await user.click(highContrastButton);
+      await userEvent.click(highContrastButton);
 
       // Check high contrast checkbox is checked
       await waitFor(() => {
@@ -597,16 +591,16 @@ describe('Cross-Domain Integration', () => {
     it('should handle export operations', async () => {
       const exportRequest = {
         domains: ['tasks', 'habits'] as ('tasks' | 'habits' | 'mood' | 'calendar')[],
-        format: 'json' as 'json' | 'csv',
+        format: 'json' as 'json' | 'csv' | 'markdown',
         start_date: '2024-01-01',
         end_date: '2024-01-31',
       };
 
       const result = await integrationService.createExport(exportRequest);
       
-      expect(result.export_id).toBe('export123');
-      expect(result.download_url).toBe('/download/export123');
-      expect(result.record_count).toBe(100);
+      expect(result.content).toBe('{\"test\": \"data\"}');
+      expect(result.filename).toBe('test-export.json');
+      expect(result.contentType).toBe('application/json');
     });
   });
 
@@ -632,7 +626,7 @@ describe('Cross-Domain Integration', () => {
     });
 
     it('should handle validation errors in forms', async () => {
-      const user = userEvent.setup();
+      
 
       // Mock validation error
       server.use(
@@ -657,14 +651,14 @@ describe('Cross-Domain Integration', () => {
       const moodCheckbox = screen.getByLabelText('Mood');
       const calendarCheckbox = screen.getByLabelText('Calendar');
 
-      await user.click(tasksCheckbox);
-      await user.click(habitsCheckbox);
-      await user.click(moodCheckbox);
-      await user.click(calendarCheckbox);
+      await userEvent.click(tasksCheckbox);
+      await userEvent.click(habitsCheckbox);
+      await userEvent.click(moodCheckbox);
+      await userEvent.click(calendarCheckbox);
 
       // Try to export
       const exportButton = screen.getByText('Export Data');
-      await user.click(exportButton);
+      await userEvent.click(exportButton);
 
       // Should handle validation error
       await waitFor(() => {

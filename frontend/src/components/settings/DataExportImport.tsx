@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
@@ -16,20 +16,26 @@ import {
   CheckCircle,
   Clock,
   Trash2,
-  RefreshCw
+  RefreshCw,
+  FileJson,
+  FileCheck
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { integrationService } from '../../services/integration';
-import { DataExportRequest, BackupMetadata } from '../../../../shared/types';
+import { DataExportRequest, DataImportRequest, BackupMetadata } from '../../../../shared/types';
 import { cn } from '../../utils/cn';
 
 export const DataExportImport: React.FC = () => {
-  const [exportFormat, setExportFormat] = useState<'json' | 'csv'>('json');
+  const [exportFormat, setExportFormat] = useState<'json' | 'markdown'>('json');
   const [selectedDomains, setSelectedDomains] = useState<string[]>(['tasks', 'habits', 'mood', 'calendar', 'journal']);
   const [dateRange, setDateRange] = useState({ start: '', end: '' });
-  const [activeTab, setActiveTab] = useState<'export' | 'backup'>('export');
+  const [activeTab, setActiveTab] = useState<'export' | 'import' | 'backup'>('export');
   const [restoreDialogOpen, setRestoreDialogOpen] = useState(false);
   const [selectedBackup, setSelectedBackup] = useState<any>(null);
+  const [importFile, setImportFile] = useState<File | null>(null);
+  const [importMode, setImportMode] = useState<'replace' | 'merge' | 'append'>('append');
+  const [validationResult, setValidationResult] = useState<any>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
   const queryClient = useQueryClient();
 
   // Fetch backups
@@ -42,8 +48,47 @@ export const DataExportImport: React.FC = () => {
   const exportMutation = useMutation({
     mutationFn: (request: DataExportRequest) => integrationService.createExport(request),
     onSuccess: (response) => {
-      // Trigger download
-      window.open(response.download_url, '_blank');
+      // Download is handled automatically in the service
+      console.log('Export completed:', response.filename);
+    },
+  });
+
+  // Import validation mutation
+  const validateImportMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const content = await integrationService.readFileContent(file);
+      const format = file.name.endsWith('.json') ? 'json' : 'markdown';
+      return integrationService.validateImportData(content, format);
+    },
+    onSuccess: (result) => {
+      setValidationResult(result);
+    },
+  });
+
+  // Import mutation
+  const importMutation = useMutation({
+    mutationFn: async (file: File) => {
+      const content = await integrationService.readFileContent(file);
+      const format = file.name.endsWith('.json') ? 'json' : 'markdown';
+      
+      const request: DataImportRequest = {
+        file_content: content,
+        format: format,
+        domains: selectedDomains as any,
+        import_mode: importMode,
+        validate_only: false
+      };
+      
+      return integrationService.importData(request);
+    },
+    onSuccess: (result) => {
+      // Refresh all data after successful import
+      queryClient.clear();
+      setImportFile(null);
+      setValidationResult(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
     },
   });
 
@@ -104,6 +149,22 @@ export const DataExportImport: React.FC = () => {
     backupMutation.mutate(selectedDomains.length === domainOptions.length ? undefined : selectedDomains);
   };
 
+  const handleFileSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      setImportFile(file);
+      setValidationResult(null);
+      // Auto-validate the file
+      validateImportMutation.mutate(file);
+    }
+  };
+
+  const handleImport = () => {
+    if (importFile) {
+      importMutation.mutate(importFile);
+    }
+  };
+
   const formatFileSize = (bytes: number): string => {
     if (bytes === 0) return '0 Bytes';
     const k = 1024;
@@ -148,6 +209,18 @@ export const DataExportImport: React.FC = () => {
         <button
           className={cn(
             "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors",
+            activeTab === 'import' 
+              ? "bg-background text-foreground shadow-sm" 
+              : "text-muted-foreground hover:text-foreground"
+          )}
+          onClick={() => setActiveTab('import')}
+        >
+          <Upload className="h-4 w-4 mr-2 inline" />
+          Import Data
+        </button>
+        <button
+          className={cn(
+            "flex-1 py-2 px-4 rounded-md text-sm font-medium transition-colors",
             activeTab === 'backup' 
               ? "bg-background text-foreground shadow-sm" 
               : "text-muted-foreground hover:text-foreground"
@@ -173,21 +246,21 @@ export const DataExportImport: React.FC = () => {
               {/* Format Selection */}
               <div className="space-y-2">
                 <label className="text-sm font-medium">Export Format</label>
-                <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as 'json' | 'csv')}>
+                <Select value={exportFormat} onValueChange={(value) => setExportFormat(value as 'json' | 'markdown')}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="json">
                       <div className="flex items-center gap-2">
-                        <FileText className="h-4 w-4" />
+                        <FileJson className="h-4 w-4" />
                         JSON (Complete data with structure)
                       </div>
                     </SelectItem>
-                    <SelectItem value="csv">
+                    <SelectItem value="markdown">
                       <div className="flex items-center gap-2">
                         <FileText className="h-4 w-4" />
-                        CSV (Spreadsheet compatible)
+                        Markdown (Human-readable format)
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -278,12 +351,12 @@ export const DataExportImport: React.FC = () => {
                 </div>
 
                 <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
-                  <h4 className="font-medium text-green-900 mb-2">CSV Format</h4>
+                  <h4 className="font-medium text-green-900 mb-2">Markdown Format</h4>
                   <ul className="text-sm text-green-800 space-y-1">
-                    <li>• Spreadsheet and database compatible</li>
-                    <li>• Easy to analyze with external tools</li>
-                    <li>• Flattened data structure</li>
-                    <li>• Separate file for each data type</li>
+                    <li>• Human-readable documentation format</li>
+                    <li>• Great for viewing and sharing insights</li>
+                    <li>• Preserves formatting and structure</li>
+                    <li>• Can be viewed in any text editor or Git platform</li>
                   </ul>
                 </div>
 
@@ -293,6 +366,218 @@ export const DataExportImport: React.FC = () => {
                     <li>• Export links expire after 24 hours</li>
                     <li>• Large datasets may take time to process</li>
                     <li>• Downloads start automatically when ready</li>
+                  </ul>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {activeTab === 'import' && (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Import Configuration */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Upload className="h-5 w-5" />
+                Import Configuration
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* File Selection */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Select Import File</label>
+                <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept=".json,.md"
+                    onChange={handleFileSelect}
+                    className="hidden"
+                  />
+                  {importFile ? (
+                    <div className="space-y-2">
+                      <FileCheck className="h-8 w-8 mx-auto text-green-600" />
+                      <p className="font-medium">{importFile.name}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {(importFile.size / 1024).toFixed(1)} KB
+                      </p>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        Choose Different File
+                      </Button>
+                    </div>
+                  ) : (
+                    <div className="space-y-2">
+                      <Upload className="h-8 w-8 mx-auto text-muted-foreground" />
+                      <div>
+                        <Button
+                          variant="outline"
+                          onClick={() => fileInputRef.current?.click()}
+                        >
+                          Choose File
+                        </Button>
+                      </div>
+                      <p className="text-sm text-muted-foreground">
+                        Select a JSON or Markdown export file
+                      </p>
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Import Mode */}
+              <div className="space-y-2">
+                <label className="text-sm font-medium">Import Mode</label>
+                <Select value={importMode} onValueChange={(value) => setImportMode(value as any)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="append">
+                      <div className="space-y-1">
+                        <div className="font-medium">Append</div>
+                        <div className="text-xs text-muted-foreground">Add new data without affecting existing</div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="merge">
+                      <div className="space-y-1">
+                        <div className="font-medium">Merge</div>
+                        <div className="text-xs text-muted-foreground">Update existing and add new data</div>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="replace">
+                      <div className="space-y-1">
+                        <div className="font-medium">Replace</div>
+                        <div className="text-xs text-muted-foreground">Replace all existing data</div>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Domain Selection for Import */}
+              <div className="space-y-3">
+                <label className="text-sm font-medium">Data to Import</label>
+                <div className="space-y-2">
+                  {domainOptions.map((domain) => {
+                    const Icon = domain.icon;
+                    return (
+                      <div key={domain.id} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`import-${domain.id}`}
+                          checked={selectedDomains.includes(domain.id)}
+                          onCheckedChange={(checked) => handleDomainToggle(domain.id, checked as boolean)}
+                        />
+                        <label htmlFor={`import-${domain.id}`} className="flex items-center gap-2 text-sm cursor-pointer">
+                          <Icon className="h-4 w-4" />
+                          {domain.label}
+                        </label>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* Validation Results */}
+              {validationResult && (
+                <div className="space-y-2">
+                  <label className="text-sm font-medium">Validation Results</label>
+                  {validationResult.success ? (
+                    <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-green-800">
+                        <CheckCircle className="h-4 w-4" />
+                        <span className="font-medium">File is valid</span>
+                      </div>
+                      {validationResult.validation_warnings && validationResult.validation_warnings.length > 0 && (
+                        <div className="mt-2 text-sm text-yellow-800">
+                          <p className="font-medium">Warnings:</p>
+                          <ul className="list-disc list-inside">
+                            {validationResult.validation_warnings.map((warning: string, i: number) => (
+                              <li key={i}>{warning}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    <div className="p-3 bg-red-50 border border-red-200 rounded-lg">
+                      <div className="flex items-center gap-2 text-red-800">
+                        <AlertCircle className="h-4 w-4" />
+                        <span className="font-medium">Validation failed</span>
+                      </div>
+                      {validationResult.errors && validationResult.errors.length > 0 && (
+                        <div className="mt-2 text-sm text-red-800">
+                          <p className="font-medium">Errors:</p>
+                          <ul className="list-disc list-inside">
+                            {validationResult.errors.map((error: string, i: number) => (
+                              <li key={i}>{error}</li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Import Button */}
+              <Button 
+                onClick={handleImport} 
+                disabled={!importFile || !validationResult?.success || selectedDomains.length === 0 || importMutation.isPending}
+                className="w-full"
+              >
+                {importMutation.isPending ? (
+                  <>
+                    <Clock className="h-4 w-4 mr-2 animate-spin" />
+                    Importing Data...
+                  </>
+                ) : (
+                  <>
+                    <Upload className="h-4 w-4 mr-2" />
+                    Import Data
+                  </>
+                )}
+              </Button>
+            </CardContent>
+          </Card>
+
+          {/* Import Info */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Import Information</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="space-y-3">
+                <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                  <h4 className="font-medium text-blue-900 mb-2">Supported Formats</h4>
+                  <ul className="text-sm text-blue-800 space-y-1">
+                    <li>• JSON files exported from this application</li>
+                    <li>• Markdown files with structured data</li>
+                    <li>• Files must follow the expected data format</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                  <h4 className="font-medium text-green-900 mb-2">Import Modes</h4>
+                  <ul className="text-sm text-green-800 space-y-1">
+                    <li>• <strong>Append:</strong> Add new data without affecting existing records</li>
+                    <li>• <strong>Merge:</strong> Update existing records and add new ones</li>
+                    <li>• <strong>Replace:</strong> Remove all existing data and replace with imported data</li>
+                  </ul>
+                </div>
+
+                <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                  <h4 className="font-medium text-yellow-900 mb-2">Important Notes</h4>
+                  <ul className="text-sm text-yellow-800 space-y-1">
+                    <li>• Always backup your data before importing</li>
+                    <li>• Import operations cannot be undone</li>
+                    <li>• Large files may take time to process</li>
+                    <li>• Validation runs automatically when you select a file</li>
                   </ul>
                 </div>
               </div>

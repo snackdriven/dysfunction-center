@@ -12,8 +12,12 @@ import { UIDemo } from './pages/UIDemo';
 import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer } from './components/common/Toast';
 import { QueryProvider } from './providers/QueryProvider';
+import { useThemeInitializer } from './hooks/useThemeInitializer';
 
 function App() {
+  // Initialize theme on app load
+  useThemeInitializer();
+
   return (
     <ErrorBoundary>
       <QueryProvider>

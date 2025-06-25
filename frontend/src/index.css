@@ -5,22 +5,35 @@
 
 @layer base {
   :root {
-    /* Light Theme */
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Custom Theme Colors - These can be overridden by JavaScript */
+    --color-primary: #2563eb;
+    --color-secondary: #64748b;
+    --color-accent: #f59e42;
+    --color-background: #f8fafc;
+    --color-foreground: #0f172a;
+    --color-muted: #e2e8f0;
+    --color-border: #cbd5e1;
+    
+    /* Map custom theme colors to existing Tailwind CSS variables */
+    --primary: var(--color-primary);
+    --secondary: var(--color-secondary);
+    --accent: var(--color-accent);
+    --background: var(--color-background);
+    --foreground: var(--color-foreground);
+    --muted: var(--color-muted);
+    --border: var(--color-border);
+    
+    /* Light Theme (keeping existing values as fallbacks) */
+    --background-fallback: 0 0% 100%;
+    --foreground-fallback: 222.2 84% 4.9%;
     --card: 0 0% 100%;
     --card-foreground: 222.2 84% 4.9%;
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
-    --primary: 238.7 83.5% 66.7%;  /* #6366f1 - Indigo */
     --primary-foreground: 0 0% 100%;
-    --secondary: 266.7 83.5% 71.8%; /* #8b5cf6 - Violet */
     --secondary-foreground: 0 0% 100%;
-    --muted: 210 40% 96%;
     --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96%;
     --accent-foreground: 222.2 84% 4.9%;
-    --destructive: 0 84.2% 60.2%; /* #ef4444 - Red */
     --destructive-foreground: 0 0% 100%;
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
@@ -147,6 +160,51 @@
 @layer utilities {
   .text-balance {
     text-wrap: balance;
+  }
+  
+  /* Custom theme utilities */
+  .bg-theme-primary {
+    background-color: var(--color-primary);
+  }
+  
+  .text-theme-primary {
+    color: var(--color-primary);
+  }
+  
+  .border-theme-primary {
+    border-color: var(--color-primary);
+  }
+  
+  .bg-theme-secondary {
+    background-color: var(--color-secondary);
+  }
+  
+  .text-theme-secondary {
+    color: var(--color-secondary);
+  }
+  
+  .bg-theme-accent {
+    background-color: var(--color-accent);
+  }
+  
+  .text-theme-accent {
+    color: var(--color-accent);
+  }
+  
+  .bg-theme-background {
+    background-color: var(--color-background);
+  }
+  
+  .text-theme-foreground {
+    color: var(--color-foreground);
+  }
+  
+  .bg-theme-muted {
+    background-color: var(--color-muted);
+  }
+  
+  .border-theme-border {
+    border-color: var(--color-border);
   }
   
   /* Ensure modal content and buttons are interactive */

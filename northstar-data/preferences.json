@@ -1,0 +1,10 @@
+[
+  {
+    "key": "theme",
+    "value": "dark"
+  },
+  {
+    "key": "notifications",
+    "value": true
+  }
+]

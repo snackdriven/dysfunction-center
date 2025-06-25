@@ -1,6 +1,8 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
+
 import { DailyProductivityData, CalendarDataOverlay, CustomTheme } from '../../../shared/types';
+import { hexToHsl } from '../utils/colorUtils';
 
 interface TaskFilters {
   search: string;
@@ -103,6 +105,8 @@ interface AppState {
   
   // Custom theme
   setCustomTheme: (theme?: CustomTheme) => void;
+  previewCustomTheme: (theme?: CustomTheme) => void;
+  clearThemePreview: () => void;
   
   // Data caching
   setDailyProductivityData: (date: string, data: DailyProductivityData) => void;
@@ -271,7 +275,117 @@ export const useAppStore = create<AppState>()(
       setLastSyncTime: (time) => set({ lastSyncTime: time }),
       
       // Custom theme
-      setCustomTheme: (theme) => set({ customTheme: theme }),
+      setCustomTheme: (theme) => {
+        set({ customTheme: theme });
+        // Apply custom theme colors as CSS variables
+        if (theme) {
+          const root = document.documentElement;
+          // Set both hex values and HSL values for compatibility
+          root.style.setProperty('--color-primary', theme.colors.primary);
+          root.style.setProperty('--color-secondary', theme.colors.secondary);
+          root.style.setProperty('--color-accent', theme.colors.accent);
+          root.style.setProperty('--color-background', theme.colors.background);
+          root.style.setProperty('--color-foreground', theme.colors.foreground);
+          root.style.setProperty('--color-muted', theme.colors.muted);
+          root.style.setProperty('--color-border', theme.colors.border);
+          
+          // Map to existing Tailwind variables (HSL format)
+          root.style.setProperty('--primary', hexToHsl(theme.colors.primary));
+          root.style.setProperty('--secondary', hexToHsl(theme.colors.secondary));
+          root.style.setProperty('--accent', hexToHsl(theme.colors.accent));
+          root.style.setProperty('--background', hexToHsl(theme.colors.background));
+          root.style.setProperty('--foreground', hexToHsl(theme.colors.foreground));
+          root.style.setProperty('--muted', hexToHsl(theme.colors.muted));
+          root.style.setProperty('--border', hexToHsl(theme.colors.border));
+        } else {
+          // Reset to default CSS variables
+          const root = document.documentElement;
+          root.style.removeProperty('--color-primary');
+          root.style.removeProperty('--color-secondary');
+          root.style.removeProperty('--color-accent');
+          root.style.removeProperty('--color-background');
+          root.style.removeProperty('--color-foreground');
+          root.style.removeProperty('--color-muted');
+          root.style.removeProperty('--color-border');
+          
+          // Reset Tailwind variables
+          root.style.removeProperty('--primary');
+          root.style.removeProperty('--secondary');
+          root.style.removeProperty('--accent');
+          root.style.removeProperty('--background');
+          root.style.removeProperty('--foreground');
+          root.style.removeProperty('--muted');
+          root.style.removeProperty('--border');
+        }
+      },
+
+      // Preview theme without saving
+      previewCustomTheme: (theme) => {
+        if (theme) {
+          const root = document.documentElement;
+          // Set both hex values and HSL values for compatibility
+          root.style.setProperty('--color-primary', theme.colors.primary);
+          root.style.setProperty('--color-secondary', theme.colors.secondary);
+          root.style.setProperty('--color-accent', theme.colors.accent);
+          root.style.setProperty('--color-background', theme.colors.background);
+          root.style.setProperty('--color-foreground', theme.colors.foreground);
+          root.style.setProperty('--color-muted', theme.colors.muted);
+          root.style.setProperty('--color-border', theme.colors.border);
+          
+          // Map to existing Tailwind variables (HSL format)
+          root.style.setProperty('--primary', hexToHsl(theme.colors.primary));
+          root.style.setProperty('--secondary', hexToHsl(theme.colors.secondary));
+          root.style.setProperty('--accent', hexToHsl(theme.colors.accent));
+          root.style.setProperty('--background', hexToHsl(theme.colors.background));
+          root.style.setProperty('--foreground', hexToHsl(theme.colors.foreground));
+          root.style.setProperty('--muted', hexToHsl(theme.colors.muted));
+          root.style.setProperty('--border', hexToHsl(theme.colors.border));
+        }
+      },
+
+      // Clear preview and restore saved theme or defaults
+      clearThemePreview: () => {
+        const { customTheme } = get();
+        if (customTheme) {
+          // Restore saved theme
+          const root = document.documentElement;
+          root.style.setProperty('--color-primary', customTheme.colors.primary);
+          root.style.setProperty('--color-secondary', customTheme.colors.secondary);
+          root.style.setProperty('--color-accent', customTheme.colors.accent);
+          root.style.setProperty('--color-background', customTheme.colors.background);
+          root.style.setProperty('--color-foreground', customTheme.colors.foreground);
+          root.style.setProperty('--color-muted', customTheme.colors.muted);
+          root.style.setProperty('--color-border', customTheme.colors.border);
+          
+          // Map to existing Tailwind variables (HSL format)
+          root.style.setProperty('--primary', hexToHsl(customTheme.colors.primary));
+          root.style.setProperty('--secondary', hexToHsl(customTheme.colors.secondary));
+          root.style.setProperty('--accent', hexToHsl(customTheme.colors.accent));
+          root.style.setProperty('--background', hexToHsl(customTheme.colors.background));
+          root.style.setProperty('--foreground', hexToHsl(customTheme.colors.foreground));
+          root.style.setProperty('--muted', hexToHsl(customTheme.colors.muted));
+          root.style.setProperty('--border', hexToHsl(customTheme.colors.border));
+        } else {
+          // Reset to defaults
+          const root = document.documentElement;
+          root.style.removeProperty('--color-primary');
+          root.style.removeProperty('--color-secondary');
+          root.style.removeProperty('--color-accent');
+          root.style.removeProperty('--color-background');
+          root.style.removeProperty('--color-foreground');
+          root.style.removeProperty('--color-muted');
+          root.style.removeProperty('--color-border');
+          
+          // Reset Tailwind variables
+          root.style.removeProperty('--primary');
+          root.style.removeProperty('--secondary');
+          root.style.removeProperty('--accent');
+          root.style.removeProperty('--background');
+          root.style.removeProperty('--foreground');
+          root.style.removeProperty('--muted');
+          root.style.removeProperty('--border');
+        }
+      },
       
       // Data caching
       setDailyProductivityData: (date, data) => {
@@ -293,6 +407,7 @@ export const useAppStore = create<AppState>()(
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         theme: state.theme,
+        customTheme: state.customTheme,
         preferences: state.preferences,
         taskFilters: state.taskFilters,
         recentTasks: state.recentTasks,

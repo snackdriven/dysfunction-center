@@ -114,12 +114,20 @@ const presetThemes: CustomTheme[] = [
 ];
 
 export const ThemeCustomization: React.FC = () => {
-  const { theme, setTheme, customTheme, setCustomTheme } = useAppStore();
+  const { theme, setTheme, customTheme, setCustomTheme, previewCustomTheme, clearThemePreview } = useAppStore();
   const [editingTheme, setEditingTheme] = useState<CustomTheme>(
     customTheme || {
-      id: 'custom',
+      id: crypto.randomUUID(),
       name: 'Custom Theme',
-      colors: defaultColors,
+      colors: {
+        primary: '#2563eb',
+        secondary: '#64748b', 
+        accent: '#f59e42',
+        background: '#f8fafc',
+        foreground: '#0f172a',
+        muted: '#e2e8f0',
+        border: '#cbd5e1',
+      },
       font_size: 'medium',
       font_family: 'system',
       high_contrast: false,
@@ -132,44 +140,51 @@ export const ThemeCustomization: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleColorChange = (colorKey: string, value: string) => {
-    setEditingTheme({
+    const updatedTheme = {
       ...editingTheme,
       colors: {
         ...editingTheme.colors,
         [colorKey]: value,
       },
       updated_at: new Date().toISOString(),
-    });
+    };
+    setEditingTheme(updatedTheme);
+    
+    // Live preview as user types/changes colors
+    previewCustomTheme(updatedTheme);
   };
 
   const handlePropertyChange = (property: keyof CustomTheme, value: any) => {
-    setEditingTheme({
+    const updatedTheme = {
       ...editingTheme,
       [property]: value,
       updated_at: new Date().toISOString(),
-    });
+    };
+    setEditingTheme(updatedTheme);
+    
+    // Live preview property changes
+    previewCustomTheme(updatedTheme);
   };
 
   const applyTheme = (themeToApply: CustomTheme) => {
     setCustomTheme(themeToApply);
-    // Re-apply current theme mode to trigger CSS updates
-    setTheme(theme);
+    setPreviewMode(false);
   };
 
   const previewTheme = () => {
     if (previewMode) {
-      // Restore original theme
-      applyTheme(customTheme || editingTheme);
+      // Clear preview and restore saved theme
+      clearThemePreview();
       setPreviewMode(false);
     } else {
-      // Apply preview
-      applyTheme(editingTheme);
+      // Start preview mode
+      previewCustomTheme(editingTheme);
       setPreviewMode(true);
     }
   };
 
   const saveTheme = () => {
-    applyTheme(editingTheme);
+    setCustomTheme(editingTheme);
     setPreviewMode(false);
   };
 

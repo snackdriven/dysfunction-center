@@ -6,6 +6,8 @@ import {
   CalendarDataOverlay,
   DataExportRequest,
   DataExportResponse,
+  DataImportRequest,
+  DataImportResponse,
   BackupMetadata,
   RestoreRequest,
   DateString 
@@ -58,21 +60,47 @@ export class IntegrationService {
   }
 
   // Data export functionality
-  async createExport(request: DataExportRequest): Promise<DataExportResponse> {
-    const response = await api.post('/integration/export', request);
+  async createExport(request: DataExportRequest): Promise<{ content: string; filename: string; contentType: string }> {
+    const response = await api.post('/export', request);
+    
+    // Automatically trigger download
+    const blob = new Blob([response.data.content], { type: response.data.contentType });
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = response.data.filename;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
+    
     return response.data;
   }
 
-  async getExportStatus(exportId: string): Promise<{ status: 'pending' | 'completed' | 'failed'; progress?: number }> {
-    const response = await api.get(`/integration/export/${exportId}/status`);
+  // Data import functionality
+  async importData(request: DataImportRequest): Promise<DataImportResponse> {
+    const response = await api.post('/import', request);
     return response.data;
   }
 
-  async downloadExport(exportId: string): Promise<Blob> {
-    const response = await api.get(`/integration/export/${exportId}/download`, {
-      responseType: 'blob'
+  async validateImportData(fileContent: string, format: 'json' | 'markdown'): Promise<DataImportResponse> {
+    const response = await api.post('/import', {
+      file_content: fileContent,
+      format: format,
+      import_mode: 'append',
+      validate_only: true
     });
     return response.data;
+  }
+
+  // File handling utilities
+  async readFileContent(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = (e) => resolve(e.target?.result as string);
+      reader.onerror = (e) => reject(new Error('Failed to read file'));
+      reader.readAsText(file);
+    });
   }
 
   // Backup and restore

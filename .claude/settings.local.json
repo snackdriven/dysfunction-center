@@ -19,7 +19,10 @@
       "Bash(timeout 10 npm run dev)",
       "Bash(npm test:*)",
       "Bash(encore run:*)",
-      "Bash(npm --version)"
+      "Bash(npm --version)",
+      "Bash(chmod:*)",
+      "Bash(sed:*)",
+      "Bash(timeout 30s npm run dev)"
     ],
     "deny": []
   }

@@ -1,0 +1,19 @@
+{
+  "id": "default",
+  "name": "Default Theme",
+  "colors": {
+    "primary": "#2563eb",
+    "secondary": "#64748b",
+    "accent": "#f59e42",
+    "background": "#f8fafc",
+    "foreground": "#0f172a",
+    "muted": "#e2e8f0",
+    "border": "#cbd5e1"
+  },
+  "font_size": "medium",
+  "font_family": "system",
+  "high_contrast": false,
+  "reduce_motion": false,
+  "created_at": "2025-06-24T10:00:00Z",
+  "updated_at": "2025-06-24T10:00:00Z"
+}
