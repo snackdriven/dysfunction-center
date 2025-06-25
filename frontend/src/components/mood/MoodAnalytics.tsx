@@ -16,7 +16,7 @@ import {
   Pie,
   Cell,
 } from 'recharts';
-import { TrendingUp, TrendingDown, Calendar, Activity } from 'lucide-react';
+import { Calendar, Activity, TrendingUp, TrendingDown } from 'lucide-react';
 
 export const MoodAnalytics: React.FC = () => {
   const { data: monthlyMoods } = useQuery({

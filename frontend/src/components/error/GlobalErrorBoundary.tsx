@@ -12,7 +12,7 @@ import {
   Copy,
   CheckCircle
 } from 'lucide-react';
-import { ApiError, errorLogger, parseApiError, getUserFriendlyMessage, getErrorRecoveryActions } from '../../utils/errorHandling';
+import { ApiError, errorLogger, parseApiError, getUserFriendlyMessage } from '../../utils/errorHandling';
 import { cn } from '../../utils/cn';
 
 interface ErrorBoundaryState {
@@ -191,7 +191,6 @@ export class GlobalErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoun
 
       const error = this.state.error;
       const userMessage = getUserFriendlyMessage(error);
-      const recoveryActions = getErrorRecoveryActions(error);
 
       return (
         <div className="min-h-screen bg-background flex items-center justify-center p-4">

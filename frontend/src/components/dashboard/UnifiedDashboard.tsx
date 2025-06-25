@@ -9,7 +9,6 @@ import {
   Target, 
   CheckCircle, 
   Clock, 
-  TrendingUp, 
   Smile,
   AlertCircle,
   Zap,

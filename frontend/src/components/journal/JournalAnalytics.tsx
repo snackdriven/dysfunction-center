@@ -3,7 +3,6 @@ import { Card } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { 
   BarChart3, 
-  TrendingUp, 
   Calendar, 
   Target, 
   BookOpen, 
@@ -76,19 +75,7 @@ export const JournalAnalytics: React.FC = () => {
         <Card className="p-6">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-orange-100 rounded-lg">
-              <TrendingUp className="h-5 w-5 text-orange-600" />
-            </div>
-            <div>
-              <p className="text-sm text-gray-600">Writing Streak</p>
-              <p className="text-2xl font-bold text-gray-900">{analytics.writing_streak} days</p>
-            </div>
-          </div>
-        </Card>
-
-        <Card className="p-6">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-purple-100 rounded-lg">
-              <Target className="h-5 w-5 text-purple-600" />
+              <Target className="h-5 w-5 text-orange-600" />
             </div>
             <div>
               <p className="text-sm text-gray-600">Avg Words</p>

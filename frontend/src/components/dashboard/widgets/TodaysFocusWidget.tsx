@@ -2,12 +2,12 @@ import React from 'react';
 import { DashboardWidget } from '../../layout/DashboardGrid';
 import { Button } from '../../ui/Button';
 import { Badge } from '../../ui/Badge';
-import { CheckCircle, Circle, Clock, AlertCircle } from 'lucide-react';
+import { CheckCircle, Circle, Clock } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { tasksApi, useUpdateTask } from '../../../services/tasks';
 
 export const TodaysFocusWidget: React.FC = () => {
-  const { data: tasks, isLoading, error } = useQuery({
+  const { data: tasks, isLoading } = useQuery({
     queryKey: ['tasks', 'today'],
     queryFn: () => tasksApi.getTodaysTasks(),
   });
@@ -63,10 +63,6 @@ export const TodaysFocusWidget: React.FC = () => {
             <div className="flex items-center gap-2">
               <Circle className="h-4 w-4 text-muted-foreground" />
               <span>{taskSummary.total - taskSummary.completed} remaining</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <span>{taskSummary.overdue} overdue</span>
             </div>
             <div className="flex items-center gap-2">
               <Clock className="h-4 w-4 text-orange-600" />

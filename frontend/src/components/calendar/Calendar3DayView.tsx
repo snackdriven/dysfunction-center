@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Card, CardContent, CardHeader } from '../ui/Card';
+import { Card, CardHeader } from '../ui/Card';
 import { Badge } from '../ui/Badge';
-import { Button } from '../ui/Button';
 import { 
   Clock, 
   Target, 
   CheckCircle2, 
   Circle,
-  Plus,
   Smile,
   MapPin,
   AlertTriangle

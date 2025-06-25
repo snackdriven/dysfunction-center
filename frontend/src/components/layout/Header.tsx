@@ -43,7 +43,7 @@ export const Header: React.FC = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tasks, habits, or moods..."
-                className="pl-10 bg-muted/50 border-0"
+                className="pl-10 bg-muted border-border dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50 dark:placeholder:text-slate-400"
               />
             </div>
           </div>

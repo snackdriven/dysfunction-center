@@ -25,9 +25,7 @@ import {
   Clock,
   Calendar,
   CheckCircle,
-  Trash2,
-  Edit,
-  Copy
+  Trash2
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { habitsApi, HabitTemplate } from '../../services/habits';

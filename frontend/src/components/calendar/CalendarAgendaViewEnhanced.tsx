@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
@@ -10,7 +10,6 @@ import {
   Circle,
   Smile,
   MapPin,
-  AlertCircle,
   Plus,
   ChevronRight,
   Star
@@ -64,11 +63,10 @@ export const CalendarAgendaViewEnhanced: React.FC<CalendarAgendaViewEnhancedProp
   onAddTask,
   onAddMood
 }) => {
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [showCompleted, setShowCompleted] = useState(false);
 
   // Create agenda items from all data sources
-  const agendaItems: AgendaItem[] = React.useMemo(() => {
+  const agendaItems: AgendaItem[] = useMemo(() => {
     const items: AgendaItem[] = [];
     const startDate = new Date(currentDate);
     const endDate = new Date(currentDate);
@@ -154,7 +152,7 @@ export const CalendarAgendaViewEnhanced: React.FC<CalendarAgendaViewEnhancedProp
       
       return 0;
     });
-  }, [currentDate, events, tasks, habits, moodEntries]);
+  }, [currentDate, events, tasks, habits]);
 
   // Group items by date
   const groupedItems = React.useMemo(() => {

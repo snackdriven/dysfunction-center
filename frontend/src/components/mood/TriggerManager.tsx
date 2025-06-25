@@ -10,7 +10,6 @@ import {
   AlertTriangle, 
   Plus, 
   Trash2, 
-  Edit, 
   BarChart3, 
   TrendingUp, 
   Activity,
@@ -19,6 +18,7 @@ import {
   Calendar
 } from 'lucide-react';
 import { moodApi, useCreateTrigger, useDeleteTrigger } from '../../services/mood';
+import { Edit } from 'lucide-react';
 
 interface TriggerManagerProps {
   selectedTriggerIds?: number[];

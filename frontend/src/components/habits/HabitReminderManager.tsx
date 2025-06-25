@@ -15,7 +15,6 @@ import {
   Mail,
   Volume2,
   VolumeX,
-  Edit,
   BarChart3,
   TrendingUp
 } from 'lucide-react';

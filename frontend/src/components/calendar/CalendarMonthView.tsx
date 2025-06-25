@@ -5,7 +5,6 @@ import { CalendarIcon, Clock, AlertCircle, MapPin } from 'lucide-react';
 import { CalendarEvent } from '../../services/calendar';
 import { Task } from '../../services/tasks';
 import { EventDetailModal } from './EventDetailModal';
-import { SkeletonLoader } from '../ui/SkeletonLoader';
 import { cn } from '../../utils/cn';
 
 interface CalendarMonthViewProps {

@@ -23,14 +23,6 @@ interface DashboardGridProps {
   onReorder?: (newOrder: string[]) => void;
 }
 
-interface DashboardWidgetConfig {
-  id: string;
-  title: string;
-  size: 'small' | 'medium' | 'large';
-  position: { x: number; y: number };
-  component: React.ComponentType;
-}
-
 export const DashboardGrid: React.FC<DashboardGridProps> = ({ 
   children, 
   columns = 3,

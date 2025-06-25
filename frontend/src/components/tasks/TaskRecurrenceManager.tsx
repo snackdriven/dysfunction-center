@@ -10,11 +10,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { 
   Repeat,
   Calendar as CalendarIcon,
-  Clock,
   Settings,
   Plus,
-  Trash2,
-  Edit
+  Trash2
 } from 'lucide-react';
 
 export interface RecurrenceRule {

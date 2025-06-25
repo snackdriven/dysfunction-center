@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Badge } from '../ui/Badge';
-import { CheckCircle, Circle, Edit, Trash2, MoreHorizontal, Flame, Target, Plus, Minus, Timer, Play, Pause, Bell } from 'lucide-react';
+import { CheckCircle, Circle, Edit, Trash2, MoreHorizontal, Flame, Target, Plus, Minus, Play, Pause, Bell } from 'lucide-react';
 import { Habit, HabitCompletion, useLogHabitCompletion, useUpdateHabit, useDeleteHabit } from '../../services/habits';
 import { HabitForm } from './HabitForm';
 import { HabitReminderManager } from './HabitReminderManager';

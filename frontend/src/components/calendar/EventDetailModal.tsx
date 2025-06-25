@@ -62,19 +62,6 @@ export const EventDetailModal: React.FC<EventDetailModalProps> = ({
     }
   };
 
-  const getReminderText = (minutes?: number) => {
-    if (!minutes) return 'No reminder';
-    if (minutes === 0) return 'At event time';
-    if (minutes < 60) return `${minutes} minutes before`;
-    if (minutes < 1440) return `${Math.floor(minutes / 60)} hours before`;
-    return `${Math.floor(minutes / 1440)} days before`;
-  };
-
-  const getRecurrenceText = (pattern?: string) => {
-    if (!pattern) return 'Does not repeat';
-    return pattern.charAt(0).toUpperCase() + pattern.slice(1);
-  };
-
   const handleDelete = async () => {
     if (window.confirm(`Are you sure you want to delete "${event.title}"?`)) {
       try {

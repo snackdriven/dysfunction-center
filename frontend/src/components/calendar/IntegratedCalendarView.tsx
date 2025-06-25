@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
 import { Card, CardContent } from '../ui/Card';
@@ -11,9 +11,7 @@ import {
   Target, 
   Smile,
   Plus,
-  Zap,
-  TrendingUp,
-  TrendingDown
+  Zap
 } from 'lucide-react';
 import { useQuery } from '@tanstack/react-query';
 import { CalendarEvent } from '../../services/calendar';

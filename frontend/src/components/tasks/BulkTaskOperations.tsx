@@ -7,8 +7,6 @@ import {
   CheckCircle, 
   Circle, 
   Trash2, 
-  FolderOpen, 
-  Tag, 
   X, 
   Loader2,
   AlertTriangle

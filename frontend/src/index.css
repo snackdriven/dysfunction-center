@@ -222,4 +222,106 @@
     }
   }
 }
+@layer base {
+  body {
+    @apply bg-background text-foreground;
+  }
+  
+  /* Force dark mode styles */
+  .dark {
+    color-scheme: dark;
+  }
+  
+  .dark body {
+    background-color: hsl(222.2 84% 4.9%) !important;
+    color: hsl(210 40% 98%) !important;
+  }
+  
+  /* Search bar specific fixes */
+  .dark input[placeholder*="Search"],
+  .dark input[placeholder*="search"] {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(210 40% 98%) !important;
+    border-color: hsl(217.2 32.6% 17.5%) !important;
+  }
+  
+  .dark input[placeholder*="Search"]::placeholder,
+  .dark input[placeholder*="search"]::placeholder {
+    color: hsl(215 20.2% 65.1%) !important;
+  }
+  
+  /* All input fields in dark mode */
+  .dark input,
+  .dark textarea,
+  .dark select {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(210 40% 98%) !important;
+    border-color: hsl(217.2 32.6% 17.5%) !important;
+  }
+  
+  .dark input::placeholder,
+  .dark textarea::placeholder {
+    color: hsl(215 20.2% 65.1%) !important;
+  }
+  
+  /* Card backgrounds */
+  .dark .card,
+  .dark [class*="card"] {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(210 40% 98%) !important;
+    border-color: hsl(217.2 32.6% 17.5%) !important;
+  }
+  
+  /* Text readability */
+  .dark .text-muted-foreground {
+    color: hsl(215 20.2% 65.1%) !important;
+  }
+  
+  /* Main content area */
+  .dark main,
+  .dark .main-content {
+    background-color: hsl(222.2 84% 4.9%) !important;
+    color: hsl(210 40% 98%) !important;
+  }
+  
+  /* Specific fixes for Settings page and forms */
+  .dark input[type="time"],
+  .dark input[type="date"],
+  .dark input[type="text"],
+  .dark input[type="email"],
+  .dark input[type="password"],
+  .dark select,
+  .dark textarea {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(210 40% 98%) !important;
+    border: 1px solid hsl(217.2 32.6% 17.5%) !important;
+  }
+  
+  /* Time picker and select dropdowns */
+  .dark select option,
+  .dark select {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(210 40% 98%) !important;
+  }
+  
+  /* Tabs and navigation */
+  .dark .tabs-trigger,
+  .dark [role="tab"] {
+    color: hsl(215 20.2% 65.1%) !important;
+  }
+  
+  .dark .tabs-trigger[data-state="active"],
+  .dark [role="tab"][data-state="active"] {
+    color: hsl(210 40% 98%) !important;
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+  }
+  
+  /* Info boxes and descriptions */
+  .dark .info-box,
+  .dark .description {
+    background-color: hsl(217.2 32.6% 17.5%) !important;
+    color: hsl(215 20.2% 65.1%) !important;
+    border-color: hsl(217.2 32.6% 17.5%) !important;
+  }
+}
 /* End of CSS */

@@ -16,7 +16,6 @@ import {
   Upload,
   RotateCcw,
   Sun,
-  Moon,
   Contrast,
   Accessibility
 } from 'lucide-react';
@@ -447,7 +446,7 @@ export const ThemeCustomization: React.FC = () => {
                   }}
                   className="w-full"
                 >
-                  <Moon className="h-4 w-4 mr-2" />
+                  <Sun className="h-4 w-4 mr-2" />
                   Make Dark Theme
                 </Button>
               </div>

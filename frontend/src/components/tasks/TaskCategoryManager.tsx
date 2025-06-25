@@ -5,7 +5,7 @@ import { Input } from '../ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 import { Badge } from '../ui/Badge';
 import { tasksApi, TaskCategory, useCreateCategory, useUpdateCategory, useDeleteCategory } from '../../services/tasks';
-import { Plus, Edit2, Trash2, Tag } from 'lucide-react';
+import { Plus, Trash2 } from 'lucide-react';
 
 interface TaskCategoryManagerProps {
   selectedCategoryId?: number;
@@ -128,7 +128,6 @@ export const TaskCategoryManager: React.FC<TaskCategoryManagerProps> = ({
       {/* Category Management */}
       <div className="flex items-center justify-between">
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <Tag className="h-5 w-5" />
           Categories
         </h3>
         <Button onClick={handleCreate} size="sm">
@@ -165,7 +164,7 @@ export const TaskCategoryManager: React.FC<TaskCategoryManagerProps> = ({
                   size="sm"
                   onClick={() => handleEdit(category)}
                 >
-                  <Edit2 className="h-4 w-4" />
+                  Edit
                 </Button>
                 <Button
                   variant="ghost"

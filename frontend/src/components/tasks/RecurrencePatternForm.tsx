@@ -5,7 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '.
 import { Checkbox } from '../ui/Checkbox';
 import { Badge } from '../ui/Badge';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { CalendarDays, Repeat, Clock, AlertCircle } from 'lucide-react';
+import { CalendarDays, Repeat, AlertCircle } from 'lucide-react';
 import { RecurrencePattern } from '../../services/tasks';
 
 interface RecurrencePatternFormProps {

@@ -7,7 +7,6 @@ import { Badge } from '../ui/Badge';
 import { 
   Clock, 
   Calendar, 
-  User, 
   Globe, 
   Save,
   Settings as SettingsIcon,

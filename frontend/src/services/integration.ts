@@ -63,8 +63,8 @@ export class IntegrationService {
   async createExport(request: DataExportRequest): Promise<{ content: string; filename: string; contentType: string }> {
     const response = await api.post('/export', request);
     
-    // Log the response to debug
-    console.log('Export response:', response.data);
+    // Remove or comment out debug log
+    // console.log('Export response:', response.data);
     
     // Automatically trigger download
     const data = response.data;

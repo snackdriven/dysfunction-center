@@ -1,8 +1,8 @@
-import { render, screen, fireEvent, waitFor, within } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { MemoryRouter } from 'react-router-dom';
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 import { setupServer } from 'msw/node';
 import { IntegratedCalendarView } from '../../components/calendar/IntegratedCalendarView';
 import { UnifiedDashboard } from '../../components/dashboard/UnifiedDashboard';
@@ -71,34 +71,34 @@ const mockInsights: ProductivityInsight[] = [
 // Mock server
 const server = setupServer(
   // Productivity data endpoints
-  rest.get('/integration/productivity/:date', (req, res, ctx) => {
-    return res(ctx.json(mockProductivityData));
+  http.get('/integration/productivity/:date', () => {
+    return HttpResponse.json(mockProductivityData);
   }),
   
-  rest.get('/integration/calendar-overlay/:date', (req, res, ctx) => {
-    return res(ctx.json(mockCalendarOverlay));
+  http.get('/integration/calendar-overlay/:date', () => {
+    return HttpResponse.json(mockCalendarOverlay);
   }),
   
-  rest.get('/integration/insights', (req, res, ctx) => {
-    return res(ctx.json(mockInsights));
+  http.get('/integration/insights', () => {
+    return HttpResponse.json(mockInsights);
   }),
   
-  rest.get('/integration/correlations', (req, res, ctx) => {
-    return res(ctx.json([]));
+  http.get('/integration/correlations', () => {
+    return HttpResponse.json([]);
   }),
   
   // Export endpoints
-  rest.post('/export', (req, res, ctx) => {
-    return res(ctx.json({
+  http.post('/export', () => {
+    return HttpResponse.json({
       content: '{"test": "data"}',
       filename: 'test-export.json',
       contentType: 'application/json',
-    }));
+    });
   }),
   
   // Backup endpoints
-  rest.get('/integration/backups', (req, res, ctx) => {
-    return res(ctx.json([
+  http.get('/integration/backups', () => {
+    return HttpResponse.json([
       {
         id: 'backup1',
         created_at: '2024-01-14T12:00:00Z',
@@ -107,53 +107,53 @@ const server = setupServer(
         version: '1.0',
         user_initiated: true,
       },
-    ]));
+    ]);
   }),
   
-  rest.post('/integration/backup', (req, res, ctx) => {
-    return res(ctx.json({
+  http.post('/integration/backup', () => {
+    return HttpResponse.json({
       id: 'backup2',
       created_at: new Date().toISOString(),
       size_bytes: 1024,
       domains: ['tasks', 'habits', 'mood', 'calendar'],
       version: '1.0',
       user_initiated: true,
-    }));
+    });
   }),
 
   // Task scheduling
-  rest.post('/integration/schedule-task', (req, res, ctx) => {
-    return res(ctx.json({ eventId: 123 }));
+  http.post('/integration/schedule-task', () => {
+    return HttpResponse.json({ eventId: 123 });
   }),
 
   // Individual domain endpoints
-  rest.get('/tasks', (req, res, ctx) => {
-    return res(ctx.json([
+  http.get('/tasks', () => {
+    return HttpResponse.json([
       { id: 1, title: 'Complete project', priority: 'high', completed: false, due_date: '2024-01-15' },
       { id: 2, title: 'Review documents', priority: 'medium', completed: true, due_date: '2024-01-15' },
-    ]));
+    ]);
   }),
 
-  rest.get('/habits', (req, res, ctx) => {
-    return res(ctx.json([
+  http.get('/habits', () => {
+    return HttpResponse.json([
       { id: 1, name: 'Exercise', current_streak: 7, completions: [{ date: '2024-01-15', completed: true }] },
       { id: 2, name: 'Read', current_streak: 3, completions: [{ date: '2024-01-15', completed: false }] },
-    ]));
+    ]);
   }),
 
-  rest.get('/mood/today', (req, res, ctx) => {
-    return res(ctx.json({
+  http.get('/mood/today', () => {
+    return HttpResponse.json({
       id: 1,
       date: '2024-01-15',
       primary_mood: 'happy',
       mood_score: 4,
       energy_level: 3,
       stress_level: 2,
-    }));
+    });
   }),
 
-  rest.get('/calendar/events', (req, res, ctx) => {
-    return res(ctx.json([
+  http.get('/calendar/events', () => {
+    return HttpResponse.json([
       {
         id: 1,
         title: 'Team meeting',
@@ -161,7 +161,7 @@ const server = setupServer(
         end_datetime: '2024-01-15T10:00:00Z',
         is_all_day: false,
       },
-    ]));
+    ]);
   }),
 );
 
@@ -608,8 +608,11 @@ describe('Cross-Domain Integration', () => {
     it('should handle network errors gracefully', async () => {
       // Simulate network error
       server.use(
-        rest.get('/integration/productivity/:date', (req, res, ctx) => {
-          return res.networkError('Failed to connect');
+        http.get('/integration/productivity/:date', () => {
+          return new HttpResponse(null, {
+            status: 500,
+            statusText: 'Failed to connect',
+          })
         })
       );
 
@@ -630,15 +633,15 @@ describe('Cross-Domain Integration', () => {
 
       // Mock validation error
       server.use(
-        rest.post('/integration/export', (req, res, ctx) => {
-          return res(
-            ctx.status(400),
-            ctx.json({
+        http.post('/integration/export', () => {
+          return HttpResponse.json(
+            {
               message: 'Validation failed',
               errors: [
                 { field: 'domains', message: 'At least one domain must be selected' }
               ]
-            })
+            },
+            { status: 400 }
           );
         })
       );

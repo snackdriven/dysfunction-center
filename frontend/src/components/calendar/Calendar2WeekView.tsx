@@ -2,15 +2,11 @@ import React from 'react';
 import { Card, CardContent } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { 
-  Clock, 
   Target, 
   CheckCircle2, 
   Circle,
   Smile,
   Calendar,
-  TrendingUp,
-  TrendingDown,
-  Minus
 } from 'lucide-react';
 import { CalendarEvent } from '../../services/calendar';
 import { Task } from '../../services/tasks';

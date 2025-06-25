@@ -33,6 +33,7 @@ vi.mock('lucide-react', () => ({
   Clock: () => <div data-testid="clock-icon" />,
   Trash2: () => <div data-testid="trash-icon" />,
   RefreshCw: () => <div data-testid="refresh-icon" />,
+  X: () => <div data-testid="x-icon" />,
 }));
 
 const renderWithQueryClient = (component: React.ReactElement) => {
@@ -185,7 +186,7 @@ describe('Data Portability Integration Tests', () => {
       });
 
       // Upload file
-      const fileInput = screen.getByText('Choose File').closest('div')?.querySelector('input[type="file"]');
+      const fileInput = screen.getByLabelText('Choose File');
       expect(fileInput).toBeInTheDocument();
 
       if (fileInput) {
@@ -195,6 +196,8 @@ describe('Data Portability Integration Tests', () => {
       // Wait for validation
       await waitFor(() => {
         expect(integrationService.readFileContent).toHaveBeenCalledWith(file);
+      });
+      await waitFor(() => {
         expect(integrationService.validateImportData).toHaveBeenCalled();
       });
 
@@ -243,7 +246,7 @@ describe('Data Portability Integration Tests', () => {
       await userEvent.click(screen.getByText('Import Data'));
 
       const file = new File(['invalid'], 'invalid.json', { type: 'application/json' });
-      const fileInput = screen.getByText('Choose File').closest('div')?.querySelector('input[type="file"]');
+      const fileInput = screen.getByLabelText('Choose File');
 
       if (fileInput) {
         await userEvent.upload(fileInput, file);
@@ -280,7 +283,7 @@ describe('Data Portability Integration Tests', () => {
       await userEvent.click(screen.getByText('Import Data'));
 
       const file = new File(['test'], 'test.json', { type: 'application/json' });
-      const fileInput = screen.getByText('Choose File').closest('div')?.querySelector('input[type="file"]');
+      const fileInput = screen.getByLabelText('Choose File');
 
       if (fileInput) {
         await userEvent.upload(fileInput, file);
@@ -322,7 +325,7 @@ describe('Data Portability Integration Tests', () => {
     it('should show import information', () => {
       renderWithQueryClient(<DataExportImport />);
 
-      fireEvent.click(screen.getByText('Import Data'));
+      userEvent.click(screen.getByText('Import Data'));
 
       expect(screen.getByText('Supported Formats')).toBeInTheDocument();
       expect(screen.getByText('JSON files exported from this application')).toBeInTheDocument();
@@ -451,7 +454,7 @@ describe('Data Portability Integration Tests', () => {
     it('should disable import button when no file selected', () => {
       renderWithQueryClient(<DataExportImport />);
 
-      fireEvent.click(screen.getByText('Import Data'));
+      userEvent.click(screen.getByText('Import Data'));
 
       const importButton = screen.getByRole('button', { name: /import data/i });
       expect(importButton).toBeDisabled();

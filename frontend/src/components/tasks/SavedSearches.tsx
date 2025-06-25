@@ -4,7 +4,7 @@ import { Input } from '../ui/Input';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '../ui/Dialog';
 import { Badge } from '../ui/Badge';
 import { TaskFilterState } from './TaskFilters';
-import { Bookmark, Plus, Trash2, Search, Star } from 'lucide-react';
+import { Bookmark, Trash2, Search, Star } from 'lucide-react';
 
 interface SavedSearch {
   id: string;

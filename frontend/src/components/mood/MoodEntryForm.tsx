@@ -22,16 +22,6 @@ const secondaryMoods = [
   'Motivated', 'Overwhelmed', 'Peaceful', 'Restless', 'Satisfied', 'Worried'
 ];
 
-const commonTriggers = [
-  'Work stress', 'Family', 'Health', 'Money', 'Relationships', 'Weather',
-  'Sleep', 'Exercise', 'Social media', 'News', 'Traffic', 'Deadlines'
-];
-
-const contextOptions = [
-  'At home', 'At work', 'Commuting', 'With friends', 'With family', 'Alone',
-  'Exercising', 'Eating', 'Working', 'Relaxing', 'Studying', 'Traveling'
-];
-
 export const MoodEntryForm: React.FC<MoodEntryFormProps> = ({ entry, onSuccess }) => {
   const [formData, setFormData] = useState({
     mood_score: entry?.mood_score || 3,

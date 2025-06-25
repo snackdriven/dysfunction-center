@@ -35,12 +35,6 @@ export const TaskForm: React.FC<TaskFormProps> = ({ task, onSuccess }) => {
     queryFn: tasksApi.getCategories
   });
 
-  const { data: parentTasks = [] } = useQuery({
-    queryKey: ['parent-tasks'],
-    queryFn: () => tasksApi.getTasks({ parent_task_id: null }),
-    enabled: !task // Only fetch for new tasks
-  });
-
   const [errors, setErrors] = React.useState<Record<string, string>>({});
 
   const createTask = useCreateTask();
