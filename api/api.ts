@@ -13,12 +13,15 @@ import {
   VersionedJournalData
 } from "../shared/types";
 import { createVersionedExport, exportAsJson, exportAsMarkdown, validateImportData } from "./exportUtils";
+/*
+// Commented out until module resolution issue is fixed
 import { tasks } from "~encore/clients";
 import { habits } from "~encore/clients";
 import { mood } from "~encore/clients";
 import { calendar } from "~encore/clients";
 import { preferences } from "~encore/clients";
 import { journal } from "~encore/clients";
+*/
 
 // API Information and Health Check
 export interface ApiInfoResponse {
@@ -110,7 +113,8 @@ export const healthCheck = api(
   }
 );
 
-// Data Export Endpoints
+/*
+// Data Export Endpoints - Moved to api/encore.service.ts
 export const exportData = api(
   { method: "POST", path: "/export", expose: true },
   async (req: DataExportRequest): Promise<{ content: string; filename: string; contentType: string }> => {
@@ -309,6 +313,7 @@ export const exportData = api(
     return { content, filename, contentType };
   }
 );
+*/
 
 // Data Import Endpoint
 export const importData = api(

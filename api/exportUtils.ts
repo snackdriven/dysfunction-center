@@ -194,6 +194,159 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
   return markdown;
 }
 
+export function exportAsCSV(versionedData: VersionedDataExport): string {
+  let csv = '';
+  
+  // Add metadata header
+  csv += `# Executive Dysfunction Center Data Export\n`;
+  csv += `# Export Date: ${new Date(versionedData.export_date).toLocaleString()}\n`;
+  csv += `# Version: ${versionedData.version}\n`;
+  csv += `# Total Records: ${versionedData.metadata.total_records}\n`;
+  csv += `# Domains: ${versionedData.metadata.domains.join(', ')}\n`;
+  if (versionedData.metadata.date_range) {
+    csv += `# Date Range: ${versionedData.metadata.date_range.start_date} to ${versionedData.metadata.date_range.end_date}\n`;
+  }
+  csv += `\n`;
+
+  // Helper function to escape CSV values
+  const escapeCSV = (value: any): string => {
+    if (value === null || value === undefined) return '';
+    const str = String(value);
+    if (str.includes(',') || str.includes('"') || str.includes('\n')) {
+      return `"${str.replace(/"/g, '""')}"`;
+    }
+    return str;
+  };
+
+  // Export Tasks as CSV
+  if (versionedData.data.tasks && versionedData.data.tasks.length > 0) {
+    csv += `# TASKS\n`;
+    csv += `ID,Title,Description,Priority,Completed,Due Date,Category,Tags,Notes,Estimated Minutes,Actual Minutes,Created At,Completed At\n`;
+    versionedData.data.tasks.forEach(task => {
+      csv += [
+        escapeCSV(task.id),
+        escapeCSV(task.title),
+        escapeCSV(task.description),
+        escapeCSV(task.priority),
+        escapeCSV(task.completed),
+        escapeCSV(task.due_date),
+        escapeCSV(task.category_name),
+        escapeCSV(task.tags?.join(';')),
+        escapeCSV(task.notes),
+        escapeCSV(task.estimated_minutes),
+        escapeCSV(task.actual_minutes),
+        escapeCSV(task.created_at),
+        escapeCSV(task.completed_at)
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  // Export Habits as CSV
+  if (versionedData.data.habits && versionedData.data.habits.length > 0) {
+    csv += `# HABITS\n`;
+    csv += `ID,Name,Description,Category,Target Frequency,Active,Target Type,Completion Type,Target Value,Unit,Created At,Updated At\n`;
+    versionedData.data.habits.forEach(habit => {
+      csv += [
+        escapeCSV(habit.id),
+        escapeCSV(habit.name),
+        escapeCSV(habit.description),
+        escapeCSV(habit.category),
+        escapeCSV(habit.target_frequency),
+        escapeCSV(habit.active),
+        escapeCSV(habit.target_type),
+        escapeCSV(habit.completion_type),
+        escapeCSV(habit.target_value),
+        escapeCSV(habit.unit),
+        escapeCSV(habit.created_at),
+        escapeCSV(habit.updated_at)
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  // Export Mood Entries as CSV
+  if (versionedData.data.mood && versionedData.data.mood.length > 0) {
+    csv += `# MOOD ENTRIES\n`;
+    csv += `ID,Mood Score,Mood Category,Secondary Mood,Energy Level,Stress Level,Location,Weather,Notes,Entry Date,Created At,Updated At,Context Tags\n`;
+    versionedData.data.mood.forEach(mood => {
+      csv += [
+        escapeCSV(mood.id),
+        escapeCSV(mood.mood_score),
+        escapeCSV(mood.mood_category),
+        escapeCSV(mood.secondary_mood),
+        escapeCSV(mood.energy_level),
+        escapeCSV(mood.stress_level),
+        escapeCSV(mood.location),
+        escapeCSV(mood.weather),
+        escapeCSV(mood.notes),
+        escapeCSV(mood.entry_date),
+        escapeCSV(mood.created_at),
+        escapeCSV(mood.updated_at),
+        escapeCSV(mood.context_tags ? JSON.stringify(mood.context_tags) : '')
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  // Export Calendar Events as CSV
+  if (versionedData.data.calendar && versionedData.data.calendar.length > 0) {
+    csv += `# CALENDAR EVENTS\n`;
+    csv += `ID,Title,Description,Start DateTime,End DateTime,All Day,Location,Color,Task ID,Created At,Updated At\n`;
+    versionedData.data.calendar.forEach(event => {
+      csv += [
+        escapeCSV(event.id),
+        escapeCSV(event.title),
+        escapeCSV(event.description),
+        escapeCSV(event.start_datetime),
+        escapeCSV(event.end_datetime),
+        escapeCSV(event.is_all_day),
+        escapeCSV(event.location),
+        escapeCSV(event.color),
+        escapeCSV(event.task_id),
+        escapeCSV(event.created_at),
+        escapeCSV(event.updated_at)
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  // Export Journal Entries as CSV
+  if (versionedData.data.journal && versionedData.data.journal.length > 0) {
+    csv += `# JOURNAL ENTRIES\n`;
+    csv += `ID,Title,Content,Mood Reference,Tags,Privacy Level,Created At,Updated At,Productivity Score\n`;
+    versionedData.data.journal.forEach(entry => {
+      csv += [
+        escapeCSV(entry.id),
+        escapeCSV(entry.title),
+        escapeCSV(entry.content),
+        escapeCSV(entry.mood_reference),
+        escapeCSV(entry.tags?.join(';')),
+        escapeCSV(entry.privacy_level),
+        escapeCSV(entry.created_at),
+        escapeCSV(entry.updated_at),
+        escapeCSV(entry.productivity_score)
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  // Export Preferences as CSV
+  if (versionedData.data.preferences && versionedData.data.preferences.length > 0) {
+    csv += `# PREFERENCES\n`;
+    csv += `Preference Key,Preference Value\n`;
+    versionedData.data.preferences.forEach(pref => {
+      csv += [
+        escapeCSV(pref.preference_key),
+        escapeCSV(pref.preference_value)
+      ].join(',') + '\n';
+    });
+    csv += `\n`;
+  }
+
+  return csv;
+}
+
 export function validateImportData(data: any): { valid: boolean; errors: string[]; warnings: string[] } {
   const errors: string[] = [];
   const warnings: string[] = [];

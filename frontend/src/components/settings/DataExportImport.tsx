@@ -51,6 +51,9 @@ export const DataExportImport: React.FC = () => {
       // Download is handled automatically in the service
       console.log('Export completed:', response.filename);
     },
+    onError: (error) => {
+      console.error('Export failed:', error);
+    },
   });
 
   // Import validation mutation

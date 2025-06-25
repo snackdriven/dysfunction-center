@@ -63,18 +63,51 @@ export class IntegrationService {
   async createExport(request: DataExportRequest): Promise<{ content: string; filename: string; contentType: string }> {
     const response = await api.post('/export', request);
     
+    // Log the response to debug
+    console.log('Export response:', response.data);
+    
     // Automatically trigger download
-    const blob = new Blob([response.data.content], { type: response.data.contentType });
+    const data = response.data;
+    
+    // Create blob with appropriate content type
+    let mimeType = data.contentType;
+    if (request.format === 'csv') {
+      mimeType = 'text/csv;charset=utf-8;';
+    } else if (request.format === 'markdown') {
+      mimeType = 'text/markdown;charset=utf-8;';
+    } else {
+      mimeType = 'application/json;charset=utf-8;';
+    }
+    
+    const blob = new Blob([data.content], { type: mimeType });
     const url = window.URL.createObjectURL(blob);
+    
+    // Create a temporary link element
     const link = document.createElement('a');
     link.href = url;
-    link.download = response.data.filename;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    window.URL.revokeObjectURL(url);
+    link.download = data.filename;
+    link.style.display = 'none';
     
-    return response.data;
+    // Add to DOM, click, and remove
+    document.body.appendChild(link);
+    
+    // Force download on different browsers
+    if (navigator.userAgent.indexOf('Chrome') !== -1) {
+      link.click();
+    } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      link.click();
+    } else {
+      // Fallback for other browsers
+      link.click();
+    }
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
+    
+    return data;
   }
 
   // Data import functionality
