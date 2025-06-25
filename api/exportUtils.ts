@@ -43,6 +43,8 @@ export function exportAsJson(versionedData: VersionedDataExport): string {
 }
 
 export function exportAsMarkdown(versionedData: VersionedDataExport): string {
+  // Ensure data is always an object
+  const data = versionedData.data || {};
   let markdown = `# Data Export - Executive Dysfunction Center\n\n`;
   markdown += `**Export Date:** ${new Date(versionedData.export_date).toLocaleString()}\n`;
   markdown += `**Version:** ${versionedData.version}\n`;
@@ -54,9 +56,9 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
   }
 
   // Export Tasks
-  if (versionedData.data.tasks && versionedData.data.tasks.length > 0) {
-    markdown += `## Tasks (${versionedData.data.tasks.length})\n\n`;
-    versionedData.data.tasks.forEach(task => {
+  if (Array.isArray(data.tasks) && data.tasks.length > 0) {
+    markdown += `## Tasks (${data.tasks.length})\n\n`;
+    data.tasks.forEach(task => {
       markdown += `### ${task.title}\n`;
       markdown += `- **ID:** ${task.id}\n`;
       markdown += `- **Priority:** ${task.priority}\n`;
@@ -70,14 +72,12 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
       if (task.actual_minutes) markdown += `- **Actual Time:** ${task.actual_minutes} minutes\n`;
       markdown += `- **Created:** ${new Date(task.created_at).toLocaleString()}\n`;
       if (task.completed_at) markdown += `- **Completed:** ${new Date(task.completed_at).toLocaleString()}\n`;
-      
       if (task.subtasks && task.subtasks.length > 0) {
         markdown += `- **Subtasks:**\n`;
         task.subtasks.forEach(subtask => {
           markdown += `  - ${subtask.completed ? '✅' : '⏳'} ${subtask.title}\n`;
         });
       }
-      
       if (task.time_entries && task.time_entries.length > 0) {
         markdown += `- **Time Entries:**\n`;
         task.time_entries.forEach(entry => {
@@ -88,15 +88,14 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
           if (entry.description) markdown += `    ${entry.description}\n`;
         });
       }
-      
       markdown += `\n`;
     });
   }
 
   // Export Habits
-  if (versionedData.data.habits && versionedData.data.habits.length > 0) {
-    markdown += `## Habits (${versionedData.data.habits.length})\n\n`;
-    versionedData.data.habits.forEach(habit => {
+  if (Array.isArray(data.habits) && data.habits.length > 0) {
+    markdown += `## Habits (${data.habits.length})\n\n`;
+    data.habits.forEach(habit => {
       markdown += `### ${habit.name}\n`;
       markdown += `- **ID:** ${habit.id}\n`;
       markdown += `- **Category:** ${habit.category}\n`;
@@ -107,23 +106,21 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
       if (habit.reminder_enabled && habit.reminder_time) markdown += `- **Reminder:** ${habit.reminder_time}\n`;
       if (habit.description) markdown += `- **Description:** ${habit.description}\n`;
       markdown += `- **Created:** ${new Date(habit.created_at).toLocaleString()}\n`;
-      
-      if (habit.completions.length > 0) {
+      if (Array.isArray(habit.completions) && habit.completions.length > 0) {
         markdown += `- **Recent Completions:**\n`;
         habit.completions.slice(-10).forEach(completion => {
           markdown += `  - ${completion.completion_date}: ${completion.completed ? '✅' : '❌'} (${completion.completion_value})\n`;
           if (completion.notes) markdown += `    ${completion.notes}\n`;
         });
       }
-      
       markdown += `\n`;
     });
   }
 
   // Export Mood Entries
-  if (versionedData.data.mood && versionedData.data.mood.length > 0) {
-    markdown += `## Mood Entries (${versionedData.data.mood.length})\n\n`;
-    versionedData.data.mood.forEach(mood => {
+  if (Array.isArray(data.mood) && data.mood.length > 0) {
+    markdown += `## Mood Entries (${data.mood.length})\n\n`;
+    data.mood.forEach(mood => {
       markdown += `### ${mood.entry_date}\n`;
       markdown += `- **ID:** ${mood.id}\n`;
       markdown += `- **Mood Score:** ${mood.mood_score}/5 ⭐\n`;
@@ -134,58 +131,55 @@ export function exportAsMarkdown(versionedData: VersionedDataExport): string {
       if (mood.location) markdown += `- **Location:** ${mood.location}\n`;
       if (mood.weather) markdown += `- **Weather:** ${mood.weather}\n`;
       if (mood.notes) markdown += `- **Notes:** ${mood.notes}\n`;
-      
-      if (mood.triggers && mood.triggers.length > 0) {
+      if (Array.isArray(mood.triggers) && mood.triggers.length > 0) {
         markdown += `- **Triggers:** ${mood.triggers.map(t => t.name).join(', ')}\n`;
       }
-      
-      if (mood.context_tags) {
-        if (mood.context_tags.activities?.length) markdown += `- **Activities:** ${mood.context_tags.activities.join(', ')}\n`;
-        if (mood.context_tags.people?.length) markdown += `- **People:** ${mood.context_tags.people.join(', ')}\n`;
-        if (mood.context_tags.emotions?.length) markdown += `- **Emotions:** ${mood.context_tags.emotions.join(', ')}\n`;
-        if (mood.context_tags.locations?.length) markdown += `- **Locations:** ${mood.context_tags.locations.join(', ')}\n`;
-      }
-      
-      markdown += `- **Created:** ${new Date(mood.created_at).toLocaleString()}\n\n`;
+      markdown += `\n`;
     });
   }
 
   // Export Calendar Events
-  if (versionedData.data.calendar && versionedData.data.calendar.length > 0) {
-    markdown += `## Calendar Events (${versionedData.data.calendar.length})\n\n`;
-    versionedData.data.calendar.forEach(event => {
+  if (Array.isArray(data.calendar) && data.calendar.length > 0) {
+    markdown += `## Calendar Events (${data.calendar.length})\n\n`;
+    data.calendar.forEach(event => {
       markdown += `### ${event.title}\n`;
       markdown += `- **ID:** ${event.id}\n`;
-      markdown += `- **Start:** ${new Date(event.start_datetime).toLocaleString()}\n`;
-      if (event.end_datetime) markdown += `- **End:** ${new Date(event.end_datetime).toLocaleString()}\n`;
-      markdown += `- **All Day:** ${event.is_all_day ? 'Yes' : 'No'}\n`;
+      markdown += `- **Start:** ${event.start_datetime}\n`;
+      markdown += `- **End:** ${event.end_datetime}\n`;
+      if (event.is_all_day) markdown += `- **All Day:** Yes\n`;
       if (event.location) markdown += `- **Location:** ${event.location}\n`;
+      if (event.color) markdown += `- **Color:** ${event.color}\n`;
+      if (event.task_title) markdown += `- **Linked Task:** ${event.task_title}\n`;
       if (event.description) markdown += `- **Description:** ${event.description}\n`;
-      if (event.task_title) markdown += `- **Related Task:** ${event.task_title}\n`;
-      if (event.recurrence_rule) markdown += `- **Recurrence:** ${event.recurrence_rule}\n`;
-      markdown += `- **Created:** ${new Date(event.created_at).toLocaleString()}\n\n`;
+      markdown += `- **Created:** ${event.created_at}\n`;
+      markdown += `- **Updated:** ${event.updated_at}\n`;
+      markdown += `\n`;
     });
   }
 
   // Export Journal Entries
-  if (versionedData.data.journal && versionedData.data.journal.length > 0) {
-    markdown += `## Journal Entries (${versionedData.data.journal.length})\n\n`;
-    versionedData.data.journal.forEach(entry => {
+  if (Array.isArray(data.journal) && data.journal.length > 0) {
+    markdown += `## Journal Entries (${data.journal.length})\n\n`;
+    data.journal.forEach(entry => {
       markdown += `### ${entry.title}\n`;
       markdown += `- **ID:** ${entry.id}\n`;
-      markdown += `- **Privacy:** ${entry.privacy_level}\n`;
-      if (entry.tags.length > 0) markdown += `- **Tags:** ${entry.tags.join(', ')}\n`;
-      if (entry.productivity_score) markdown += `- **Productivity Score:** ${entry.productivity_score}/10\n`;
+      markdown += `- **Created:** ${entry.created_at}\n`;
+      if (entry.updated_at) markdown += `- **Updated:** ${entry.updated_at}\n`;
       if (entry.mood_reference) markdown += `- **Mood Reference:** ${entry.mood_reference}\n`;
-      markdown += `- **Created:** ${new Date(entry.created_at).toLocaleString()}\n\n`;
-      markdown += `${entry.content}\n\n---\n\n`;
+      if (entry.tags && entry.tags.length > 0) markdown += `- **Tags:** ${entry.tags.join(', ')}\n`;
+      if (entry.privacy_level) markdown += `- **Privacy:** ${entry.privacy_level}\n`;
+      if (entry.related_tasks && entry.related_tasks.length > 0) markdown += `- **Related Tasks:** ${entry.related_tasks.join(', ')}\n`;
+      if (entry.related_habits && entry.related_habits.length > 0) markdown += `- **Related Habits:** ${entry.related_habits.join(', ')}\n`;
+      if (entry.productivity_score) markdown += `- **Productivity Score:** ${entry.productivity_score}\n`;
+      if (entry.content) markdown += `- **Content:**\n\n${entry.content}\n`;
+      markdown += `\n`;
     });
   }
 
   // Export Preferences
-  if (versionedData.data.preferences && versionedData.data.preferences.length > 0) {
-    markdown += `## User Preferences (${versionedData.data.preferences.length})\n\n`;
-    versionedData.data.preferences.forEach(pref => {
+  if (Array.isArray(data.preferences) && data.preferences.length > 0) {
+    markdown += `## Preferences (${data.preferences.length})\n\n`;
+    data.preferences.forEach(pref => {
       markdown += `- **${pref.preference_key}:** ${pref.preference_value}\n`;
     });
     markdown += `\n`;

@@ -79,43 +79,33 @@ export class IntegrationService {
       mimeType = 'application/json;charset=utf-8;';
     }
     
-    let blob = new Blob([data.content], { type: mimeType });
-    let url = window.URL.createObjectURL(blob);
+    const blob = new Blob([data.content], { type: mimeType });
+    const url = window.URL.createObjectURL(blob);
     
     // Create a temporary link element
     const link = document.createElement('a');
     link.href = url;
     link.download = data.filename;
     link.style.display = 'none';
+    
+    // Add to DOM, click, and remove
     document.body.appendChild(link);
     
-    // Try download
-    try {
+    // Force download on different browsers
+    if (navigator.userAgent.indexOf('Chrome') !== -1) {
       link.click();
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 100);
-    } catch (e) {
-      // Fallback for markdown: try as text/plain
-      if (request.format === 'markdown') {
-        try {
-          blob = new Blob([data.content], { type: 'text/plain;charset=utf-8;' });
-          url = window.URL.createObjectURL(blob);
-          link.href = url;
-          link.download = data.filename;
-          link.click();
-          setTimeout(() => {
-            document.body.removeChild(link);
-            window.URL.revokeObjectURL(url);
-          }, 100);
-        } catch (err) {
-          alert('Download failed. Please right-click and save the text manually.');
-        }
-      } else {
-        alert('Download failed. Please try a different browser or check your popup blocker.');
-      }
+    } else if (navigator.userAgent.indexOf('Firefox') !== -1) {
+      link.click();
+    } else {
+      // Fallback for other browsers
+      link.click();
     }
+    
+    // Clean up
+    setTimeout(() => {
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    }, 100);
     
     return data;
   }
