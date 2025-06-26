@@ -160,6 +160,36 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
   deleteTemplate: async (id: number): Promise<void> => {
     await api.delete(`/habit-templates/${id}`);
   },
+
+  // Multi-completion API endpoints
+  getDailyCompletions: async (habitId: number, date?: string): Promise<HabitCompletion[]> => {
+    const targetDate = date || new Date().toISOString().split('T')[0];
+    const { data } = await api.get(`/habits/${habitId}/daily-completions`, { 
+      params: { date: targetDate } 
+    });
+    return data.completions || [];
+  },
+
+  logMultipleCompletions: async (habitId: number, completions: Array<{
+    completion_value: number;
+    notes?: string;
+    completion_timestamp: string;
+  }>, date?: string): Promise<{ completions: HabitCompletion[]; progress: any }> => {
+    const { data } = await api.post(`/habits/${habitId}/multiple-completions`, {
+      completions,
+      completion_date: date || new Date().toISOString().split('T')[0]
+    });
+    return data;
+  },
+
+  deleteCompletion: async (completionId: number): Promise<void> => {
+    await api.delete(`/habits/completions/${completionId}`);
+  },
+
+  updateCompletion: async (completionId: number, updates: Partial<HabitCompletion>): Promise<HabitCompletion> => {
+    const { data } = await api.put(`/habits/completions/${completionId}`, updates);
+    return data;
+  },
 };
 
 export const useCreateHabit = () => {
@@ -215,6 +245,48 @@ export const useCreateHabitFromTemplate = () => {
   return useMutation({
     mutationFn: habitsApi.createHabitFromTemplate,
     onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    },
+  });
+};
+
+// Multi-completion hooks
+export const useLogMultipleCompletions = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ habitId, completions, date }: { 
+      habitId: number; 
+      completions: Array<{ completion_value: number; notes?: string; completion_timestamp: string; }>; 
+      date?: string; 
+    }) => habitsApi.logMultipleCompletions(habitId, completions, date),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habit-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    },
+  });
+};
+
+export const useDeleteCompletion = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: habitsApi.deleteCompletion,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habit-completions'] });
+      queryClient.invalidateQueries({ queryKey: ['habits'] });
+    },
+  });
+};
+
+export const useUpdateCompletion = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, ...updates }: { id: number } & Partial<HabitCompletion>) =>
+      habitsApi.updateCompletion(id, updates),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['habit-completions'] });
       queryClient.invalidateQueries({ queryKey: ['habits'] });
     },
   });

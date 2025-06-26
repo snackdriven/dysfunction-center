@@ -30,6 +30,8 @@ import { HabitForm } from '../habits/HabitForm';
 import { MoodEntryForm } from '../mood/MoodEntryForm';
 import { cn } from '../../utils/cn';
 import { preferencesService } from '../../services/preferences';
+import { CurrentTimeDisplay } from '../ui/CurrentTimeDisplay';
+import { useTimeDisplayPreferences } from '../../hooks/useTimeDisplayPreferences';
 
 export const UnifiedDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -197,6 +199,9 @@ export const UnifiedDashboard: React.FC = () => {
   const displayName = preferences?.preferences?.display_name || '';
   const avatarUrl = preferences?.preferences?.avatar_url || '';
 
+  // Fetch time display preferences
+  const { data: timeDisplayData } = useTimeDisplayPreferences();
+
   if (productivityLoading) {
     return (
       <div className="flex items-center justify-center h-96">
@@ -221,6 +226,17 @@ export const UnifiedDashboard: React.FC = () => {
           </p>
         </div>
         <div className="flex items-center gap-4">
+          <CurrentTimeDisplay 
+            format={timeDisplayData?.time_display ? {
+              timeFormat: timeDisplayData.time_display.time_format,
+              dateFormat: timeDisplayData.time_display.date_format,
+              showSeconds: timeDisplayData.time_display.show_seconds,
+              showDate: timeDisplayData.time_display.show_date,
+              showTimeZone: timeDisplayData.time_display.show_timezone,
+            } : undefined}
+            size="md"
+            className="text-muted-foreground"
+          />
           <span className="text-lg font-semibold">{new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
       </div>

@@ -65,7 +65,10 @@ export const getApiInfo = api(
           "PUT /habits/:id - Update a habit",
           "DELETE /habits/:id - Delete a habit",
           "POST /habits/:habit_id/completions - Log habit completion",
-          "GET /habits/:habit_id/history - Get habit completion history"
+          "POST /habits/:habit_id/multiple-completions - Log multiple completions at once",
+          "GET /habits/:habit_id/daily-completions - Get all completions for a habit on a specific day",
+          "GET /habits/:habit_id/history - Get habit completion history",
+          "GET /habits/completions/today - Get today's habit completions"
         ],
         mood: [
           "GET /mood - List mood entries",
@@ -79,6 +82,8 @@ export const getApiInfo = api(
           "GET /preferences/:key - Get a user preference",
           "POST /preferences - Set a user preference",
           "DELETE /preferences/:key - Delete a user preference",
+          "GET /preferences/time-display - Get time display preferences",
+          "POST /preferences/time-display - Set time display preferences",
           "GET /theme - Get theme preferences",
           "POST /theme - Set theme preferences",
           "GET /theme/system - Get system theme info"

@@ -3,6 +3,7 @@ import { preferencesDB } from "./encore.service";
 import {
   UserPreference,
   ThemePreference,
+  TimeDisplayPreference,
   GetPreferenceRequest,
   GetPreferenceResponse,
   SetPreferenceRequest,
@@ -81,8 +82,11 @@ export const getPreference = api(
           'end_of_day_time': '23:59',
           'start_of_week': 'monday',
           'timezone': Intl.DateTimeFormat().resolvedOptions().timeZone,
-          'date_format': 'YYYY-MM-DD',
-          'time_format': '24h',
+          'date_format': 'short',
+          'time_format': '12h',
+          'show_seconds': 'false',
+          'show_date': 'true',
+          'show_timezone': 'false',
           'theme': 'system',
           'auto_switch_theme': 'true',
           'dark_hours_start': '18:00',
@@ -338,6 +342,74 @@ export const getSystemTheme = api(
       };
     } catch (error) {
       throw new Error(`Failed to get system theme: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get time display preferences
+export const getTimeDisplayPreferences = api(
+  { method: "GET", path: "/preferences/time-display", expose: true },
+  async (req: { user_id?: string }): Promise<{ time_display: TimeDisplayPreference }> => {
+    try {
+      const user_id = req.user_id || 'default_user';
+
+      // Get individual preferences
+      const timeFormatPref = await getPreference({ key: 'time_format', user_id });
+      const dateFormatPref = await getPreference({ key: 'date_format', user_id });
+      const showSecondsPref = await getPreference({ key: 'show_seconds', user_id });
+      const showDatePref = await getPreference({ key: 'show_date', user_id });
+      const showTimezonePref = await getPreference({ key: 'show_timezone', user_id });
+
+      const time_display: TimeDisplayPreference = {
+        time_format: (timeFormatPref.preference.preference_value as '12h' | '24h') || '12h',
+        date_format: (dateFormatPref.preference.preference_value as 'short' | 'long' | 'iso') || 'short',
+        show_seconds: showSecondsPref.preference.preference_value === 'true',
+        show_date: showDatePref.preference.preference_value !== 'false',
+        show_timezone: showTimezonePref.preference.preference_value === 'true'
+      };
+
+      return { time_display };
+    } catch (error) {
+      throw new Error(`Failed to get time display preferences: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Set time display preferences
+export const setTimeDisplayPreferences = api(
+  { method: "POST", path: "/preferences/time-display", expose: true },
+  async (req: { 
+    time_format?: '12h' | '24h';
+    date_format?: 'short' | 'long' | 'iso';
+    show_seconds?: boolean;
+    show_date?: boolean;
+    show_timezone?: boolean;
+    user_id?: string;
+  }): Promise<{ time_display: TimeDisplayPreference }> => {
+    try {
+      const user_id = req.user_id || 'default_user';
+
+      // Set individual preferences
+      if (req.time_format !== undefined) {
+        await setPreference({ key: 'time_format', value: req.time_format, user_id });
+      }
+      if (req.date_format !== undefined) {
+        await setPreference({ key: 'date_format', value: req.date_format, user_id });
+      }
+      if (req.show_seconds !== undefined) {
+        await setPreference({ key: 'show_seconds', value: req.show_seconds.toString(), user_id });
+      }
+      if (req.show_date !== undefined) {
+        await setPreference({ key: 'show_date', value: req.show_date.toString(), user_id });
+      }
+      if (req.show_timezone !== undefined) {
+        await setPreference({ key: 'show_timezone', value: req.show_timezone.toString(), user_id });
+      }
+
+      // Return updated preferences
+      return await getTimeDisplayPreferences({ user_id });
+    } catch (error) {
+      throw new Error(`Failed to set time display preferences: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 );

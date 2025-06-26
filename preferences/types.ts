@@ -18,6 +18,15 @@ export interface ThemePreference {
   dark_end_time?: string;   // HH:MM format
 }
 
+// Time display preference interface
+export interface TimeDisplayPreference {
+  time_format: '12h' | '24h';
+  date_format: 'short' | 'long' | 'iso';
+  show_seconds: boolean;
+  show_date: boolean;
+  show_timezone: boolean;
+}
+
 // Request/Response types
 export interface GetPreferenceRequest {
   key: string;

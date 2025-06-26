@@ -892,3 +892,97 @@ export const logMultipleCompletions = api(
     }
   }
 );
+
+// Delete individual completion
+export const deleteCompletion = api(
+  { method: "DELETE", path: "/habits/completions/:completion_id", expose: true },
+  async (req: { completion_id: number }): Promise<{ success: boolean; message: string }> => {
+    try {
+      const { completion_id } = req;
+
+      // Check if completion exists
+      const checkGenerator = habitDB.query`
+        SELECT id, habit_id FROM habit_completions WHERE id = ${completion_id}
+      `;
+      const checkResult = await collectResults(checkGenerator);
+      
+      if (checkResult.length === 0) {
+        throw new Error("Completion not found");
+      }
+
+      // Delete the completion
+      const deleteGenerator = habitDB.query`
+        DELETE FROM habit_completions WHERE id = ${completion_id}
+      `;
+      await collectResults(deleteGenerator);
+
+      return {
+        success: true,
+        message: "Completion deleted successfully"
+      };
+    } catch (error) {
+      throw new Error(`Failed to delete completion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Update individual completion
+export const updateCompletion = api(
+  { method: "PUT", path: "/habits/completions/:completion_id", expose: true },
+  async (req: { 
+    completion_id: number; 
+    completion_value?: number; 
+    notes?: string; 
+    completion_timestamp?: string 
+  }): Promise<{ completion: HabitCompletion }> => {
+    try {
+      const { completion_id, completion_value, notes, completion_timestamp } = req;
+
+      // Check if completion exists
+      const checkGenerator = habitDB.query`
+        SELECT * FROM habit_completions WHERE id = ${completion_id}
+      `;
+      const checkResult = await collectResults(checkGenerator);
+      
+      if (checkResult.length === 0) {
+        throw new Error("Completion not found");
+      }
+
+      const existing = checkResult[0];
+
+      // Prepare update values
+      const updatedValue = completion_value !== undefined ? completion_value : existing.completion_value;
+      const updatedNotes = notes !== undefined ? sanitizeString(notes, 500) : existing.notes;
+      const updatedTimestamp = completion_timestamp !== undefined ? completion_timestamp : existing.completion_timestamp;
+
+      // Update the completion
+      const updateGenerator = habitDB.query`
+        UPDATE habit_completions 
+        SET 
+          completion_value = ${updatedValue},
+          notes = ${updatedNotes},
+          completion_timestamp = ${updatedTimestamp},
+          updated_at = CURRENT_TIMESTAMP
+        WHERE id = ${completion_id}
+        RETURNING *
+      `;
+      const updateResult = await collectResults(updateGenerator);
+      const updatedRow = updateResult[0];
+
+      const completion: HabitCompletion = {
+        id: updatedRow.id,
+        habit_id: updatedRow.habit_id,
+        completion_date: updatedRow.completion_date,
+        completed: updatedRow.completed,
+        notes: updatedRow.notes,
+        created_at: updatedRow.created_at,
+        completion_value: updatedRow.completion_value || 1,
+        completion_timestamp: updatedRow.completion_timestamp
+      };
+
+      return { completion };
+    } catch (error) {
+      throw new Error(`Failed to update completion: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);

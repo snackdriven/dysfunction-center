@@ -27,6 +27,18 @@ export interface ThemeResponse {
   theme_preference: ThemePreference;
 }
 
+export interface TimeDisplayPreference {
+  time_format: '12h' | '24h';
+  date_format: 'short' | 'long' | 'iso';
+  show_seconds: boolean;
+  show_date: boolean;
+  show_timezone: boolean;
+}
+
+export interface TimeDisplayResponse {
+  time_display: TimeDisplayPreference;
+}
+
 export class PreferencesService {
   // Get a specific preference
   async getPreference(key: string, userId?: string): Promise<UserPreference> {
@@ -143,6 +155,22 @@ export class PreferencesService {
 
   async setStreakGracePeriod(days: number, userId?: string): Promise<void> {
     await this.setPreference('habit_streak_grace_period', days.toString(), userId);
+  }
+
+  // Time display preferences
+  async getTimeDisplayPreferences(userId?: string): Promise<TimeDisplayResponse> {
+    const response = await api.get('/preferences/time-display', {
+      params: userId ? { user_id: userId } : {}
+    });
+    return response.data;
+  }
+
+  async setTimeDisplayPreferences(preferences: Partial<TimeDisplayPreference>, userId?: string): Promise<TimeDisplayResponse> {
+    const response = await api.post('/preferences/time-display', {
+      ...preferences,
+      user_id: userId
+    });
+    return response.data;
   }
 }
 

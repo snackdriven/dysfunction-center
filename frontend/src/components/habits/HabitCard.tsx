@@ -8,6 +8,8 @@ import { HabitForm } from './HabitForm';
 import { HabitReminderManager } from './HabitReminderManager';
 import { MultiCompletionProgress } from '../ui/MultiCompletionProgress';
 import { Dialog, DialogContent } from '../ui/Dialog';
+import { BulkCompletionModal } from './BulkCompletionModal';
+import { TodayCompletionsList } from './TodayCompletionsList';
 
 interface HabitCardProps {
   habit: Habit;
@@ -18,6 +20,8 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [showActions, setShowActions] = useState(false);
   const [showReminders, setShowReminders] = useState(false);
+  const [showBulkCompletion, setShowBulkCompletion] = useState(false);
+  const [showCompletionsList, setShowCompletionsList] = useState(false);
   const [currentValue, setCurrentValue] = useState(completion?.value || 0);
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [timerStart, setTimerStart] = useState<Date | null>(null);
@@ -207,6 +211,28 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
                       <Trash2 className="h-3 w-3" />
                       Delete
                     </button>
+                    <button
+                      onClick={() => {
+                        setShowBulkCompletion(true);
+                        setShowActions(false);
+                      }}
+                      className="w-full px-3 py-1.5 text-left text-sm hover:bg-muted flex items-center gap-2"
+                    >
+                      <Plus className="h-3 w-3" />
+                      Bulk Add Completions
+                    </button>
+                    {todayCompletions.length > 0 && (
+                      <button
+                        onClick={() => {
+                          setShowCompletionsList(true);
+                          setShowActions(false);
+                        }}
+                        className="w-full px-3 py-1.5 text-left text-sm hover:bg-muted flex items-center gap-2"
+                      >
+                        <Calendar className="h-3 w-3" />
+                        View Today's Completions ({todayCompletions.length})
+                      </button>
+                    )}
                   </div>
                 </>
               )}
@@ -344,6 +370,28 @@ export const HabitCard: React.FC<HabitCardProps> = ({ habit, completion }) => {
             onRemindersUpdate={() => {
               // Optionally refresh habit data or trigger callbacks
             }}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Bulk Completion Modal */}
+      <BulkCompletionModal
+        habit={habit}
+        isOpen={showBulkCompletion}
+        onClose={() => setShowBulkCompletion(false)}
+      />
+
+      {/* Today Completions List Dialog */}
+      <Dialog open={showCompletionsList} onOpenChange={setShowCompletionsList}>
+        <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+          <TodayCompletionsList
+            habit={habit}
+            completions={todayCompletions}
+            onAddCompletion={() => {
+              setShowCompletionsList(false);
+              setShowBulkCompletion(true);
+            }}
+            showActions={true}
           />
         </DialogContent>
       </Dialog>

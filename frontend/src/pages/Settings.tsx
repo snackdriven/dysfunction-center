@@ -4,6 +4,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs'
 import { DataExportImport } from '../components/settings/DataExportImport';
 import { ThemeCustomization } from '../components/settings/ThemeCustomization';
 import { GeneralSettings } from '../components/settings/GeneralSettings';
+import { TimeDisplaySettings } from '../components/settings/TimeDisplaySettings';
 import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
 import { 
   Settings as SettingsIcon,
@@ -44,6 +45,7 @@ export const Settings: React.FC = () => {
         {/* General Settings */}
         <TabsContent value="general" className="space-y-6">
           <GeneralSettings />
+          <TimeDisplaySettings />
         </TabsContent>
 
         {/* Theme Settings */}
