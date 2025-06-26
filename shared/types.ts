@@ -320,7 +320,7 @@ export interface CustomTheme {
     border: string;
   };
   font_size: 'small' | 'medium' | 'large' | 'extra-large';
-  font_family: 'system' | 'serif' | 'monospace';
+  font_family: 'system' | 'serif' | 'monospace' | 'inter' | 'roboto' | 'open-sans' | 'poppins' | 'source-sans' | 'lato' | 'nunito' | 'dyslexic-friendly';
   high_contrast: boolean;
   reduce_motion: boolean;
   created_at: TimestampString;

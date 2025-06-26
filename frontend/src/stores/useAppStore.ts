@@ -297,6 +297,44 @@ export const useAppStore = create<AppState>()(
           root.style.setProperty('--foreground', hexToHsl(theme.colors.foreground));
           root.style.setProperty('--muted', hexToHsl(theme.colors.muted));
           root.style.setProperty('--border', hexToHsl(theme.colors.border));
+          
+          // Apply font size
+          const fontSizes = {
+            'small': '14px',
+            'medium': '16px',
+            'large': '18px',
+            'extra-large': '20px'
+          };
+          root.style.setProperty('--base-font-size', fontSizes[theme.font_size] || '16px');
+          
+          // Apply font family
+          const fontFamilies = {
+            'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            'serif': 'Georgia, "Times New Roman", Times, serif',
+            'monospace': 'Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
+            'inter': '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+            'roboto': '"Roboto", -apple-system, BlinkMacSystemFont, sans-serif',
+            'open-sans': '"Open Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+            'poppins': '"Poppins", -apple-system, BlinkMacSystemFont, sans-serif',
+            'source-sans': '"Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+            'lato': '"Lato", -apple-system, BlinkMacSystemFont, sans-serif',
+            'nunito': '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif',
+            'dyslexic-friendly': '"OpenDyslexic", "Comic Sans MS", cursive, sans-serif'
+          };
+          root.style.setProperty('--base-font-family', fontFamilies[theme.font_family] || fontFamilies.system);
+          
+          // Apply accessibility settings
+          if (theme.high_contrast) {
+            root.classList.add('high-contrast');
+          } else {
+            root.classList.remove('high-contrast');
+          }
+          
+          if (theme.reduce_motion) {
+            root.classList.add('reduce-motion');
+          } else {
+            root.classList.remove('reduce-motion');
+          }
         } else {
           // Reset to default CSS variables
           const root = document.documentElement;
@@ -316,6 +354,13 @@ export const useAppStore = create<AppState>()(
           root.style.removeProperty('--foreground');
           root.style.removeProperty('--muted');
           root.style.removeProperty('--border');
+          
+          // Reset font settings
+          root.style.removeProperty('--base-font-size');
+          root.style.removeProperty('--base-font-family');
+          
+          // Reset accessibility classes
+          root.classList.remove('high-contrast', 'reduce-motion');
         }
       },
 
@@ -340,6 +385,44 @@ export const useAppStore = create<AppState>()(
           root.style.setProperty('--foreground', hexToHsl(theme.colors.foreground));
           root.style.setProperty('--muted', hexToHsl(theme.colors.muted));
           root.style.setProperty('--border', hexToHsl(theme.colors.border));
+          
+          // Apply font size during preview
+          const fontSizes = {
+            'small': '14px',
+            'medium': '16px',
+            'large': '18px',
+            'extra-large': '20px'
+          };
+          root.style.setProperty('--base-font-size', fontSizes[theme.font_size] || '16px');
+          
+          // Apply font family during preview
+          const fontFamilies = {
+            'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            'serif': 'Georgia, "Times New Roman", Times, serif',
+            'monospace': 'Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
+            'inter': '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+            'roboto': '"Roboto", -apple-system, BlinkMacSystemFont, sans-serif',
+            'open-sans': '"Open Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+            'poppins': '"Poppins", -apple-system, BlinkMacSystemFont, sans-serif',
+            'source-sans': '"Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+            'lato': '"Lato", -apple-system, BlinkMacSystemFont, sans-serif',
+            'nunito': '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif',
+            'dyslexic-friendly': '"OpenDyslexic", "Comic Sans MS", cursive, sans-serif'
+          };
+          root.style.setProperty('--base-font-family', fontFamilies[theme.font_family] || fontFamilies.system);
+          
+          // Apply accessibility settings during preview
+          if (theme.high_contrast) {
+            root.classList.add('high-contrast');
+          } else {
+            root.classList.remove('high-contrast');
+          }
+          
+          if (theme.reduce_motion) {
+            root.classList.add('reduce-motion');
+          } else {
+            root.classList.remove('reduce-motion');
+          }
         }
       },
 
@@ -365,6 +448,43 @@ export const useAppStore = create<AppState>()(
           root.style.setProperty('--foreground', hexToHsl(customTheme.colors.foreground));
           root.style.setProperty('--muted', hexToHsl(customTheme.colors.muted));
           root.style.setProperty('--border', hexToHsl(customTheme.colors.border));
+          
+          // Restore font settings
+          const fontSizes = {
+            'small': '14px',
+            'medium': '16px',
+            'large': '18px',
+            'extra-large': '20px'
+          };
+          root.style.setProperty('--base-font-size', fontSizes[customTheme.font_size] || '16px');
+          
+          const fontFamilies = {
+            'system': '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+            'serif': 'Georgia, "Times New Roman", Times, serif',
+            'monospace': 'Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace',
+            'inter': '"Inter", -apple-system, BlinkMacSystemFont, sans-serif',
+            'roboto': '"Roboto", -apple-system, BlinkMacSystemFont, sans-serif',
+            'open-sans': '"Open Sans", -apple-system, BlinkMacSystemFont, sans-serif',
+            'poppins': '"Poppins", -apple-system, BlinkMacSystemFont, sans-serif',
+            'source-sans': '"Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif',
+            'lato': '"Lato", -apple-system, BlinkMacSystemFont, sans-serif',
+            'nunito': '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif',
+            'dyslexic-friendly': '"OpenDyslexic", "Comic Sans MS", cursive, sans-serif'
+          };
+          root.style.setProperty('--base-font-family', fontFamilies[customTheme.font_family] || fontFamilies.system);
+          
+          // Restore accessibility settings
+          if (customTheme.high_contrast) {
+            root.classList.add('high-contrast');
+          } else {
+            root.classList.remove('high-contrast');
+          }
+          
+          if (customTheme.reduce_motion) {
+            root.classList.add('reduce-motion');
+          } else {
+            root.classList.remove('reduce-motion');
+          }
         } else {
           // Reset to defaults
           const root = document.documentElement;
@@ -384,6 +504,13 @@ export const useAppStore = create<AppState>()(
           root.style.removeProperty('--foreground');
           root.style.removeProperty('--muted');
           root.style.removeProperty('--border');
+          
+          // Reset font settings
+          root.style.removeProperty('--base-font-size');
+          root.style.removeProperty('--base-font-family');
+          
+          // Reset accessibility classes
+          root.classList.remove('high-contrast', 'reduce-motion');
         }
       },
       

@@ -5,10 +5,15 @@ export function hexToHsl(hex: string): string {
   // Remove # if present
   hex = hex.replace('#', '');
   
+  // Handle 3-character hex codes
+  if (hex.length === 3) {
+    hex = hex.split('').map(char => char + char).join('');
+  }
+  
   // Parse RGB
-  const r = parseInt(hex.substr(0, 2), 16) / 255;
-  const g = parseInt(hex.substr(2, 2), 16) / 255;
-  const b = parseInt(hex.substr(4, 2), 16) / 255;
+  const r = parseInt(hex.substring(0, 2), 16) / 255;
+  const g = parseInt(hex.substring(2, 4), 16) / 255;
+  const b = parseInt(hex.substring(4, 6), 16) / 255;
   
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Roboto:wght@300;400;500;700&family=Open+Sans:wght@300;400;500;600;700&family=Poppins:wght@300;400;500;600;700&family=Source+Sans+Pro:wght@300;400;500;600;700&family=Lato:wght@300;400;700&family=Nunito:wght@300;400;500;600;700&family=OpenDyslexic&family=JetBrains+Mono:wght@400;500;600&display=swap');
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -14,14 +14,14 @@
     --color-muted: #e2e8f0;
     --color-border: #cbd5e1;
     
-    /* Map custom theme colors to existing Tailwind CSS variables */
-    --primary: var(--color-primary);
-    --secondary: var(--color-secondary);
-    --accent: var(--color-accent);
-    --background: var(--color-background);
-    --foreground: var(--color-foreground);
-    --muted: var(--color-muted);
-    --border: var(--color-border);
+    /* Default Tailwind CSS variables in HSL format */
+    --primary: 221.2 83.2% 53.3%;
+    --secondary: 210 40% 56%;
+    --accent: 24.6 95% 53.1%;
+    --background: 0 0% 100%;
+    --foreground: 222.2 84% 4.9%;
+    --muted: 210 28% 91%;
+    --border: 214.3 31.8% 91.4%;
     
     /* Light Theme (keeping existing values as fallbacks) */
     --background-fallback: 0 0% 100%;
@@ -99,6 +99,35 @@
   body {
     @apply bg-background text-foreground;
     font-feature-settings: "rlig" 1, "calt" 1;
+    font-size: var(--base-font-size, 16px);
+    font-family: var(--base-font-family, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif);
+  }
+  
+  /* High Contrast Mode Support */
+  .high-contrast {
+    filter: contrast(150%);
+  }
+  
+  .high-contrast * {
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
+  
+  .high-contrast button, 
+  .high-contrast input, 
+  .high-contrast select,
+  .high-contrast textarea {
+    border: 2px solid currentColor !important;
+  }
+  
+  /* Reduced Motion Support */
+  .reduce-motion *,
+  .reduce-motion *::before,
+  .reduce-motion *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
   
   /* Scrollbar styling */
@@ -162,49 +191,111 @@
     text-wrap: balance;
   }
   
-  /* Custom theme utilities */
-  .bg-theme-primary {
-    background-color: var(--color-primary);
+  /* Custom theme utilities - Use CSS custom properties directly */
+  .bg-custom-primary {
+    background-color: var(--color-primary) !important;
   }
   
-  .text-theme-primary {
-    color: var(--color-primary);
+  .text-custom-primary {
+    color: var(--color-primary) !important;
   }
   
-  .border-theme-primary {
-    border-color: var(--color-primary);
+  .border-custom-primary {
+    border-color: var(--color-primary) !important;
   }
   
-  .bg-theme-secondary {
-    background-color: var(--color-secondary);
+  .bg-custom-secondary {
+    background-color: var(--color-secondary) !important;
   }
   
-  .text-theme-secondary {
-    color: var(--color-secondary);
+  .text-custom-secondary {
+    color: var(--color-secondary) !important;
   }
   
-  .bg-theme-accent {
-    background-color: var(--color-accent);
+  .bg-custom-accent {
+    background-color: var(--color-accent) !important;
   }
   
-  .text-theme-accent {
-    color: var(--color-accent);
+  .text-custom-accent {
+    color: var(--color-accent) !important;
   }
   
-  .bg-theme-background {
-    background-color: var(--color-background);
+  .bg-custom-background {
+    background-color: var(--color-background) !important;
   }
   
-  .text-theme-foreground {
-    color: var(--color-foreground);
+  .text-custom-foreground {
+    color: var(--color-foreground) !important;
   }
   
-  .bg-theme-muted {
-    background-color: var(--color-muted);
+  .bg-custom-muted {
+    background-color: var(--color-muted) !important;
   }
   
-  .border-theme-border {
-    border-color: var(--color-border);
+  .border-custom-border {
+    border-color: var(--color-border) !important;
+  }
+  
+  /* Font size utilities */
+  .text-theme-small {
+    font-size: 14px !important;
+  }
+  
+  .text-theme-medium {
+    font-size: 16px !important;
+  }
+  
+  .text-theme-large {
+    font-size: 18px !important;
+  }
+  
+  .text-theme-extra-large {
+    font-size: 20px !important;
+  }
+  
+  /* Font family utilities */
+  .font-theme-system {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif !important;
+  }
+  
+  .font-theme-serif {
+    font-family: Georgia, "Times New Roman", Times, serif !important;
+  }
+  
+  .font-theme-monospace {
+    font-family: Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace !important;
+  }
+  
+  .font-theme-inter {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-roboto {
+    font-family: "Roboto", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-open-sans {
+    font-family: "Open Sans", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-poppins {
+    font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-source-sans {
+    font-family: "Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-lato {
+    font-family: "Lato", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-nunito {
+    font-family: "Nunito", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  }
+  
+  .font-theme-dyslexic-friendly {
+    font-family: "OpenDyslexic", "Comic Sans MS", cursive, sans-serif !important;
   }
   
   /* Ensure modal content has proper constraints */

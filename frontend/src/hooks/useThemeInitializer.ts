@@ -11,6 +11,14 @@ export const useThemeInitializer = () => {
   useEffect(() => {
     // Re-apply custom theme if it exists (after page reload)
     if (customTheme) {
+      // Force re-application of the theme to ensure all styles are set
+      setCustomTheme(customTheme);
+    }
+  }, []); // Run only once on mount
+
+  // Also listen for customTheme changes to ensure they are applied
+  useEffect(() => {
+    if (customTheme) {
       setCustomTheme(customTheme);
     }
   }, [customTheme, setCustomTheme]);

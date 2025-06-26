@@ -14,10 +14,12 @@ import {
   Upload,
   RotateCcw,
   Sun,
-  Contrast
+  Contrast,
+  Bug
 } from 'lucide-react';
 import { useAppStore } from '../../stores/useAppStore';
 import { CustomTheme } from '../../../../shared/types';
+import { ThemeDebugPanel } from './ThemeDebugPanel';
 
 const defaultColors = {
   primary: '#6366f1',
@@ -31,78 +33,154 @@ const defaultColors = {
 
 const presetThemes: CustomTheme[] = [
   {
-    id: 'ocean',
-    name: 'Ocean Blue',
+    id: 'ocean-breeze',
+    name: 'Ocean Breeze',
     colors: {
-      primary: '#0ea5e9',
-      secondary: '#0284c7',
-      accent: '#06b6d4',
-      background: '#f8fafc',
-      foreground: '#0f172a',
-      muted: '#f1f5f9',
-      border: '#cbd5e1',
+      primary: '#0F7CDB',     // Blue 600 - high contrast
+      secondary: '#64748B',   // Slate 500 - accessible gray
+      accent: '#0EA5E9',      // Sky 500 - complementary blue
+      background: '#FAFBFC',  // Very light blue-gray
+      foreground: '#1E293B',  // Slate 800 - high contrast text
+      muted: '#F1F5F9',      // Slate 100 - subtle background
+      border: '#CBD5E1',     // Slate 300 - visible borders
     },
     font_size: 'medium',
-    font_family: 'system',
+    font_family: 'inter',
     high_contrast: false,
     reduce_motion: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'forest',
-    name: 'Forest Green',
+    id: 'emerald-focus',
+    name: 'Emerald Focus',
     colors: {
-      primary: '#059669',
-      secondary: '#047857',
-      accent: '#10b981',
-      background: '#f9fafb',
-      foreground: '#111827',
-      muted: '#f3f4f6',
-      border: '#d1d5db',
+      primary: '#059669',     // Emerald 600 - nature-inspired, calm
+      secondary: '#6B7280',   // Gray 500 - neutral complement
+      accent: '#10B981',      // Emerald 500 - consistent green family
+      background: '#F9FAFB',  // Gray 50 - clean white
+      foreground: '#111827',  // Gray 900 - maximum contrast
+      muted: '#F3F4F6',      // Gray 100 - subtle distinction
+      border: '#D1D5DB',     // Gray 300 - clear separation
     },
     font_size: 'medium',
-    font_family: 'system',
+    font_family: 'open-sans',
     high_contrast: false,
     reduce_motion: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'sunset',
-    name: 'Sunset Orange',
+    id: 'warm-productivity',
+    name: 'Warm Productivity',
     colors: {
-      primary: '#ea580c',
-      secondary: '#dc2626',
-      accent: '#f59e0b',
-      background: '#fffbeb',
-      foreground: '#1c1917',
-      muted: '#fef3c7',
-      border: '#fde68a',
+      primary: '#DC2626',     // Red 600 - energizing, urgent
+      secondary: '#78716C',   // Stone 500 - warm neutral
+      accent: '#F59E0B',      // Amber 500 - motivating orange
+      background: '#FFFBEB',  // Amber 50 - very light warm
+      foreground: '#1C1917',  // Stone 900 - warm black
+      muted: '#FEF3C7',      // Amber 100 - warm highlight
+      border: '#F3E8FF',     // Purple 50 - subtle warm border
     },
     font_size: 'medium',
-    font_family: 'system',
+    font_family: 'poppins',
     high_contrast: false,
     reduce_motion: false,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'midnight',
-    name: 'Midnight Purple',
+    id: 'deep-night',
+    name: 'Deep Night',
     colors: {
-      primary: '#7c3aed',
-      secondary: '#6d28d9',
-      accent: '#a855f7',
-      background: '#0f0f23',
-      foreground: '#f8fafc',
-      muted: '#1e1b4b',
-      border: '#312e81',
+      primary: '#8B5CF6',     // Violet 500 - accessible on dark
+      secondary: '#6B7280',   // Gray 500 - muted secondary
+      accent: '#A78BFA',      // Violet 400 - lighter accent
+      background: '#0F172A',  // Slate 900 - true dark
+      foreground: '#F8FAFC',  // Slate 50 - high contrast white
+      muted: '#1E293B',      // Slate 800 - subtle dark sections
+      border: '#334155',     // Slate 700 - visible dark borders
     },
     font_size: 'medium',
-    font_family: 'system',
+    font_family: 'inter',
     high_contrast: false,
     reduce_motion: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'high-contrast-light',
+    name: 'High Contrast Light',
+    colors: {
+      primary: '#000000',     // Pure black - maximum contrast
+      secondary: '#374151',   // Gray 700 - strong secondary
+      accent: '#1F2937',      // Gray 800 - consistent dark theme
+      background: '#FFFFFF',  // Pure white - maximum contrast
+      foreground: '#000000',  // Pure black text
+      muted: '#F9FAFB',      // Gray 50 - minimal difference
+      border: '#000000',     // Black borders for clarity
+    },
+    font_size: 'large',
+    font_family: 'open-sans',
+    high_contrast: true,
+    reduce_motion: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'high-contrast-dark',
+    name: 'High Contrast Dark',
+    colors: {
+      primary: '#FFFFFF',     // Pure white - maximum contrast on dark
+      secondary: '#D1D5DB',   // Gray 300 - lighter secondary
+      accent: '#F3F4F6',      // Gray 100 - consistent light theme
+      background: '#000000',  // Pure black - maximum contrast
+      foreground: '#FFFFFF',  // Pure white text
+      muted: '#111827',      // Gray 900 - subtle distinction
+      border: '#FFFFFF',     // White borders for clarity
+    },
+    font_size: 'large',
+    font_family: 'open-sans',
+    high_contrast: true,
+    reduce_motion: false,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'calm-focus',
+    name: 'Calm Focus',
+    colors: {
+      primary: '#4338CA',     // Indigo 600 - calming, focused
+      secondary: '#6B7280',   // Gray 500 - neutral
+      accent: '#8B5CF6',      // Violet 500 - creative accent
+      background: '#F8FAFC',  // Slate 50 - very light
+      foreground: '#1E293B',  // Slate 800 - readable
+      muted: '#E2E8F0',      // Slate 200 - soft muted areas
+      border: '#CBD5E1',     // Slate 300 - gentle borders
+    },
+    font_size: 'medium',
+    font_family: 'nunito',
+    high_contrast: false,
+    reduce_motion: true,    // Reduced motion for calmness
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: 'accessibility-first',
+    name: 'Accessibility First',
+    colors: {
+      primary: '#1D4ED8',     // Blue 700 - WCAG AAA compliant
+      secondary: '#4B5563',   // Gray 600 - accessible secondary
+      accent: '#059669',      // Emerald 600 - color-blind friendly
+      background: '#FFFFFF',  // Pure white
+      foreground: '#111827',  // Gray 900 - maximum readability
+      muted: '#F3F4F6',      // Gray 100 - subtle backgrounds
+      border: '#6B7280',     // Gray 500 - clearly visible borders
+    },
+    font_size: 'large',
+    font_family: 'dyslexic-friendly',
+    high_contrast: true,
+    reduce_motion: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -133,6 +211,7 @@ export const ThemeCustomization: React.FC = () => {
     }
   );
   const [previewMode, setPreviewMode] = useState(false);
+  const [showDebug, setShowDebug] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleColorChange = (colorKey: string, value: string) => {
@@ -164,6 +243,7 @@ export const ThemeCustomization: React.FC = () => {
 
   const applyTheme = (themeToApply: CustomTheme) => {
     setCustomTheme(themeToApply);
+    setEditingTheme(themeToApply); // Update the editing theme to reflect the applied theme
     setPreviewMode(false);
   };
 
@@ -182,6 +262,7 @@ export const ThemeCustomization: React.FC = () => {
   const saveTheme = () => {
     setCustomTheme(editingTheme);
     setPreviewMode(false);
+    // The editingTheme is already up to date, no need to change it
   };
 
   const resetToDefault = () => {
@@ -221,7 +302,12 @@ export const ThemeCustomization: React.FC = () => {
     reader.onload = (e) => {
       try {
         const importedTheme = JSON.parse(e.target?.result as string) as CustomTheme;
+        // Update the imported theme's timestamps
+        importedTheme.updated_at = new Date().toISOString();
         setEditingTheme(importedTheme);
+        // Automatically preview the imported theme
+        previewCustomTheme(importedTheme);
+        setPreviewMode(true);
       } catch (error) {
         alert('Invalid theme file format');
       }
@@ -275,19 +361,38 @@ export const ThemeCustomization: React.FC = () => {
               {presetThemes.map((preset) => (
                 <div
                   key={preset.id}
-                  className="p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors"
+                  className={`p-3 border rounded-lg cursor-pointer hover:bg-muted/50 transition-colors ${
+                    customTheme?.id === preset.id ? 'ring-2 ring-primary' : ''
+                  }`}
                   onClick={() => setEditingTheme(preset)}
                 >
                   <div className="flex items-center justify-between mb-2">
-                    <h4 className="font-medium">{preset.name}</h4>
-                    <div className="flex gap-1">
-                      {Object.values(preset.colors).slice(0, 3).map((color, idx) => (
-                        <div
-                          key={idx}
-                          className="w-4 h-4 rounded-full border"
-                          style={{ backgroundColor: color }}
-                        />
-                      ))}
+                    <div>
+                      <h4 className="font-medium">{preset.name}</h4>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {preset.id === 'ocean-breeze' && 'Calming blue tones for focus'}
+                        {preset.id === 'emerald-focus' && 'Nature-inspired greens for productivity'}
+                        {preset.id === 'warm-productivity' && 'Energizing warm colors for motivation'}
+                        {preset.id === 'deep-night' && 'Easy on the eyes for dark environments'}
+                        {preset.id === 'high-contrast-light' && 'Maximum readability on light background'}
+                        {preset.id === 'high-contrast-dark' && 'Maximum readability on dark background'}
+                        {preset.id === 'calm-focus' && 'Reduced motion for sensitive users'}
+                        {preset.id === 'accessibility-first' && 'Optimized for screen readers and disabilities'}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <div className="flex gap-1">
+                        {Object.values(preset.colors).slice(0, 3).map((color, idx) => (
+                          <div
+                            key={idx}
+                            className="w-4 h-4 rounded-full border"
+                            style={{ backgroundColor: color }}
+                          />
+                        ))}
+                      </div>
+                      {customTheme?.id === preset.id && (
+                        <Badge variant="default" className="text-xs">Applied</Badge>
+                      )}
                     </div>
                   </div>
                   <Button
@@ -382,8 +487,16 @@ export const ThemeCustomization: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="system">System Default</SelectItem>
-                    <SelectItem value="serif">Serif (Georgia)</SelectItem>
-                    <SelectItem value="monospace">Monospace (Monaco)</SelectItem>
+                    <SelectItem value="inter">Inter (Modern)</SelectItem>
+                    <SelectItem value="roboto">Roboto (Clean)</SelectItem>
+                    <SelectItem value="open-sans">Open Sans (Friendly)</SelectItem>
+                    <SelectItem value="poppins">Poppins (Rounded)</SelectItem>
+                    <SelectItem value="source-sans">Source Sans Pro (Professional)</SelectItem>
+                    <SelectItem value="lato">Lato (Humanist)</SelectItem>
+                    <SelectItem value="nunito">Nunito (Soft)</SelectItem>
+                    <SelectItem value="serif">Serif (Traditional)</SelectItem>
+                    <SelectItem value="monospace">Monospace (Code)</SelectItem>
+                    <SelectItem value="dyslexic-friendly">OpenDyslexic (Accessibility)</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -469,39 +582,80 @@ export const ThemeCustomization: React.FC = () => {
                 backgroundColor: editingTheme.colors.background,
                 color: editingTheme.colors.foreground,
                 borderColor: editingTheme.colors.border,
+                fontSize: editingTheme.font_size === 'small' ? '14px' : 
+                         editingTheme.font_size === 'large' ? '18px' :
+                         editingTheme.font_size === 'extra-large' ? '20px' : '16px',
+                fontFamily: editingTheme.font_family === 'serif' ? 'Georgia, "Times New Roman", Times, serif' :
+                           editingTheme.font_family === 'monospace' ? 'Monaco, "Cascadia Code", "Roboto Mono", Consolas, "Courier New", monospace' :
+                           editingTheme.font_family === 'inter' ? '"Inter", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'roboto' ? '"Roboto", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'open-sans' ? '"Open Sans", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'poppins' ? '"Poppins", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'source-sans' ? '"Source Sans Pro", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'lato' ? '"Lato", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'nunito' ? '"Nunito", -apple-system, BlinkMacSystemFont, sans-serif' :
+                           editingTheme.font_family === 'dyslexic-friendly' ? '"OpenDyslexic", "Comic Sans MS", cursive, sans-serif' :
+                           '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif',
+                filter: editingTheme.high_contrast ? 'contrast(150%)' : 'none',
               }}
             >
               <h3 className="text-lg font-semibold mb-3">Theme Preview</h3>
               <div className="space-y-3">
-                <div className="flex gap-2">
-                  <div
-                    className="px-3 py-1 rounded text-white text-sm"
-                    style={{ backgroundColor: editingTheme.colors.primary }}
-                  >
-                    Primary Button
-                  </div>
-                  <div
-                    className="px-3 py-1 rounded text-white text-sm"
-                    style={{ backgroundColor: editingTheme.colors.secondary }}
-                  >
-                    Secondary Button
-                  </div>
-                  <div
-                    className="px-3 py-1 rounded text-white text-sm"
-                    style={{ backgroundColor: editingTheme.colors.accent }}
-                  >
-                    Accent Button
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Color Palette:</p>
+                  <div className="flex gap-2 flex-wrap">
+                    <div
+                      className="px-3 py-2 rounded text-white text-sm font-medium shadow-sm"
+                      style={{ backgroundColor: editingTheme.colors.primary }}
+                    >
+                      Primary Action
+                    </div>
+                    <div
+                      className="px-3 py-2 rounded text-white text-sm font-medium shadow-sm"
+                      style={{ backgroundColor: editingTheme.colors.secondary }}
+                    >
+                      Secondary
+                    </div>
+                    <div
+                      className="px-3 py-2 rounded text-white text-sm font-medium shadow-sm"
+                      style={{ backgroundColor: editingTheme.colors.accent }}
+                    >
+                      Accent
+                    </div>
                   </div>
                 </div>
+                
                 <div
-                  className="p-3 rounded"
-                  style={{ backgroundColor: editingTheme.colors.muted }}
+                  className="p-3 rounded border"
+                  style={{ 
+                    backgroundColor: editingTheme.colors.muted,
+                    borderColor: editingTheme.colors.border
+                  }}
                 >
-                  <p className="text-sm">
-                    This is how muted content will appear with your custom theme.
-                    Notice how the colors work together harmoniously.
+                  <p className="text-sm font-medium mb-1">Content Card Example</p>
+                  <p className="text-sm opacity-75">
+                    This shows how cards and muted content will appear. 
+                    The {editingTheme.font_family.replace('-', ' ')} font family provides excellent readability.
                   </p>
                 </div>
+                
+                <div className="space-y-1">
+                  <div className="text-lg font-bold">Heading Example</div>
+                  <div className="text-base">Regular body text for reading content</div>
+                  <div className="text-sm opacity-75">Muted text for secondary information</div>
+                </div>
+                
+                {editingTheme.high_contrast && (
+                  <div className="p-2 bg-yellow-100 border border-yellow-400 rounded text-sm">
+                    <strong>High Contrast Mode:</strong> Enhanced visibility for better accessibility
+                  </div>
+                )}
+                
+                {editingTheme.reduce_motion && (
+                  <div className="p-2 bg-blue-100 border border-blue-400 rounded text-sm">
+                    <strong>Reduced Motion:</strong> Animations minimized for comfort
+                  </div>
+                )}
               </div>
             </div>
 
@@ -537,6 +691,14 @@ export const ThemeCustomization: React.FC = () => {
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset to Default
               </Button>
+              <Button 
+                onClick={() => setShowDebug(!showDebug)} 
+                variant="outline"
+                size="sm"
+              >
+                <Bug className="h-4 w-4 mr-2" />
+                {showDebug ? 'Hide Debug' : 'Show Debug'}
+              </Button>
             </div>
 
             {/* Theme Information */}
@@ -549,6 +711,9 @@ export const ThemeCustomization: React.FC = () => {
           </div>
         </CardContent>
       </Card>
+      
+      {/* Debug Panel */}
+      {showDebug && <ThemeDebugPanel />}
     </div>
   );
 };
