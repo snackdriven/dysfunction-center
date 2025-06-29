@@ -17,7 +17,7 @@ export const typography = {
     '5xl': 'clamp(3rem, 2rem + 5vw, 4rem)',              // 48-64px
   },
 
-  // Line heights optimized for executive dysfunction readability
+  // Line heights for executive dysfunction readability
   lineHeight: {
     none: '1',
     tight: '1.25',
@@ -138,7 +138,7 @@ export const spacing = {
     96: '24rem',      // 384px
   },
 
-  // Executive dysfunction-optimized spacing
+  // Executive dysfunction spacing
   cognitive: {
     // Minimal cognitive load
     tight: {

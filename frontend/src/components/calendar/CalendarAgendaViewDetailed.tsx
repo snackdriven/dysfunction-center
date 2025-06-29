@@ -20,7 +20,7 @@ import { Habit } from '../../services/habits';
 import { MoodEntry } from '../../services/mood';
 import { cn } from '../../utils/cn';
 
-interface CalendarAgendaViewEnhancedProps {
+interface CalendarAgendaViewDetailedProps {
   currentDate: Date;
   events: CalendarEvent[];
   tasks: Task[];
@@ -49,7 +49,7 @@ interface AgendaItem {
   data: CalendarEvent | Task | Habit | MoodEntry;
 }
 
-export const CalendarAgendaViewEnhanced: React.FC<CalendarAgendaViewEnhancedProps> = ({
+export const CalendarAgendaViewDetailed: React.FC<CalendarAgendaViewDetailedProps> = ({
   currentDate,
   events,
   tasks,

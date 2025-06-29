@@ -121,7 +121,7 @@ export interface GridProps
 }
 
 /**
- * Responsive Grid component with executive dysfunction optimizations.
+ * Grid component with executive dysfunction optimizations.
  * 
  * @example
  * ```tsx

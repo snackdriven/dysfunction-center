@@ -216,7 +216,7 @@ export const GeneralSettings: React.FC = () => {
             <div className="flex items-center gap-2">
               <label className="text-sm font-medium">Streak Grace Period (days)</label>
               <Badge variant="outline" className="text-xs">
-                Advanced
+                Optional
               </Badge>
             </div>
             <Input

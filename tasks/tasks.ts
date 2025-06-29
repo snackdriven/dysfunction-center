@@ -115,7 +115,7 @@ export const getTasks = api(
       const generator = taskDB.query`SELECT * FROM tasks ORDER BY created_at DESC`;
       const allTasks = await collectResults(generator);
       
-      // Apply filters in memory for now (can be optimized later)
+      // Apply filters in memory for now (can be improved later)
       let filteredTasks = allTasks;
       
       if (req.completed !== undefined) {

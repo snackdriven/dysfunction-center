@@ -29,7 +29,7 @@ interface WidgetStat {
   color?: 'default' | 'success' | 'warning' | 'error' | 'info';
 }
 
-interface EnhancedWidgetProps {
+interface DetailedWidgetProps {
   title: string;
   description?: string;
   icon?: IconComponent;
@@ -136,7 +136,7 @@ const ErrorState: React.FC<{ error: string; onRefresh?: () => void }> = ({ error
   </div>
 );
 
-export const EnhancedWidget: React.FC<EnhancedWidgetProps> = ({
+export const DetailedWidget: React.FC<DetailedWidgetProps> = ({
   title,
   description,
   icon: Icon,

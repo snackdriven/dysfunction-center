@@ -1,6 +1,6 @@
 /**
  * Executive Dysfunction Center Design Token System
- * Comprehensive, maintainable design tokens for consistent styling
+ * Design tokens for consistent styling
  */
 
 export const tokens = {

@@ -1,5 +1,5 @@
 /**
- * Desktop-Optimized Focus Management and Accessibility
+ * Desktop Focus Management and Accessibility
  * Designed specifically for executive dysfunction support
  */
 

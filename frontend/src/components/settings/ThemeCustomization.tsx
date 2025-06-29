@@ -485,7 +485,7 @@ export const ThemeCustomization: React.FC = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="system">System Default</SelectItem>
-                    <SelectItem value="inter">Inter (Modern)</SelectItem>
+                    <SelectItem value="inter">Inter</SelectItem>
                     <SelectItem value="roboto">Roboto (Clean)</SelectItem>
                     <SelectItem value="open-sans">Open Sans (Friendly)</SelectItem>
                     <SelectItem value="poppins">Poppins (Rounded)</SelectItem>

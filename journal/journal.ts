@@ -338,7 +338,7 @@ export const deleteJournalEntry = api(
   }
 );
 
-// Advanced Features
+// Additional Features
 
 // Search journal entries
 export const searchJournalEntries = api(

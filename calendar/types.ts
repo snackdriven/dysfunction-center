@@ -26,7 +26,7 @@ export interface CalendarEventException {
   created_at: TimestampString;
 }
 
-// Enhanced Calendar Event with related data
+// Calendar Event with related data
 export interface CalendarEventWithDetails extends CalendarEvent {
   task?: {
     id: number;
