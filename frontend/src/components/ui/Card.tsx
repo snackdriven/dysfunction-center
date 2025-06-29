@@ -3,7 +3,7 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
 
 const cardVariants = cva(
-  "rounded-lg border bg-card text-card-foreground",
+  "rounded-lg border bg-card text-card-foreground transition-all duration-200",
   {
     variants: {
       variant: {
@@ -55,7 +55,7 @@ const Card = React.forwardRef<HTMLDivElement, CardProps>(
       ref={ref}
       className={cn(
         cardVariants({ variant, padding }),
-        interactive && "cursor-pointer transition-all hover:shadow-md hover:scale-[1.02]",
+        interactive && "cursor-pointer hover:shadow-md hover:scale-[1.01] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         className
       )}
       {...props}

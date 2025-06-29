@@ -68,41 +68,47 @@ export const Journal: React.FC = () => {
   );
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <div className="max-w-6xl mx-auto">
+    <div className="space-y-6 sm:space-y-8">
+      <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
-          <div>
-            <h1 className="text-2xl font-bold text-gray-900 mb-2">Journal</h1>
-            <p className="text-gray-600">
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 sm:mb-8">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Journal
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
               Record your thoughts, track your mood, and reflect on your daily experiences.
             </p>
           </div>
-          <Button onClick={() => setIsCreating(true)} className="flex items-center gap-2">
+          <Button 
+            onClick={() => setIsCreating(true)} 
+            className="flex items-center gap-2 w-full sm:w-auto min-h-[44px]"
+          >
             <Plus className="h-4 w-4" />
             New Entry
           </Button>
         </div>
 
         {/* Search and Filters */}
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+        <div className="bg-card rounded-lg shadow-sm border p-4 sm:p-6 mb-6 sm:mb-8">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
               <Input
                 type="text"
                 placeholder="Search journal entries..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
+                className="pl-10 min-h-[44px]"
+                aria-label="Search journal entries"
               />
             </div>
 
             {/* Privacy Filter */}
             <div>
               <Select value={privacyFilter} onValueChange={setPrivacyFilter}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]" aria-label="Filter by privacy level">
                   <SelectValue placeholder="All privacy levels" />
                 </SelectTrigger>
                 <SelectContent>
@@ -117,7 +123,7 @@ export const Journal: React.FC = () => {
             {/* Sort */}
             <div>
               <Select value={sortBy} onValueChange={setSortBy}>
-                <SelectTrigger>
+                <SelectTrigger className="min-h-[44px]" aria-label="Sort entries">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -133,16 +139,16 @@ export const Journal: React.FC = () => {
 
         {/* Loading State */}
         {isLoading && (
-          <div className="text-center py-8">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
-            <p className="text-gray-600 mt-2">Loading journal entries...</p>
+          <div className="text-center py-12" role="status" aria-live="polite">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary mx-auto"></div>
+            <p className="text-muted-foreground mt-4">Loading journal entries...</p>
           </div>
         )}
 
         {/* Error State */}
         {error && (
-          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
-            <p className="text-red-600">
+          <div className="bg-destructive/10 border border-destructive/20 rounded-lg p-4 sm:p-6 mb-6 sm:mb-8" role="alert">
+            <p className="text-destructive font-medium">
               Failed to load journal entries. Please try again.
             </p>
           </div>
@@ -152,50 +158,57 @@ export const Journal: React.FC = () => {
         {!isLoading && !error && (
           <>
             {filteredEntries.length === 0 ? (
-              <div className="text-center py-12">
-                <FileText className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-gray-900 mb-2">No journal entries found</h3>
-                <p className="text-gray-600 mb-4">
+              <div className="text-center py-12 sm:py-16">
+                <FileText className="h-16 w-16 text-muted-foreground mx-auto mb-6" />
+                <h3 className="text-lg sm:text-xl font-medium text-foreground mb-3">No journal entries found</h3>
+                <p className="text-muted-foreground mb-6 max-w-md mx-auto">
                   {searchQuery || privacyFilter
-                    ? 'Try adjusting your search or filters.'
-                    : 'Start your journaling journey by creating your first entry.'}
+                    ? 'Try adjusting your search or filters to find what you\'re looking for.'
+                    : 'Start your journaling journey by creating your first entry and begin tracking your thoughts and experiences.'}
                 </p>
                 {!searchQuery && !privacyFilter && (
-                  <Button onClick={() => setIsCreating(true)} variant="outline">
+                  <Button 
+                    onClick={() => setIsCreating(true)} 
+                    variant="outline"
+                    className="min-h-[44px]"
+                  >
                     Create your first entry
                   </Button>
                 )}
               </div>
             ) : (
-              <div className="space-y-4">
+              <div className="space-y-4 sm:space-y-6">
                 {/* Stats */}
                 <div className="flex flex-wrap gap-2 mb-4">
-                  <Badge variant="secondary">
+                  <Badge variant="secondary" className="text-xs sm:text-sm">
                     {filteredEntries.length} {filteredEntries.length === 1 ? 'entry' : 'entries'}
                   </Badge>
                   {searchQuery && (
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-xs sm:text-sm">
                       Searching: "{searchQuery}"
                     </Badge>
                   )}
                   {privacyFilter && (
-                    <Badge variant="outline">
+                    <Badge variant="outline" className="text-xs sm:text-sm">
                       Privacy: {privacyFilter}
                     </Badge>
                   )}
                 </div>
 
                 {/* Entries */}
-                {filteredEntries.map((entry) => (
-                  <JournalEntry
-                    key={entry.id}
-                    entry={entry}
-                    onEdit={setEditingEntry}
-                    onDelete={handleDeleteEntry}
-                  />
-                ))}
+                <div className="space-y-4 sm:space-y-6">
+                  {filteredEntries.map((entry) => (
+                    <JournalEntry
+                      key={entry.id}
+                      entry={entry}
+                      onEdit={setEditingEntry}
+                      onDelete={handleDeleteEntry}
+                    />
+                  ))}
+                </div>
               </div>
-            )}          </>
+            )}
+          </>
         )}
         
         {/* Create Entry Modal */}

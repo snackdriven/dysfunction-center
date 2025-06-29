@@ -6,12 +6,14 @@ import { ThemeCustomization } from '../components/settings/ThemeCustomization';
 import { GeneralSettings } from '../components/settings/GeneralSettings';
 import { TimeDisplaySettings } from '../components/settings/TimeDisplaySettings';
 import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
+import { HighContrastToggle, ContrastStatus, ColorContrastTester } from '../components/ui/HighContrastMode';
 import { 
   Settings as SettingsIcon,
   Palette,  Download,
   // User, // Commented out as unused
   Bell,
   Shield,
+  Eye,
   // Database // Commented out as unused
 } from 'lucide-react';
 
@@ -33,9 +35,10 @@ export const Settings: React.FC = () => {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="general">
-        <TabsList className="grid w-full grid-cols-6">
+        <TabsList className="grid w-full grid-cols-7">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
+          <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
           <TabsTrigger value="data">Data</TabsTrigger>
           <TabsTrigger value="sync">Sync</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
@@ -59,6 +62,65 @@ export const Settings: React.FC = () => {
             </CardHeader>
             <CardContent>
               <ThemeCustomization />
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        {/* Accessibility Settings */}
+        <TabsContent value="accessibility" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Eye className="h-5 w-5" />
+                Accessibility Options
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              <div>
+                <h4 className="font-medium mb-3">High Contrast Mode</h4>
+                <div className="space-y-4">
+                  <HighContrastToggle />
+                  <ContrastStatus />
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Keyboard Navigation</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p>• Press <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl + /</kbd> to show all keyboard shortcuts</p>
+                  <p>• Use <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Alt + 1-8</kbd> to navigate between main sections</p>
+                  <p>• Press <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Ctrl + K</kbd> for quick search</p>
+                  <p>• Use <kbd className="px-1 py-0.5 bg-gray-200 dark:bg-gray-700 rounded text-xs">Tab</kbd> to navigate between interactive elements</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Screen Reader Support</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p>• Full ARIA labels and descriptions</p>
+                  <p>• Semantic HTML structure</p>
+                  <p>• Live regions for dynamic content</p>
+                  <p>• Skip links for easy navigation</p>
+                </div>
+              </div>
+              
+              <div>
+                <h4 className="font-medium mb-3">Touch Accessibility</h4>
+                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                  <p>• All interactive elements meet 44px minimum touch target size</p>
+                  <p>• Adequate spacing between touch targets</p>
+                  <p>• Touch-friendly gestures and interactions</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+          
+          <Card>
+            <CardHeader>
+              <CardTitle>Color Contrast Testing</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <ColorContrastTester />
             </CardContent>
           </Card>
         </TabsContent>

@@ -103,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) =>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
+      <nav className="flex-1 p-4 space-y-1" role="navigation" aria-label="Main navigation">
         {navigationItems.map((item) => {
           const isActive = location.pathname === item.href;
           return (
@@ -111,10 +111,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) =>
               key={item.name}
               to={item.href}
               className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative group',
+                'flex items-center gap-3 px-3 py-3 rounded-lg text-sm font-medium transition-all duration-200 relative group min-h-[44px] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
                 isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  ? 'bg-primary text-primary-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/70'
               )}
               title={!isOpen ? item.name : undefined}
             >
@@ -133,8 +133,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) =>
               
               {/* Tooltip for collapsed state */}
               {!isOpen && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">
-                  {item.name}
+                <div className="absolute left-full ml-3 px-3 py-2 bg-popover text-popover-foreground text-sm rounded-md shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 z-50 whitespace-nowrap pointer-events-none border border-border">
+                  <div className="font-medium">{item.name}</div>
+                  <div className="text-xs text-muted-foreground mt-1">{item.description}</div>
                 </div>
               )}
             </NavLink>

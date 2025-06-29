@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@axe-core/react": "^4.10.2",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
@@ -38,6 +39,7 @@
     "@types/react-router-dom": "^5.3.3",
     "@uiw/react-md-editor": "^4.0.7",
     "autoprefixer": "^10.4.21",
+    "axe-core": "^4.10.3",
     "axios": "^1.10.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",

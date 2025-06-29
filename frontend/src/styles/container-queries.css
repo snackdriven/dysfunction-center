@@ -1,0 +1,605 @@
+/* Container Query Utilities for Executive Dysfunction Center */
+
+/* ============================================================================
+   CONTAINER QUERY POLYFILL AND FALLBACKS
+   ============================================================================ */
+
+/* Container query polyfill support detection */
+@supports not (container-type: inline-size) {
+  /* Fallback styles for browsers that don't support container queries */
+  .dashboard-widget,
+  .card-container,
+  .nav-container,
+  .form-container,
+  .content-container,
+  .chart-container {
+    /* Use viewport-based media queries as fallback */
+    width: 100%;
+  }
+}
+
+/* ============================================================================
+   BASE CONTAINER DECLARATIONS
+   ============================================================================ */
+
+/* Dashboard widget containers */
+.dashboard-widget {
+  container-type: inline-size;
+  container-name: widget;
+}
+
+/* Card containers */
+.card-container {
+  container-type: inline-size;
+  container-name: card;
+}
+
+/* Navigation containers */
+.nav-container {
+  container-type: inline-size;
+  container-name: navigation;
+}
+
+/* Form containers */
+.form-container {
+  container-type: inline-size;
+  container-name: form;
+}
+
+/* Content area containers */
+.content-container {
+  container-type: inline-size;
+  container-name: content;
+}
+
+/* Data visualization containers */
+.chart-container {
+  container-type: inline-size;
+  container-name: chart;
+}
+
+/* ============================================================================
+   WIDGET RESPONSIVE PATTERNS
+   ============================================================================ */
+
+/* Small widget (mobile-first) */
+.widget-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 1rem;
+}
+
+/* Medium widget - 2 column layout */
+@container widget (min-width: 300px) {
+  .widget-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    padding: 1.25rem;
+  }
+  
+  .widget-header {
+    grid-column: 1 / -1;
+  }
+  
+  .widget-actions {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: flex-end;
+  }
+}
+
+/* Large widget - 3+ column layout */
+@container widget (min-width: 500px) {
+  .widget-content {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+    padding: 1.5rem;
+  }
+  
+  .widget-stats {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+  }
+}
+
+/* Extra large widget - advanced layouts */
+@container widget (min-width: 768px) {
+  .widget-content {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 2rem;
+    padding: 2rem;
+  }
+  
+  .widget-chart {
+    grid-column: span 2;
+  }
+  
+  .widget-sidebar {
+    grid-column: span 1;
+  }
+}
+
+/* ============================================================================
+   CARD RESPONSIVE PATTERNS
+   ============================================================================ */
+
+/* Base card layout */
+.card-content {
+  padding: 1rem;
+}
+
+/* Medium card */
+@container card (min-width: 250px) {
+  .card-content {
+    padding: 1.25rem;
+  }
+  
+  .card-title {
+    font-size: 1.125rem;
+  }
+  
+  .card-description {
+    margin-top: 0.5rem;
+    line-height: 1.5;
+  }
+}
+
+/* Large card */
+@container card (min-width: 400px) {
+  .card-content {
+    padding: 1.5rem;
+  }
+  
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 1rem;
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+  }
+}
+
+/* ============================================================================
+   NAVIGATION RESPONSIVE PATTERNS
+   ============================================================================ */
+
+/* Compact navigation */
+.nav-items {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+/* Medium navigation */
+@container navigation (min-width: 200px) {
+  .nav-items {
+    gap: 0.5rem;
+  }
+  
+  .nav-item {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    border-radius: 0.5rem;
+  }
+  
+  .nav-item-text {
+    display: block;
+  }
+}
+
+/* Wide navigation */
+@container navigation (min-width: 280px) {
+  .nav-item {
+    padding: 1rem;
+  }
+  
+  .nav-item-badge {
+    margin-left: auto;
+  }
+  
+  .nav-section-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--muted-foreground);
+    margin: 1rem 0 0.5rem 1rem;
+  }
+}
+
+/* ============================================================================
+   FORM RESPONSIVE PATTERNS
+   ============================================================================ */
+
+/* Mobile-first form layout */
+.form-content {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Medium form - 2 column layout */
+@container form (min-width: 400px) {
+  .form-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem 1.5rem;
+  }
+  
+  .form-field-full {
+    grid-column: 1 / -1;
+  }
+  
+  .form-actions {
+    grid-column: 1 / -1;
+    display: flex;
+    gap: 1rem;
+    justify-content: flex-end;
+    margin-top: 1rem;
+  }
+}
+
+/* Large form - 3 column layout */
+@container form (min-width: 600px) {
+  .form-content {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .form-field-half {
+    grid-column: span 1;
+  }
+  
+  .form-field-full {
+    grid-column: 1 / -1;
+  }
+}
+
+/* ============================================================================
+   DATA VISUALIZATION RESPONSIVE PATTERNS
+   ============================================================================ */
+
+/* Small chart */
+.chart-content {
+  height: 200px;
+  padding: 1rem;
+}
+
+/* Medium chart */
+@container chart (min-width: 400px) {
+  .chart-content {
+    height: 300px;
+    padding: 1.5rem;
+  }
+  
+  .chart-legend {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+}
+
+/* Large chart */
+@container chart (min-width: 600px) {
+  .chart-content {
+    height: 400px;
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1.5rem;
+  }
+  
+  .chart-legend {
+    flex-direction: column;
+    justify-content: flex-start;
+    margin-top: 0;
+  }
+}
+
+/* ============================================================================
+   EXECUTIVE DYSFUNCTION SPECIFIC PATTERNS
+   ============================================================================ */
+
+/* Task card responsive behavior */
+.task-card {
+  container-type: inline-size;
+  container-name: task;
+}
+
+@container task (min-width: 250px) {
+  .task-content {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 0.75rem;
+    align-items: start;
+  }
+  
+  .task-priority {
+    margin-top: 0.25rem;
+  }
+  
+  .task-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
+}
+
+/* Habit tracker responsive behavior */
+.habit-tracker {
+  container-type: inline-size;
+  container-name: habit;
+}
+
+@container habit (min-width: 300px) {
+  .habit-days {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+  }
+}
+
+@container habit (min-width: 500px) {
+  .habit-content {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    gap: 1rem;
+    align-items: center;
+  }
+  
+  .habit-stats {
+    display: flex;
+    gap: 1rem;
+    font-size: 0.875rem;
+  }
+}
+
+/* Mood entry responsive behavior */
+.mood-entry {
+  container-type: inline-size;
+  container-name: mood;
+}
+
+@container mood (min-width: 350px) {
+  .mood-content {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 1rem;
+  }
+  
+  .mood-details {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES
+   ============================================================================ */
+
+/* Container query breakpoint utilities */
+.cq-sm { container-type: inline-size; }
+.cq-md { container-type: inline-size; }
+.cq-lg { container-type: inline-size; }
+.cq-xl { container-type: inline-size; }
+
+/* Responsive visibility utilities */
+@container (max-width: 299px) {
+  .cq-hidden-sm { display: none !important; }
+}
+
+@container (min-width: 300px) and (max-width: 499px) {
+  .cq-hidden-md { display: none !important; }
+}
+
+@container (min-width: 500px) and (max-width: 767px) {
+  .cq-hidden-lg { display: none !important; }
+}
+
+@container (min-width: 768px) {
+  .cq-hidden-xl { display: none !important; }
+}
+
+/* Responsive text sizing */
+@container (min-width: 300px) {
+  .cq-text-lg { font-size: 1.125rem; }
+}
+
+@container (min-width: 500px) {
+  .cq-text-xl { font-size: 1.25rem; }
+  .cq-text-lg { font-size: 1.125rem; }
+}
+
+/* ============================================================================
+   RESPONSIVE COMPONENT UTILITIES
+   ============================================================================ */
+
+/* Touch-friendly targets */
+.touch-target-44 {
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  touch-action: manipulation;
+}
+
+/* Named containers for new responsive components */
+.responsive-dashboard-grid {
+  container-name: dashboard;
+  container-type: inline-size;
+}
+
+.responsive-widget-container {
+  container-name: widget;
+  container-type: inline-size;
+}
+
+.responsive-card {
+  container-name: card;
+  container-type: inline-size;
+}
+
+.responsive-form {
+  container-name: form;
+  container-type: inline-size;
+}
+
+.responsive-navigation {
+  container-name: nav;
+  container-type: inline-size;
+}
+
+.responsive-data-visualization {
+  container-name: viz;
+  container-type: inline-size;
+}
+
+/* Enhanced widget responsive patterns */
+@container widget (min-width: 200px) {
+  .widget-compact-text { display: none; }
+  .widget-full-text { display: inline; }
+}
+
+@container widget (min-width: 280px) {
+  .widget-subtitle { display: block; }
+  .widget-meta { display: flex; }
+}
+
+@container widget (min-width: 320px) {
+  .widget-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+}
+
+@container widget (min-width: 400px) {
+  .widget-stats-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  .widget-content-padding {
+    padding: 1.5rem;
+  }
+}
+
+/* Enhanced card responsive patterns */
+@container card (min-width: 250px) {
+  .card-title-responsive {
+    font-size: 1rem;
+    line-height: 1.25;
+  }
+  .card-subtitle-responsive {
+    display: block;
+    font-size: 0.875rem;
+  }
+}
+
+@container card (min-width: 300px) {
+  .card-header-flex {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+  }
+}
+
+@container card (min-width: 400px) {
+  .card-content-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+  .card-title-responsive {
+    font-size: 1.125rem;
+  }
+}
+
+/* Enhanced form responsive patterns */
+@container form (min-width: 400px) {
+  .form-field-horizontal {
+    display: flex;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+  .form-label-horizontal {
+    flex: 0 0 33.333333%;
+    padding-top: 0.5rem;
+  }
+  .form-content-horizontal {
+    flex: 1;
+  }
+}
+
+@container form (min-width: 600px) {
+  .form-two-column {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+@container form (min-width: 768px) {
+  .form-adaptive-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+  }
+}
+
+/* Enhanced navigation responsive patterns */
+@container nav (min-width: 768px) {
+  .nav-mobile { display: none; }
+  .nav-desktop { display: block; }
+  .nav-bottom { display: none; }
+}
+
+/* Data visualization responsive patterns */
+@container viz (min-width: 300px) {
+  .viz-compact { display: none; }
+  .viz-full { display: block; }
+  .viz-metric-icon { display: block; }
+}
+
+@container viz (min-width: 500px) {
+  .viz-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+  }
+}
+
+@container viz (min-width: 800px) {
+  .viz-cards-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+/* Utility classes for executive dysfunction features */
+.focus-ring-enhanced {
+  outline: 2px solid transparent;
+  outline-offset: 2px;
+}
+
+.focus-ring-enhanced:focus-visible {
+  outline: 2px solid var(--color-primary-500, #3b82f6);
+  outline-offset: 2px;
+}
+
+.cognitive-ease {
+  font-family: system-ui, -apple-system, sans-serif;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
+}
+
+.distraction-free {
+  background-color: var(--color-background, #ffffff);
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}

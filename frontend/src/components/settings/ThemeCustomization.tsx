@@ -13,7 +13,6 @@ import {
   Download,
   Upload,
   RotateCcw,
-  Sun,
   Contrast,
   Bug
 } from 'lucide-react';
@@ -34,15 +33,15 @@ const defaultColors = {
 const presetThemes: CustomTheme[] = [
   {
     id: 'ocean-breeze',
-    name: 'Ocean Breeze',
+    name: 'Ocean Breeze Dark',
     colors: {
-      primary: '#0F7CDB',     // Blue 600 - high contrast
-      secondary: '#64748B',   // Slate 500 - accessible gray
-      accent: '#0EA5E9',      // Sky 500 - complementary blue
-      background: '#FAFBFC',  // Very light blue-gray
-      foreground: '#1E293B',  // Slate 800 - high contrast text
-      muted: '#F1F5F9',      // Slate 100 - subtle background
-      border: '#CBD5E1',     // Slate 300 - visible borders
+      primary: '#0ea5e9',
+      secondary: '#64748b',
+      accent: '#06b6d4',
+      background: '#0f172a',
+      foreground: '#f8fafc',
+      muted: '#1e293b',
+      border: '#334155',
     },
     font_size: 'medium',
     font_family: 'inter',
@@ -53,18 +52,18 @@ const presetThemes: CustomTheme[] = [
   },
   {
     id: 'emerald-focus',
-    name: 'Emerald Focus',
+    name: 'Emerald Focus Dark',
     colors: {
-      primary: '#059669',     // Emerald 600 - nature-inspired, calm
-      secondary: '#6B7280',   // Gray 500 - neutral complement
-      accent: '#10B981',      // Emerald 500 - consistent green family
-      background: '#F9FAFB',  // Gray 50 - clean white
-      foreground: '#111827',  // Gray 900 - maximum contrast
-      muted: '#F3F4F6',      // Gray 100 - subtle distinction
-      border: '#D1D5DB',     // Gray 300 - clear separation
+      primary: '#10b981',
+      secondary: '#6b7280',
+      accent: '#34d399',
+      background: '#111827',
+      foreground: '#f9fafb',
+      muted: '#1f2937',
+      border: '#374151',
     },
     font_size: 'medium',
-    font_family: 'open-sans',
+    font_family: 'roboto',
     high_contrast: false,
     reduce_motion: false,
     created_at: new Date().toISOString(),
@@ -72,15 +71,15 @@ const presetThemes: CustomTheme[] = [
   },
   {
     id: 'warm-productivity',
-    name: 'Warm Productivity',
+    name: 'Warm Productivity Dark',
     colors: {
-      primary: '#DC2626',     // Red 600 - energizing, urgent
-      secondary: '#78716C',   // Stone 500 - warm neutral
-      accent: '#F59E0B',      // Amber 500 - motivating orange
-      background: '#FFFBEB',  // Amber 50 - very light warm
-      foreground: '#1C1917',  // Stone 900 - warm black
-      muted: '#FEF3C7',      // Amber 100 - warm highlight
-      border: '#F3E8FF',     // Purple 50 - subtle warm border
+      primary: '#f59e0b',
+      secondary: '#78716c',
+      accent: '#fb923c',
+      background: '#1c1917',
+      foreground: '#fafaf9',
+      muted: '#292524',
+      border: '#44403c',
     },
     font_size: 'medium',
     font_family: 'poppins',
@@ -93,13 +92,13 @@ const presetThemes: CustomTheme[] = [
     id: 'deep-night',
     name: 'Deep Night',
     colors: {
-      primary: '#8B5CF6',     // Violet 500 - accessible on dark
-      secondary: '#6B7280',   // Gray 500 - muted secondary
-      accent: '#A78BFA',      // Violet 400 - lighter accent
-      background: '#0F172A',  // Slate 900 - true dark
-      foreground: '#F8FAFC',  // Slate 50 - high contrast white
-      muted: '#1E293B',      // Slate 800 - subtle dark sections
-      border: '#334155',     // Slate 700 - visible dark borders
+      primary: '#8B5CF6',
+      secondary: '#6B7280',
+      accent: '#A78BFA',
+      background: '#0F172A',
+      foreground: '#F8FAFC',
+      muted: '#1E293B',
+      border: '#334155',
     },
     font_size: 'medium',
     font_family: 'inter',
@@ -109,77 +108,20 @@ const presetThemes: CustomTheme[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: 'high-contrast-light',
-    name: 'High Contrast Light',
-    colors: {
-      primary: '#000000',     // Pure black - maximum contrast
-      secondary: '#374151',   // Gray 700 - strong secondary
-      accent: '#1F2937',      // Gray 800 - consistent dark theme
-      background: '#FFFFFF',  // Pure white - maximum contrast
-      foreground: '#000000',  // Pure black text
-      muted: '#F9FAFB',      // Gray 50 - minimal difference
-      border: '#000000',     // Black borders for clarity
-    },
-    font_size: 'large',
-    font_family: 'open-sans',
-    high_contrast: true,
-    reduce_motion: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'high-contrast-dark',
-    name: 'High Contrast Dark',
-    colors: {
-      primary: '#FFFFFF',     // Pure white - maximum contrast on dark
-      secondary: '#D1D5DB',   // Gray 300 - lighter secondary
-      accent: '#F3F4F6',      // Gray 100 - consistent light theme
-      background: '#000000',  // Pure black - maximum contrast
-      foreground: '#FFFFFF',  // Pure white text
-      muted: '#111827',      // Gray 900 - subtle distinction
-      border: '#FFFFFF',     // White borders for clarity
-    },
-    font_size: 'large',
-    font_family: 'open-sans',
-    high_contrast: true,
-    reduce_motion: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
     id: 'calm-focus',
-    name: 'Calm Focus',
+    name: 'Calm Focus Dark',
     colors: {
-      primary: '#4338CA',     // Indigo 600 - calming, focused
-      secondary: '#6B7280',   // Gray 500 - neutral
-      accent: '#8B5CF6',      // Violet 500 - creative accent
-      background: '#F8FAFC',  // Slate 50 - very light
-      foreground: '#1E293B',  // Slate 800 - readable
-      muted: '#E2E8F0',      // Slate 200 - soft muted areas
-      border: '#CBD5E1',     // Slate 300 - gentle borders
+      primary: '#6366f1',
+      secondary: '#8b5cf6',
+      accent: '#a78bfa',
+      background: '#1e293b',
+      foreground: '#f8fafc',
+      muted: '#334155',
+      border: '#475569',
     },
     font_size: 'medium',
-    font_family: 'nunito',
+    font_family: 'lato',
     high_contrast: false,
-    reduce_motion: true,    // Reduced motion for calmness
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: 'accessibility-first',
-    name: 'Accessibility First',
-    colors: {
-      primary: '#1D4ED8',     // Blue 700 - WCAG AAA compliant
-      secondary: '#4B5563',   // Gray 600 - accessible secondary
-      accent: '#059669',      // Emerald 600 - color-blind friendly
-      background: '#FFFFFF',  // Pure white
-      foreground: '#111827',  // Gray 900 - maximum readability
-      muted: '#F3F4F6',      // Gray 100 - subtle backgrounds
-      border: '#6B7280',     // Gray 500 - clearly visible borders
-    },
-    font_size: 'large',
-    font_family: 'dyslexic-friendly',
-    high_contrast: true,
     reduce_motion: true,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
@@ -215,11 +157,27 @@ export const ThemeCustomization: React.FC = () => {
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleColorChange = (colorKey: string, value: string) => {
+    // Clean and validate the hex color value
+    let cleanValue = value.trim();
+    
+    // Ensure it starts with #
+    if (!cleanValue.startsWith('#')) {
+      cleanValue = '#' + cleanValue.replace(/^#+/, '');
+    }
+    
+    // Remove any non-hex characters (except #)
+    cleanValue = cleanValue.replace(/[^#0-9A-Fa-f]/g, '');
+    
+    // Ensure proper length (either #RGB or #RRGGBB)
+    if (cleanValue.length > 7) {
+      cleanValue = cleanValue.substring(0, 7);
+    }
+    
     const updatedTheme = {
       ...editingTheme,
       colors: {
         ...editingTheme.colors,
-        [colorKey]: value,
+        [colorKey]: cleanValue,
       },
       updated_at: new Date().toISOString(),
     };
@@ -241,9 +199,49 @@ export const ThemeCustomization: React.FC = () => {
     previewCustomTheme(updatedTheme);
   };
 
+  const cleanTheme = (theme: CustomTheme): CustomTheme => {
+    const cleanedColors: any = {};
+    
+    // Clean all color values
+    Object.entries(theme.colors).forEach(([key, value]) => {
+      let cleanValue = String(value).trim();
+      
+      // Ensure it starts with #
+      if (!cleanValue.startsWith('#')) {
+        cleanValue = '#' + cleanValue.replace(/^#+/, '');
+      }
+      
+      // Remove any non-hex characters (except #)
+      cleanValue = cleanValue.replace(/[^#0-9A-Fa-f]/g, '');
+      
+      // Ensure proper length
+      if (cleanValue.length > 7) {
+        cleanValue = cleanValue.substring(0, 7);
+      } else if (cleanValue.length < 4) {
+        // If too short, use a fallback
+        cleanValue = '#000000';
+      } else if (cleanValue.length === 4) {
+        // Convert #RGB to #RRGGBB
+        const r = cleanValue[1];
+        const g = cleanValue[2];
+        const b = cleanValue[3];
+        cleanValue = `#${r}${r}${g}${g}${b}${b}`;
+      }
+      
+      cleanedColors[key] = cleanValue;
+    });
+
+    return {
+      ...theme,
+      colors: cleanedColors,
+      updated_at: new Date().toISOString(),
+    };
+  };
+
   const applyTheme = (themeToApply: CustomTheme) => {
-    setCustomTheme(themeToApply);
-    setEditingTheme(themeToApply); // Update the editing theme to reflect the applied theme
+    const cleanedTheme = cleanTheme(themeToApply);
+    setCustomTheme(cleanedTheme);
+    setEditingTheme(cleanedTheme); // Update the editing theme to reflect the applied theme
     setPreviewMode(false);
   };
 
@@ -260,9 +258,10 @@ export const ThemeCustomization: React.FC = () => {
   };
 
   const saveTheme = () => {
-    setCustomTheme(editingTheme);
+    const cleanedTheme = cleanTheme(editingTheme);
+    setCustomTheme(cleanedTheme);
+    setEditingTheme(cleanedTheme); // Update to the cleaned version
     setPreviewMode(false);
-    // The editingTheme is already up to date, no need to change it
   };
 
   const resetToDefault = () => {
@@ -277,8 +276,9 @@ export const ThemeCustomization: React.FC = () => {
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString(),
     };
-    setEditingTheme(defaultTheme);
-    applyTheme(defaultTheme);
+    const cleanedTheme = cleanTheme(defaultTheme);
+    setEditingTheme(cleanedTheme);
+    applyTheme(cleanedTheme);
   };
 
   const exportTheme = () => {
@@ -315,31 +315,29 @@ export const ThemeCustomization: React.FC = () => {
     reader.readAsText(file);
   };
 
-  const generateHighContrastTheme = () => {
-    const highContrastTheme: CustomTheme = {
-      ...editingTheme,
-      colors: {
-        ...editingTheme.colors,
-        background: '#000000',
-        foreground: '#ffffff',
-        muted: '#333333',
-        border: '#666666',
-      },
-      high_contrast: true,
-      name: `${editingTheme.name} (High Contrast)`,
-    };
-    setEditingTheme(highContrastTheme);
+  // Function to determine if a color is light or dark
+  const isLightColor = (hexColor: string): boolean => {
+    try {
+      const hex = hexColor.replace('#', '');
+      if (hex.length !== 6) return false; // Default to dark text if invalid
+      
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+      
+      // Calculate relative luminance
+      const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+      return luminance > 0.5;
+    } catch (error) {
+      console.warn('Invalid color format:', hexColor);
+      return false; // Default to dark text if invalid
+    }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
-        <div>
-          <h2 className="text-2xl font-bold tracking-tight">Theme Customization</h2>
-          <p className="text-muted-foreground">
-            Personalize your interface with custom colors, fonts, and accessibility options
-          </p>
-        </div>
+        <h2 className="text-2xl font-bold tracking-tight">Theme Customization</h2>
         {previewMode && (
           <Badge variant="secondary" className="animate-pulse">
             Preview Mode Active
@@ -374,10 +372,7 @@ export const ThemeCustomization: React.FC = () => {
                         {preset.id === 'emerald-focus' && 'Nature-inspired greens for productivity'}
                         {preset.id === 'warm-productivity' && 'Energizing warm colors for motivation'}
                         {preset.id === 'deep-night' && 'Easy on the eyes for dark environments'}
-                        {preset.id === 'high-contrast-light' && 'Maximum readability on light background'}
-                        {preset.id === 'high-contrast-dark' && 'Maximum readability on dark background'}
                         {preset.id === 'calm-focus' && 'Reduced motion for sensitive users'}
-                        {preset.id === 'accessibility-first' && 'Optimized for screen readers and disabilities'}
                       </p>
                     </div>
                     <div className="flex items-center gap-2">
@@ -395,17 +390,20 @@ export const ThemeCustomization: React.FC = () => {
                       )}
                     </div>
                   </div>
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="w-full"
+                  <button
+                    className="w-full h-9 px-3 text-xs font-medium rounded-md border-2 transition-all duration-200 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 hover:scale-105 hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
+                    style={{
+                      backgroundColor: preset.colors.primary,
+                      color: isLightColor(preset.colors.primary) ? '#000000' : '#FFFFFF',
+                      borderColor: preset.colors.border,
+                    }}
                     onClick={(e) => {
                       e.stopPropagation();
                       applyTheme(preset);
                     }}
                   >
                     Apply Theme
-                  </Button>
+                  </button>
                 </div>
               ))}
             </div>
@@ -421,7 +419,7 @@ export const ThemeCustomization: React.FC = () => {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
               {Object.entries(editingTheme.colors).map(([key, value]) => (
                 <div key={key} className="space-y-2">
                   <label className="text-sm font-medium capitalize">
@@ -432,7 +430,7 @@ export const ThemeCustomization: React.FC = () => {
                       type="color"
                       value={value}
                       onChange={(e) => handleColorChange(key, e.target.value)}
-                      className="w-12 h-10 border rounded cursor-pointer"
+                      className="w-12 h-10 border rounded cursor-pointer flex-shrink-0"
                     />
                     <Input
                       value={value}
@@ -528,37 +526,7 @@ export const ThemeCustomization: React.FC = () => {
 
               {/* Quick Actions */}
               <div className="space-y-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={generateHighContrastTheme}
-                  className="w-full"
-                >
-                  <Contrast className="h-4 w-4 mr-2" />
-                  Generate High Contrast
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => {
-                    const darkTheme = {
-                      ...editingTheme,
-                      colors: {
-                        ...editingTheme.colors,
-                        background: '#1a1a1a',
-                        foreground: '#ffffff',
-                        muted: '#2a2a2a',
-                        border: '#404040',
-                      },
-                      name: `${editingTheme.name} (Dark)`,
-                    };
-                    setEditingTheme(darkTheme);
-                  }}
-                  className="w-full"
-                >
-                  <Sun className="h-4 w-4 mr-2" />
-                  Make Dark Theme
-                </Button>
+
               </div>
             </div>
           </CardContent>
@@ -690,6 +658,18 @@ export const ThemeCustomization: React.FC = () => {
               <Button onClick={resetToDefault} variant="outline">
                 <RotateCcw className="h-4 w-4 mr-2" />
                 Reset to Default
+              </Button>
+              <Button 
+                onClick={() => {
+                  const cleanedTheme = cleanTheme(editingTheme);
+                  setEditingTheme(cleanedTheme);
+                  previewCustomTheme(cleanedTheme);
+                }} 
+                variant="outline"
+                size="sm"
+              >
+                <RotateCcw className="h-4 w-4 mr-2" />
+                Clean Colors
               </Button>
               <Button 
                 onClick={() => setShowDebug(!showDebug)} 

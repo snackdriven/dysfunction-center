@@ -16,7 +16,8 @@ import {
   ArrowRight,
   Star,
   BarChart3,
-  ExternalLink
+  ExternalLink,
+  MapPin
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAppStore } from '../../stores/useAppStore';
@@ -32,6 +33,7 @@ import { cn } from '../../utils/cn';
 import { preferencesService } from '../../services/preferences';
 import { CurrentTimeDisplay } from '../ui/CurrentTimeDisplay';
 import { useTimeDisplayPreferences } from '../../hooks/useTimeDisplayPreferences';
+import { CountdownWidget } from './widgets/CountdownWidget';
 
 export const UnifiedDashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -214,18 +216,18 @@ export const UnifiedDashboard: React.FC = () => {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header with Date Selection */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight">
             {displayName ? `Welcome, ${displayName}!` : 'Productivity Dashboard'}
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
             Your unified view across tasks, habits, mood, and calendar
           </p>
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:gap-4">
           <CurrentTimeDisplay 
             format={timeDisplayData?.time_display ? {
               timeFormat: timeDisplayData.time_display.time_format,
@@ -237,54 +239,73 @@ export const UnifiedDashboard: React.FC = () => {
             size="md"
             className="text-muted-foreground"
           />
-          <span className="text-lg font-semibold">{new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
+          <span className="text-sm sm:text-lg font-semibold">{new Date(selectedDate).toLocaleDateString(undefined, { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</span>
         </div>
       </div>
 
       {/* Overall Productivity Score */}
       {productivityData && (
         <Card className={cn(
-          "border-l-4",
-          getScoreBgColor(productivityData.productivity_score)
-        )} style={{ borderLeftColor: getScoreColor(productivityData.productivity_score).replace('text-', '') }}>
+          "border-l-4 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-950/30 dark:to-indigo-950/30",
+          (productivityData?.productivity_score || 0) >= 80 ? "border-green-500" :
+          (productivityData?.productivity_score || 0) >= 60 ? "border-blue-500" :
+          (productivityData?.productivity_score || 0) >= 40 ? "border-yellow-500" : "border-red-500"
+        )}>
           <CardHeader className="pb-3">
             <div className="flex items-center justify-between">
-              <CardTitle className="flex items-center gap-2">
-                <BarChart3 className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-slate-800 dark:text-slate-200">
+                <BarChart3 className="h-5 w-5 text-blue-600" />
                 Daily Productivity Score
               </CardTitle>
-              <Badge variant="outline" className={getScoreColor(productivityData.productivity_score)}>
-                {productivityData.productivity_score}/100
+              <Badge 
+                variant="outline" 
+                className={cn(
+                  "font-semibold",
+                  (productivityData?.productivity_score || 0) >= 80 ? "border-green-500 text-green-700 bg-green-50" :
+                  (productivityData?.productivity_score || 0) >= 60 ? "border-blue-500 text-blue-700 bg-blue-50" :
+                  (productivityData?.productivity_score || 0) >= 40 ? "border-yellow-500 text-yellow-700 bg-yellow-50" : 
+                  "border-red-500 text-red-700 bg-red-50"
+                )}
+              >
+                {productivityData?.productivity_score || 0}/100
               </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
-              <Progress value={productivityData.productivity_score} className="h-3" />
+              <Progress 
+                value={productivityData?.productivity_score || 0} 
+                className={cn(
+                  "h-3",
+                  (productivityData?.productivity_score || 0) >= 80 ? "bg-green-100" :
+                  (productivityData?.productivity_score || 0) >= 60 ? "bg-blue-100" :
+                  (productivityData?.productivity_score || 0) >= 40 ? "bg-yellow-100" : "bg-red-100"
+                )}
+              />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                <div className="text-center">
-                  <div className="font-semibold text-lg">
-                    {productivityData.tasks.completed}/{productivityData.tasks.total}
+                <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/30 rounded-lg border border-blue-200 dark:border-blue-800">
+                  <div className="font-semibold text-lg text-blue-700 dark:text-blue-300">
+                    {productivityData?.tasks?.completed || 0}/{productivityData?.tasks?.total || 0}
                   </div>
-                  <div className="text-muted-foreground">Tasks</div>
+                  <div className="text-blue-600 dark:text-blue-400">Tasks</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-lg">
-                    {productivityData.habits.completed}/{productivityData.habits.total}
+                <div className="text-center p-3 bg-green-50 dark:bg-green-950/30 rounded-lg border border-green-200 dark:border-green-800">
+                  <div className="font-semibold text-lg text-green-700 dark:text-green-300">
+                    {productivityData?.habits?.completed || 0}/{productivityData?.habits?.total || 0}
                   </div>
-                  <div className="text-muted-foreground">Habits</div>
+                  <div className="text-green-600 dark:text-green-400">Habits</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-lg">
-                    {productivityData.mood.score ? productivityData.mood.score.toFixed(1) : 'N/A'}
+                <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/30 rounded-lg border border-purple-200 dark:border-purple-800">
+                  <div className="font-semibold text-lg text-purple-700 dark:text-purple-300">
+                    {productivityData?.mood?.score ? productivityData.mood.score.toFixed(1) : 'N/A'}
                   </div>
-                  <div className="text-muted-foreground">Mood</div>
+                  <div className="text-purple-600 dark:text-purple-400">Mood</div>
                 </div>
-                <div className="text-center">
-                  <div className="font-semibold text-lg">
-                    {Math.round(productivityData.events.duration_minutes / 60)}h
+                <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/30 rounded-lg border border-orange-200 dark:border-orange-800">
+                  <div className="font-semibold text-lg text-orange-700 dark:text-orange-300">
+                    {Math.round((productivityData?.events?.duration_minutes || 0) / 60)}h
                   </div>
-                  <div className="text-muted-foreground">Scheduled</div>
+                  <div className="text-orange-600 dark:text-orange-400">Scheduled</div>
                 </div>
               </div>
             </div>
@@ -292,94 +313,110 @@ export const UnifiedDashboard: React.FC = () => {
         </Card>
       )}
 
-      {/* Insights */}
-      {insights && insights.length > 0 && (
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <Star className="h-5 w-5" />
-              AI Insights & Recommendations
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {insights.slice(0, 3).map((insight) => (
-                <div key={insight.id} className={cn(
-                  "p-3 rounded-lg border-l-4",
-                  insight.type === 'positive' ? 'bg-green-50 border-green-500' :
-                  insight.type === 'warning' ? 'bg-yellow-50 border-yellow-500' :
-                  'bg-blue-50 border-blue-500'
-                )}>
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <h4 className="font-medium">{insight.title}</h4>
-                      <p className="text-sm text-muted-foreground mt-1">
-                        {insight.description}
-                      </p>
-                      {insight.action_items.length > 0 && (
-                        <ul className="mt-2 text-sm space-y-1">
-                          {insight.action_items.slice(0, 2).map((action, idx) => (
-                            <li key={idx} className="flex items-start gap-2">
-                              <ArrowRight className="h-3 w-3 mt-0.5 text-muted-foreground" />
-                              <span>{action}</span>
-                            </li>
-                          ))}
-                        </ul>
-                      )}
+      {/* Top Row: Insights and Countdown */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 sm:gap-6">
+        {/* Insights */}
+        {insights && insights.length > 0 && (
+          <Card className="lg:col-span-2 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-950/30 dark:to-purple-950/30 border-indigo-200 dark:border-indigo-800">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-indigo-800 dark:text-indigo-200">
+                <Star className="h-5 w-5 text-yellow-500" />
+                AI Insights & Recommendations
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {insights.slice(0, 3).map((insight) => (
+                  <div key={insight.id} className={cn(
+                    "p-3 rounded-lg border-l-4 transition-all duration-200 hover:shadow-sm",
+                    insight.type === 'positive' ? 'bg-green-50 dark:bg-green-950/30 border-green-500' :
+                    insight.type === 'warning' ? 'bg-yellow-50 dark:bg-yellow-950/30 border-yellow-500' :
+                    'bg-blue-50 dark:bg-blue-950/30 border-blue-500'
+                  )}>
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <h4 className="font-medium text-slate-800 dark:text-slate-200">{insight.title}</h4>
+                        <p className="text-sm text-slate-600 dark:text-slate-400 mt-1">
+                          {insight.description}
+                        </p>
+                        {insight.action_items.length > 0 && (
+                          <ul className="mt-2 text-sm space-y-1">
+                            {insight.action_items.slice(0, 2).map((action, idx) => (
+                              <li key={idx} className="flex items-start gap-2 text-slate-600 dark:text-slate-400">
+                                <ArrowRight className="h-3 w-3 mt-0.5 text-slate-500" />
+                                <span>{action}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                      <Badge 
+                        variant={insight.priority === 'high' ? 'destructive' : 'secondary'}
+                        className="ml-2"
+                      >
+                        {insight.priority}
+                      </Badge>
                     </div>
-                    <Badge variant={insight.priority === 'high' ? 'destructive' : 'secondary'}>
-                      {insight.priority}
-                    </Badge>
                   </div>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      )}
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+        
+        {/* Countdown Widget */}
+        <CountdownWidget className="lg:col-span-1" />
+      </div>
 
       {/* Overview Content */}
-      <div className="space-y-6">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="space-y-6 sm:space-y-8">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
           {/* Priority Tasks */}
-          <Card>
+          <Card className="bg-gradient-to-br from-red-50 to-pink-50 dark:from-red-950/30 dark:to-pink-950/30 border-red-200 dark:border-red-800 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <AlertCircle className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-red-800 dark:text-red-200">
+                <AlertCircle className="h-5 w-5 text-red-600" />
                 Priority Tasks
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {todayTasks?.slice(0, 4).map((task) => (
-                  <div key={task.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                  <div key={task.id} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 border border-red-100 dark:border-red-900 rounded-lg hover:bg-red-25 dark:hover:bg-red-950/20 hover:shadow-md transition-all duration-200">
                     <div className="relative">
                       <input
                         type="checkbox"
                         checked={task.completed}
                         onChange={() => handleTaskToggle(task.id, task.completed)}
-                        className="h-4 w-4 rounded border cursor-pointer"
+                        className="h-4 w-4 rounded border-red-300 text-red-600 focus:ring-red-500 cursor-pointer"
                         disabled={updateTaskMutation.isPending}
                       />
                       {updateTaskMutation.isPending && (
                         <div className="absolute inset-0 flex items-center justify-center">
-                          <div className="h-2 w-2 animate-spin rounded-full border border-primary border-t-transparent" />
+                          <div className="h-2 w-2 animate-spin rounded-full border border-red-600 border-t-transparent" />
                         </div>
                       )}
                     </div>
                     <div className="flex-1 min-w-0">
                       <h4 className={cn(
-                        "font-medium truncate",
-                        task.completed && "line-through text-muted-foreground"
+                        "font-medium truncate text-slate-800 dark:text-slate-200",
+                        task.completed && "line-through text-slate-500 dark:text-slate-400"
                       )}>
                         {task.title}
                       </h4>
                       <div className="flex items-center gap-2 mt-1">
-                        <Badge variant={task.priority === 'high' ? 'destructive' : 'secondary'}>
+                        <Badge 
+                          variant={task.priority === 'high' ? 'destructive' : 'secondary'}
+                          className={cn(
+                            task.priority === 'high' ? 'bg-red-100 text-red-800 border-red-300' :
+                            task.priority === 'medium' ? 'bg-yellow-100 text-yellow-800 border-yellow-300' :
+                            'bg-gray-100 text-gray-800 border-gray-300'
+                          )}
+                        >
                           {task.priority}
                         </Badge>
                         {task.due_date && (
-                          <span className="text-xs text-muted-foreground">
+                          <span className="text-xs text-red-600 dark:text-red-400 font-medium">
                             Due: {new Date(task.due_date).toLocaleDateString()}
                           </span>
                         )}
@@ -416,10 +453,10 @@ export const UnifiedDashboard: React.FC = () => {
           </Card>
 
           {/* Today's Habits */}
-          <Card>
+          <Card className="bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/30 dark:to-emerald-950/30 border-green-200 dark:border-green-800 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Target className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-green-800 dark:text-green-200">
+                <Target className="h-5 w-5 text-green-600" />
                 Today's Habits
               </CardTitle>
             </CardHeader>
@@ -428,19 +465,21 @@ export const UnifiedDashboard: React.FC = () => {
                 {todayHabits?.slice(0, 4).map((habit) => {
                   const isCompleted = isHabitCompleted(habit.id);
                   return (
-                    <div key={habit.id} className="flex items-center gap-3 p-3 border rounded-lg">
+                    <div key={habit.id} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 border border-green-100 dark:border-green-900 rounded-lg hover:bg-green-25 dark:hover:bg-green-950/20 hover:shadow-md transition-all duration-200">
                       <div className={cn(
-                        "w-4 h-4 rounded-full",
-                        isCompleted ? "bg-green-500" : "bg-gray-300"
+                        "w-4 h-4 rounded-full border-2 transition-all duration-200",
+                        isCompleted 
+                          ? "bg-green-500 border-green-500 shadow-md" 
+                          : "bg-gray-100 dark:bg-gray-700 border-green-300 dark:border-green-600"
                       )} />
                       <div className="flex-1 min-w-0">
                         <h4 className={cn(
-                          "font-medium truncate",
-                          isCompleted && "text-green-700"
+                          "font-medium truncate text-slate-800 dark:text-slate-200",
+                          isCompleted && "text-green-700 dark:text-green-300"
                         )}>
                           {habit.name}
                         </h4>
-                        <div className="flex items-center gap-2 mt-1 text-sm text-muted-foreground">
+                        <div className="flex items-center gap-2 mt-1 text-sm text-green-600 dark:text-green-400">
                           <Zap className="h-3 w-3" />
                           Streak: {getHabitStreak(habit)} days
                         </div>
@@ -450,6 +489,11 @@ export const UnifiedDashboard: React.FC = () => {
                         variant={isCompleted ? "primary" : "outline"}
                         onClick={() => handleHabitToggle(habit.id)}
                         disabled={logHabitCompletionMutation.isPending}
+                        className={cn(
+                          isCompleted 
+                            ? "bg-green-600 hover:bg-green-700 text-white border-green-600" 
+                            : "border-green-300 text-green-700 hover:bg-green-50 dark:hover:bg-green-950/20"
+                        )}
                       >
                         {logHabitCompletionMutation.isPending ? 
                           <div className="h-3 w-3 animate-spin rounded-full border border-current border-t-transparent" /> :
@@ -488,10 +532,10 @@ export const UnifiedDashboard: React.FC = () => {
           </Card>
 
           {/* Mood Check-in */}
-          <Card>
+          <Card className="bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/30 dark:to-violet-950/30 border-purple-200 dark:border-purple-800 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <Smile className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-purple-800 dark:text-purple-200">
+                <Smile className="h-5 w-5 text-purple-600" />
                 Mood Check-in
               </CardTitle>
             </CardHeader>
@@ -591,23 +635,29 @@ export const UnifiedDashboard: React.FC = () => {
           </Card>
 
           {/* Upcoming Events */}
-          <Card>
+          <Card className="bg-gradient-to-br from-orange-50 to-amber-50 dark:from-orange-950/30 dark:to-amber-950/30 border-orange-200 dark:border-orange-800 hover:shadow-lg transition-all duration-300">
             <CardHeader className="pb-3">
-              <CardTitle className="flex items-center gap-2">
-                <CalendarIcon className="h-5 w-5" />
+              <CardTitle className="flex items-center gap-2 text-orange-800 dark:text-orange-200">
+                <CalendarIcon className="h-5 w-5 text-orange-600" />
                 Upcoming Events
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
                 {upcomingEvents?.slice(0, 4).map((event) => (
-                  <div key={event.id} className="flex items-center gap-3 p-3 border rounded-lg">
-                    <Clock className="h-4 w-4 text-muted-foreground" />
+                  <div key={event.id} className="flex items-center gap-3 p-3 bg-white dark:bg-slate-800 border border-orange-100 dark:border-orange-900 rounded-lg hover:bg-orange-25 dark:hover:bg-orange-950/20 hover:shadow-md transition-all duration-200">
+                    <Clock className="h-4 w-4 text-orange-600" />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-medium truncate">{event.title}</h4>
-                      <div className="text-sm text-muted-foreground">
+                      <h4 className="font-medium truncate text-slate-800 dark:text-slate-200">{event.title}</h4>
+                      <div className="text-sm text-orange-600 dark:text-orange-400">
                         {event.is_all_day ? 'All Day' : formatTime(event.start_datetime)}
-                        {event.location && ` • ${event.location}`}
+                        {event.location && (
+                          <span className="text-slate-600 dark:text-slate-400">
+                            {' • '}
+                            <MapPin className="h-3 w-3 inline mr-1" />
+                            {event.location}
+                          </span>
+                        )}
                       </div>
                     </div>
                   </div>

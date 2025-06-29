@@ -49,10 +49,10 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ className })
 
   return (
     <div className={cn(
-      "fixed bottom-0 left-0 right-0 z-50 bg-card border-t border-border safe-area-pb",
+      "fixed bottom-0 left-0 right-0 z-50 bg-card/95 backdrop-blur supports-[backdrop-filter]:bg-card/80 border-t border-border safe-area-pb shadow-lg",
       className
     )}>
-      <nav className="flex items-center justify-around px-2 py-2">
+      <nav className="flex items-center justify-around px-2 py-3">
         {mobileNavigationItems.map((item) => {
           const isActive = location.pathname === item.href;
           
@@ -61,10 +61,10 @@ export const MobileNavigation: React.FC<MobileNavigationProps> = ({ className })
               key={item.name}
               to={item.href}
               className={cn(
-                'flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-all min-w-0 flex-1',
+                'flex flex-col items-center gap-1 px-3 py-2 rounded-lg text-xs font-medium transition-all min-w-0 flex-1 min-h-[44px] justify-center',
                 isActive
-                  ? 'text-primary bg-primary/10'
-                  : 'text-muted-foreground hover:text-foreground'
+                  ? 'text-primary bg-primary/15 shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
               )}
             >
               <item.icon className={cn(

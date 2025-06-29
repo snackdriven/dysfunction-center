@@ -138,7 +138,7 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {  
             label="Title"
             placeholder="Enter event title..."
             value={formData.title}
-            onChange={(e) => handleInputChange('title', e.target.value)}
+            onChange={(value) => handleInputChange('title', value)}
             error={errors.title}
             required
           />
@@ -177,7 +177,7 @@ export const EventForm: React.FC<EventFormProps> = ({ event, onSuccess }) => {  
               type={formData.all_day ? "date" : "datetime-local"}
               value={formData.all_day ? formData.start_time.split('T')[0] : formData.start_time}
               onChange={(e) => {
-                const value = formData.all_day ? `${e.target.value}T00:00` : e.target.value;
+                const value = formData.all_day ? `${val}T00:00` : val;
                 handleStartTimeChange(value);
               }}
               error={errors.start_time}

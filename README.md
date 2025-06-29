@@ -1,10 +1,10 @@
 # Executive Dysfunction Center
 
-A modern, fullstack productivity and mental health platform for managing tasks, habits, mood, journaling, and calendar events, built with a focus on context, persistence, and advanced analytics.
+A fullstack productivity and mental health platform for managing tasks, habits, mood, journaling, and calendar events, built with a focus on context, persistence, and analytics.
 
 ## Overview
 
-Executive Dysfunction Center helps users track and improve productivity, habits, journaling, and well-being. It features a modern, minimal UI, advanced data visualization, and seamless integration between productivity domains.
+Executive Dysfunction Center helps users track and improve productivity, habits, journaling, and well-being. It features a minimal UI, data visualization, and integration between productivity domains.
 
 ## Technology Stack
 
@@ -44,11 +44,11 @@ frontend/
 _docs/              # Internal documentation and API notes
 ```
 
-## Modern UI/UX Design
+## UI/UX Design
 
-- **Minimal, progressive interfaces** with contextual interactions
-- **Sophisticated data visualization** (Recharts, D3.js)
-- **Responsive layouts**: Desktop sidebar, mobile tab bar, adaptive grids
+- **Minimal interfaces** with contextual interactions
+- **Data visualization** (Recharts, D3.js)
+- **Layouts**: Desktop sidebar, mobile tab bar, adaptive grids
 - **Micro-interactions**: Animations for task completion, habit streaks, mood selection, journaling
 - **Accessibility and performance**: Virtual scrolling, code splitting, keyboard navigation
 

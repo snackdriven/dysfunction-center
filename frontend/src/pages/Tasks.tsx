@@ -51,18 +51,20 @@ export const Tasks: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8 animate-fade-in">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Tasks</h1>
-          <p className="text-muted-foreground">
-            Manage your tasks and stay productive
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-gray-900 dark:text-white">
+            Task Management
+          </h1>
+          <p className="text-sm sm:text-base text-gray-600 dark:text-gray-400">
+            Organize, prioritize, and complete your tasks efficiently
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
           <DialogTrigger asChild>
-            <Button>
+            <Button className="bg-gradient-to-r from-red-600 to-red-700 hover:from-red-700 hover:to-red-800 shadow-lg hover-lift">
               <Plus className="mr-2 h-4 w-4" />
               Add Task
             </Button>
@@ -74,26 +76,29 @@ export const Tasks: React.FC = () => {
       </div>
 
       {/* View Modes and Filters */}
-      <div className="space-y-4">
+      <div className="bg-white dark:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 p-6 shadow-sm">
         {/* View Mode Tabs */}
         <Tabs value={currentView} defaultValue="list" onValueChange={(value) => setCurrentView(value as 'list' | 'kanban')}>
-          <div className="flex items-center justify-between">
-            <TabsList>
-              <TabsTrigger value="list" className="flex items-center gap-2">
+          <div className="flex items-center justify-between mb-6">
+            <TabsList className="bg-gray-100 dark:bg-gray-700">
+              <TabsTrigger value="list" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600">
                 <List className="h-4 w-4" />
-                List
+                List View
               </TabsTrigger>
-              <TabsTrigger value="kanban" className="flex items-center gap-2">
+              <TabsTrigger value="kanban" className="flex items-center gap-2 data-[state=active]:bg-white dark:data-[state=active]:bg-gray-600">
                 <Columns className="h-4 w-4" />
-                Kanban
+                Kanban Board
               </TabsTrigger>
             </TabsList>
             
             {/* Filters */}
-            <div className="flex items-center gap-2">
-              <Filter className="h-4 w-4 text-muted-foreground" />
+            <div className="flex flex-wrap items-center gap-3">
+              <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400">
+                <Filter className="h-4 w-4" />
+                Filter by:
+              </div>
               <Select value={statusFilter} onValueChange={setStatusFilter}>
-                <SelectTrigger className="w-32">
+                <SelectTrigger className="w-36 bg-gray-50 dark:bg-gray-700 border-gray-200 dark:border-gray-600">
                   <SelectValue placeholder="Status" />
                 </SelectTrigger>
                 <SelectContent>
@@ -119,7 +124,7 @@ export const Tasks: React.FC = () => {
           </div>
 
           {/* Search Bar */}
-          <div className="relative max-w-md">
+          <div className="relative max-w-md w-full sm:w-auto">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
               placeholder="Search tasks..."

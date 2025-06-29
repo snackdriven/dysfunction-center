@@ -13,6 +13,7 @@ import { ErrorBoundary } from './components/common/ErrorBoundary';
 import { ToastContainer } from './components/common/Toast';
 import { QueryProvider } from './providers/QueryProvider';
 import { useThemeInitializer } from './hooks/useThemeInitializer';
+import { GlobalKeyboardShortcuts, KeyboardShortcutsHelp } from './utils/keyboardNavigation';
 
 function App() {
   // Initialize theme on app load
@@ -22,6 +23,7 @@ function App() {
     <ErrorBoundary>
       <QueryProvider>
         <Router>
+          <GlobalKeyboardShortcuts />
           <Routes>
             <Route path="/" element={<AppShell />}>
               <Route index element={<Dashboard />} />
@@ -35,6 +37,7 @@ function App() {
               <Route path="ui-demo" element={<UIDemo />} />
             </Route>
           </Routes>
+          <KeyboardShortcutsHelp />
         </Router>
         <ToastContainer />
       </QueryProvider>

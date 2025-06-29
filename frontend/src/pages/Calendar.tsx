@@ -111,93 +111,107 @@ export const Calendar: React.FC = () => {
 
   return (
     <ErrorBoundary>
-      <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Calendar</h1>
-          <p className="text-muted-foreground">
-            Manage your events and track important deadlines
-          </p>
+      <div className="space-y-6 sm:space-y-8">
+        {/* Header */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="space-y-2">
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+              Calendar
+            </h1>
+            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+              Manage your events, track important deadlines, and visualize your schedule
+            </p>
+          </div>
+          <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
+            <DialogTrigger asChild>
+              <Button className="w-full sm:w-auto min-h-[44px]">
+                <Plus className="mr-2 h-4 w-4" />
+                Add Event
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg">
+              <EventForm onSuccess={() => setIsCreateDialogOpen(false)} />
+            </DialogContent>
+          </Dialog>
         </div>
-        <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <Plus className="mr-2 h-4 w-4" />
-              Add Event
-            </Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-lg">
-            <EventForm onSuccess={() => setIsCreateDialogOpen(false)} />
-          </DialogContent>
-        </Dialog>
-      </div>
 
-      {/* Summary Stats */}
-      <div className="grid grid-cols-2 md:grid-cols-6 gap-4">
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4 text-blue-600" />
-              <span className="text-sm font-medium">Events</span>
-            </div>
-            <p className="text-2xl font-bold text-blue-600">{summaryStats.totalEvents}</p>
-            <p className="text-xs text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
+        {/* Summary Stats */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4">
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarIcon className="h-4 w-4 text-blue-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Events</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-blue-600" aria-label={`${summaryStats.totalEvents} events this month`}>
+                {summaryStats.totalEvents}
+              </p>
+              <p className="text-xs text-muted-foreground">This month</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Tasks Due</span>
-            </div>
-            <p className="text-2xl font-bold text-green-600">{summaryStats.totalTasks}</p>
-            <p className="text-xs text-muted-foreground">This month</p>
-          </CardContent>
-        </Card>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Tasks Due</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-green-600" aria-label={`${summaryStats.totalTasks} tasks due this month`}>
+                {summaryStats.totalTasks}
+              </p>
+              <p className="text-xs text-muted-foreground">This month</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <Clock className="h-4 w-4 text-orange-600" />
-              <span className="text-sm font-medium">Due Today</span>
-            </div>
-            <p className="text-2xl font-bold text-orange-600">{summaryStats.todayTasks}</p>
-            <p className="text-xs text-muted-foreground">Tasks</p>
-          </CardContent>
-        </Card>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <Clock className="h-4 w-4 text-orange-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Due Today</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-orange-600" aria-label={`${summaryStats.todayTasks} tasks due today`}>
+                {summaryStats.todayTasks}
+              </p>
+              <p className="text-xs text-muted-foreground">Tasks</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-4 w-4 text-red-600" />
-              <span className="text-sm font-medium">Overdue</span>
-            </div>
-            <p className="text-2xl font-bold text-red-600">{summaryStats.overdueTasks}</p>
-            <p className="text-xs text-muted-foreground">Tasks</p>
-          </CardContent>
-        </Card>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <AlertCircle className="h-4 w-4 text-red-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Overdue</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-red-600" aria-label={`${summaryStats.overdueTasks} overdue tasks`}>
+                {summaryStats.overdueTasks}
+              </p>
+              <p className="text-xs text-muted-foreground">Tasks</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CheckCircle className="h-4 w-4 text-green-600" />
-              <span className="text-sm font-medium">Completed</span>
-            </div>
-            <p className="text-2xl font-bold text-green-600">{summaryStats.completedTasks}</p>
-            <p className="text-xs text-muted-foreground">Tasks</p>
-          </CardContent>
-        </Card>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CheckCircle className="h-4 w-4 text-green-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Completed</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-green-600" aria-label={`${summaryStats.completedTasks} completed tasks`}>
+                {summaryStats.completedTasks}
+              </p>
+              <p className="text-xs text-muted-foreground">Tasks</p>
+            </CardContent>
+          </Card>
 
-        <Card>
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2">
-              <CalendarIcon className="h-4 w-4 text-purple-600" />
-              <span className="text-sm font-medium">Upcoming</span>
-            </div>
-            <p className="text-2xl font-bold text-purple-600">{summaryStats.upcomingEvents}</p>
-            <p className="text-xs text-muted-foreground">Events</p>
+          <Card className="hover:shadow-md transition-shadow">
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <CalendarIcon className="h-4 w-4 text-purple-600" aria-hidden="true" />
+                <span className="text-xs sm:text-sm font-medium">Upcoming</span>
+              </div>
+              <p className="text-xl sm:text-2xl font-bold text-purple-600" aria-label={`${summaryStats.upcomingEvents} upcoming events`}>
+                {summaryStats.upcomingEvents}
+              </p>
+              <p className="text-xs text-muted-foreground">Events</p>
           </CardContent>
         </Card>
       </div>

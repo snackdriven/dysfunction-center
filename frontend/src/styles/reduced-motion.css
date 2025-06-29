@@ -1,0 +1,410 @@
+/* Reduced Motion Support for Executive Dysfunction Center */
+
+/* ============================================================================
+   REDUCED MOTION PREFERENCES
+   ============================================================================ */
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  /* Remove all animations and transitions */
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* Remove transforms that might cause motion sickness */
+  .transform-scale,
+  .transform-rotate,
+  .transform-translate {
+    transform: none !important;
+  }
+  
+  /* Remove parallax effects */
+  .parallax {
+    transform: none !important;
+  }
+  
+  /* Disable auto-playing content */
+  .autoplay {
+    animation-play-state: paused !important;
+  }
+}
+
+/* ============================================================================
+   EXECUTIVE DYSFUNCTION MOTION CONSIDERATIONS
+   ============================================================================ */
+
+/* Calming, purposeful animations for executive dysfunction users */
+.calm-transition {
+  transition: all 0.2s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .calm-transition {
+    transition: none;
+  }
+}
+
+/* Focus-enhancing micro-interactions */
+.focus-enhance {
+  transition: 
+    box-shadow 0.15s ease-out,
+    border-color 0.15s ease-out,
+    background-color 0.15s ease-out;
+}
+
+.focus-enhance:focus {
+  box-shadow: 
+    0 0 0 2px var(--background),
+    0 0 0 4px var(--ring);
+  border-color: var(--ring);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .focus-enhance {
+    transition: none;
+  }
+  
+  .focus-enhance:focus {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+}
+
+/* Progress indication animations */
+.progress-animation {
+  position: relative;
+  overflow: hidden;
+}
+
+.progress-animation::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    rgba(255, 255, 255, 0.2),
+    transparent
+  );
+  animation: progress-shimmer 2s infinite;
+}
+
+@keyframes progress-shimmer {
+  0% { left: -100%; }
+  100% { left: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .progress-animation::after {
+    display: none;
+  }
+  
+  /* Static progress indication for reduced motion */
+  .progress-static {
+    background: repeating-linear-gradient(
+      45deg,
+      var(--muted),
+      var(--muted) 10px,
+      var(--muted-foreground) 10px,
+      var(--muted-foreground) 20px
+    );
+  }
+}
+
+/* Achievement celebration animations */
+.achievement-celebration {
+  animation: celebrate 0.6s ease-out;
+}
+
+@keyframes celebrate {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .achievement-celebration {
+    animation: none;
+    /* Static celebration indicator */
+    box-shadow: 0 0 0 3px var(--success);
+  }
+}
+
+/* Gentle state transition animations */
+.state-transition {
+  transition: 
+    opacity 0.2s ease-out,
+    transform 0.2s ease-out;
+}
+
+.state-transition.entering {
+  opacity: 0;
+  transform: translateY(8px);
+}
+
+.state-transition.entered {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.state-transition.exiting {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.state-transition.exited {
+  opacity: 0;
+  transform: translateY(-8px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .state-transition {
+    transition: none;
+  }
+  
+  .state-transition.entering,
+  .state-transition.exiting {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   MOTION ACCESSIBILITY FEATURES
+   ============================================================================ */
+
+/* Vestibular disorder considerations */
+.safe-motion {
+  /* Limit movement to prevent vestibular issues */
+  transform: translateX(0) translateY(0);
+  animation-duration: 0.3s;
+  animation-timing-function: ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .safe-motion {
+    transform: none;
+    animation: none;
+  }
+}
+
+/* Motion warning for potentially problematic content */
+.motion-warning {
+  display: none;
+  padding: 1rem;
+  background: var(--warning);
+  color: var(--warning-foreground);
+  border-radius: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-warning {
+    display: block;
+  }
+}
+
+/* Smooth scroll controls */
+html {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
+/* ============================================================================
+   DISTRACTION-FREE ANIMATION MODES
+   ============================================================================ */
+
+/* Minimal distraction mode */
+.distraction-free {
+  /* Remove all non-essential animations */
+  --animation-duration: 0ms;
+}
+
+.distraction-free .decorative-animation,
+.distraction-free .ambient-animation,
+.distraction-free .background-animation {
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Keep only functional animations in distraction-free mode */
+.distraction-free .loading-spinner,
+.distraction-free .progress-bar,
+.distraction-free .focus-indicator {
+  /* These remain for functionality */
+  animation-duration: var(--animation-duration, 0.2s);
+}
+
+/* ============================================================================
+   EXECUTIVE DYSFUNCTION SPECIFIC MOTION PATTERNS
+   ============================================================================ */
+
+/* Task completion celebration - gentle and encouraging */
+.task-complete {
+  animation: task-success 0.4s ease-out;
+}
+
+@keyframes task-success {
+  0% { background-color: var(--background); }
+  50% { background-color: var(--success); }
+  100% { background-color: var(--background); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .task-complete {
+    animation: none;
+    border-left: 4px solid var(--success);
+  }
+}
+
+/* Habit streak visualization - subtle progress indication */
+.habit-streak {
+  position: relative;
+}
+
+.habit-streak::before {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  background: var(--success);
+  width: var(--streak-progress, 0%);
+  transition: width 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .habit-streak::before {
+    transition: none;
+  }
+}
+
+/* Mood tracking - calm transitions */
+.mood-transition {
+  transition: background-color 0.3s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mood-transition {
+    transition: none;
+  }
+}
+
+/* ============================================================================
+   LOADING AND STATE ANIMATIONS
+   ============================================================================ */
+
+/* Gentle loading spinner for executive dysfunction users */
+.gentle-spinner {
+  animation: gentle-spin 2s linear infinite;
+}
+
+@keyframes gentle-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gentle-spinner {
+    animation: none;
+    /* Static loading indicator */
+  }
+  
+  .gentle-spinner::after {
+    content: '⏳';
+    font-size: 1.2em;
+  }
+}
+
+/* Skeleton loading with reduced motion */
+.skeleton {
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    var(--muted-foreground) 50%,
+    var(--muted) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeleton-loading 1.5s infinite;
+}
+
+@keyframes skeleton-loading {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .skeleton {
+    animation: none;
+    background: var(--muted);
+  }
+}
+
+/* ============================================================================
+   NOTIFICATION ANIMATIONS
+   ============================================================================ */
+
+/* Gentle notification entrance */
+.notification-enter {
+  animation: notification-slide 0.3s ease-out;
+}
+
+@keyframes notification-slide {
+  from {
+    opacity: 0;
+    transform: translateY(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .notification-enter {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* ============================================================================
+   UTILITY CLASSES FOR MOTION CONTROL
+   ============================================================================ */
+
+/* Motion control utilities */
+.motion-safe {
+  /* Only animate if motion is safe */
+  --safe-animation: true;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .motion-safe {
+    transition: all 0.2s ease-out;
+  }
+}
+
+.motion-reduce {
+  /* Force reduced motion regardless of preference */
+  animation: none !important;
+  transition: none !important;
+}
+
+/* Animation state classes */
+.animate-none { animation: none !important; }
+.animate-pause { animation-play-state: paused !important; }
+.animate-slow { animation-duration: 2s !important; }
+.animate-fast { animation-duration: 0.1s !important; }

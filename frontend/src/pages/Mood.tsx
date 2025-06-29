@@ -31,25 +31,27 @@ export const Mood: React.FC = () => {
   }, [recentMoods]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 sm:space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Mood Tracking</h1>
-          <p className="text-muted-foreground">
-            Monitor your emotional wellbeing and identify patterns
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div className="space-y-2">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-foreground">
+            Mood Tracking
+          </h1>
+          <p className="text-sm sm:text-base text-muted-foreground max-w-2xl">
+            Monitor your emotional wellbeing and identify patterns over time
           </p>
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           {todayMood && (
-            <Button variant="outline">
+            <Button variant="outline" className="w-full sm:w-auto min-h-[44px]">
               <Smile className="mr-2 h-4 w-4" />
               Update Today's Mood
             </Button>
           )}
           <Dialog open={isEntryDialogOpen} onOpenChange={setIsEntryDialogOpen}>
             <DialogTrigger asChild>
-              <Button>
+              <Button className="w-full sm:w-auto min-h-[44px]">
                 <Plus className="mr-2 h-4 w-4" />
                 {todayMood ? 'Add Entry' : 'Log Today\'s Mood'}
               </Button>
@@ -62,16 +64,16 @@ export const Mood: React.FC = () => {
       </div>
 
       {/* Today's Mood Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <div className="p-4 bg-card rounded-lg border">
-          <h3 className="font-semibold mb-2">Today's Mood</h3>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
+        <div className="p-4 sm:p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+          <h3 className="font-semibold mb-3 text-base">Today's Mood</h3>
           {todayMood ? (
-            <div className="flex items-center gap-2">
-              <span className="text-2xl">
+            <div className="flex items-center gap-3">
+              <span className="text-3xl" role="img" aria-label="Mood emoji">
                 {['😢', '😔', '😐', '🙂', '😊'][todayMood.mood_score - 1]}
               </span>
               <div>
-                <p className="font-medium">{todayMood.mood_score}/5</p>
+                <p className="font-medium text-lg">{todayMood.mood_score}/5</p>
                 <p className="text-sm text-muted-foreground">
                   {['Very Low', 'Low', 'Neutral', 'Good', 'Excellent'][todayMood.mood_score - 1]}
                 </p>
@@ -82,12 +84,12 @@ export const Mood: React.FC = () => {
           )}
         </div>
 
-        <div className="p-4 bg-card rounded-lg border">
-          <h3 className="font-semibold mb-2">7-Day Average</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">📊</span>
+        <div className="p-4 sm:p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow">
+          <h3 className="font-semibold mb-3 text-base">7-Day Average</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl" role="img" aria-label="Chart">📊</span>
             <div>
-              <p className="font-medium">{averageMood.toFixed(1)}/5</p>
+              <p className="font-medium text-lg">{averageMood.toFixed(1)}/5</p>
               <p className="text-sm text-muted-foreground">
                 {averageMood >= 4 ? 'Great week!' : averageMood >= 3 ? 'Good week' : 'Challenging week'}
               </p>
@@ -95,12 +97,12 @@ export const Mood: React.FC = () => {
           </div>
         </div>
 
-        <div className="p-4 bg-card rounded-lg border">
-          <h3 className="font-semibold mb-2">Streak</h3>
-          <div className="flex items-center gap-2">
-            <span className="text-2xl">🔥</span>
+        <div className="p-4 sm:p-6 bg-card rounded-lg border shadow-sm hover:shadow-md transition-shadow sm:col-span-2 lg:col-span-1">
+          <h3 className="font-semibold mb-3 text-base">Streak</h3>
+          <div className="flex items-center gap-3">
+            <span className="text-3xl" role="img" aria-label="Fire">🔥</span>
             <div>
-              <p className="font-medium">{recentMoods?.length || 0} days</p>
+              <p className="font-medium text-lg">{recentMoods?.length || 0} days</p>
               <p className="text-sm text-muted-foreground">Consecutive logs</p>
             </div>
           </div>
@@ -108,39 +110,43 @@ export const Mood: React.FC = () => {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="history" className="space-y-4">
-        <TabsList>
-          <TabsTrigger value="history" className="flex items-center gap-2">
+      <Tabs defaultValue="history" className="space-y-4 sm:space-y-6">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 gap-1">
+          <TabsTrigger value="history" className="flex items-center gap-2 min-h-[44px] text-sm">
             <History className="h-4 w-4" />
-            History
+            <span className="hidden sm:inline">History</span>
+            <span className="sm:hidden">📋</span>
           </TabsTrigger>
-          <TabsTrigger value="analytics" className="flex items-center gap-2">
+          <TabsTrigger value="analytics" className="flex items-center gap-2 min-h-[44px] text-sm">
             <BarChart3 className="h-4 w-4" />
-            Analytics
+            <span className="hidden sm:inline">Analytics</span>
+            <span className="sm:hidden">📊</span>
           </TabsTrigger>
-          <TabsTrigger value="patterns" className="flex items-center gap-2">
+          <TabsTrigger value="patterns" className="flex items-center gap-2 min-h-[44px] text-sm">
             <TrendingUp className="h-4 w-4" />
-            Patterns
+            <span className="hidden sm:inline">Patterns</span>
+            <span className="sm:hidden">📈</span>
           </TabsTrigger>
-          <TabsTrigger value="correlations" className="flex items-center gap-2">
+          <TabsTrigger value="correlations" className="flex items-center gap-2 min-h-[44px] text-sm">
             <Brain className="h-4 w-4" />
-            Correlations
+            <span className="hidden sm:inline">Correlations</span>
+            <span className="sm:hidden">🧠</span>
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="history">
+        <TabsContent value="history" className="space-y-4">
           <MoodHistory />
         </TabsContent>
 
-        <TabsContent value="analytics">
+        <TabsContent value="analytics" className="space-y-4">
           <MoodAnalytics />
         </TabsContent>
 
-        <TabsContent value="patterns">
+        <TabsContent value="patterns" className="space-y-4">
           <MoodPatterns />
         </TabsContent>
 
-        <TabsContent value="correlations">
+        <TabsContent value="correlations" className="space-y-4">
           <MoodCorrelationAnalyzer />
         </TabsContent>
       </Tabs>

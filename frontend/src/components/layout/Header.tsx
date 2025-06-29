@@ -11,7 +11,7 @@ export const Header: React.FC = () => {
   const ThemeIcon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor;
 
   return (
-    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-40">
+    <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
       <div className="flex items-center justify-between h-full px-4 lg:px-6">
         {/* Left Section */}
         <div className="flex items-center gap-4 flex-1">
@@ -40,19 +40,19 @@ export const Header: React.FC = () => {
           {/* App Name in Header */}
           <span className="font-bold text-xl ml-4 hidden md:inline-block">Executive Dysfunction Center</span>
           {/* Search */}
-          <div className="flex-1 max-w-md">
+          <div className="flex-1 max-w-md hidden sm:block">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
                 placeholder="Search tasks, habits, or moods..."
-                className="pl-10 bg-muted border-border dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50 dark:placeholder:text-slate-400"
+                className="pl-10 bg-muted/50 border-border focus:bg-background transition-colors duration-200 dark:bg-slate-800 dark:border-slate-700 dark:text-slate-50 dark:placeholder:text-slate-400"
               />
             </div>
           </div>
         </div>
 
         {/* Right Section */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           {/* Theme Toggle */}
           <Button 
             variant="ghost" 

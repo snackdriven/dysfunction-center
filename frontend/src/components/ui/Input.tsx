@@ -1,15 +1,15 @@
 import * as React from "react";
 import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
+import { FormProps } from "../../types/components";
 
 const inputVariants = cva(
-  "flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-background text-foreground placeholder:text-muted-foreground dark:bg-slate-800 dark:text-slate-50 dark:border-slate-700 dark:placeholder:text-slate-400",
+  "flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-background text-foreground placeholder:text-muted-foreground transition-colors",
   {
     variants: {
       variant: {
-        default: "border-input",
-        error: "border-error focus-visible:ring-error",
-        success: "border-success focus-visible:ring-success",
+        default: "border-input hover:border-input/80 focus-visible:border-ring",
+        error: "border-destructive focus-visible:ring-destructive hover:border-destructive/80",
       },
       size: {
         sm: "h-9 px-2 py-1 text-xs",
@@ -25,20 +25,9 @@ const inputVariants = cva(
 );
 
 export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size'>,
-    VariantProps<typeof inputVariants> {
-  /**
-   * Error message to display
-   */
-  error?: string;
-  /**
-   * Label for the input
-   */
-  label?: string;
-  /**
-   * Helper text to display below the input
-   */
-  helperText?: string;
+  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'>,
+    VariantProps<typeof inputVariants>,
+    FormProps {
   /**
    * Icon to display at the start of the input
    */
@@ -47,6 +36,18 @@ export interface InputProps
    * Icon to display at the end of the input
    */
   endIcon?: React.ReactNode;
+  /**
+   * Input value for controlled components
+   */
+  value?: string;
+  /**
+   * Change handler with standardized signature
+   */
+  onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
+  /**
+   * Input type
+   */
+  type?: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number' | 'date' | 'time' | 'datetime-local';
 }
 
 /**
@@ -73,6 +74,15 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     startIcon, 
     endIcon,
     id,
+    required,
+    loading,
+    value,
+    onChange,
+    priority,
+    'data-testid': dataTestId,
+    'aria-label': ariaLabel,
+    'aria-describedby': ariaDescribedby,
+    'aria-invalid': ariaInvalid,
     ...props 
   }, ref) => {
     const inputId = React.useId();
@@ -80,15 +90,40 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     const inputVariant = hasError ? "error" : variant;
 
     const idToUse = id || inputId;
+    const descriptionId = `${idToUse}-description`;
+    const errorId = `${idToUse}-error`;
+
+    // Handle controlled component change
+    const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
+      if (onChange) {
+        onChange(event.target.value, event);
+      }
+    }, [onChange]);
+
+    // Build aria-describedby
+    const ariaDescribedByParts = [
+      ariaDescribedby,
+      helperText && descriptionId,
+      error && errorId
+    ].filter(Boolean);
+    
+    const finalAriaDescribedBy = ariaDescribedByParts.length > 0 ? ariaDescribedByParts.join(' ') : undefined;
 
     return (
       <div className="w-full">
         {label && (
           <label 
             htmlFor={idToUse}
-            className="block text-sm font-medium text-foreground mb-1"
+            className={cn(
+              "block text-sm font-medium text-foreground mb-1",
+              priority === 'high' && "text-orange-600 dark:text-orange-400",
+              priority === 'urgent' && "text-red-600 dark:text-red-400 font-semibold"
+            )}
           >
             {label}
+            {required && (
+              <span className="text-destructive ml-1" aria-hidden="true">*</span>
+            )}
           </label>
         )}
         
@@ -102,28 +137,51 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <input
             type={type}
             id={idToUse}
+            value={value}
+            onChange={handleChange}
+            disabled={loading || props.disabled}
             className={cn(
-              inputVariants({ variant: inputVariant, size, className }),
+              inputVariants({ variant: inputVariant, size }),
               startIcon && "pl-9",
-              endIcon && "pr-9"
+              endIcon && "pr-9",
+              loading && "cursor-wait",
+              priority === 'high' && "border-orange-300 focus:border-orange-500 focus:ring-orange-500",
+              priority === 'urgent' && "border-red-400 focus:border-red-600 focus:ring-red-600",
+              className
             )}
             ref={ref}
+            aria-describedby={finalAriaDescribedBy}
+            aria-invalid={ariaInvalid ?? (hasError ? 'true' : undefined)}
+            aria-required={required ? 'true' : undefined}
+            aria-label={ariaLabel}
+            data-testid={dataTestId}
             {...props}
           />
           
-          {endIcon && (
+          {loading && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+            </div>
+          )}
+          
+          {!loading && endIcon && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
               {endIcon}
             </div>
           )}
         </div>
         
-        {(error || helperText) && (
-          <p className={cn(
-            "mt-1 text-xs",
-            error ? "text-error" : "text-muted-foreground"
-          )}>
-            {error || helperText}
+        {/* Helper text */}
+        {helperText && !error && (
+          <p id={descriptionId} className="mt-1 text-xs text-muted-foreground">
+            {helperText}
+          </p>
+        )}
+        
+        {/* Error display */}
+        {error && (
+          <p id={errorId} className="mt-1 text-xs text-destructive" role="alert">
+            {error}
           </p>
         )}
       </div>
@@ -135,20 +193,8 @@ Input.displayName = "Input";
 
 export interface TextareaProps
   extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
-    VariantProps<typeof inputVariants> {
-  /**
-   * Error message to display
-   */
-  error?: string;
-  /**
-   * Label for the textarea
-   */
-  label?: string;
-  /**
-   * Helper text to display below the textarea
-   */
-  helperText?: string;
-}
+    VariantProps<typeof inputVariants>,
+    Pick<FormProps, 'label' | 'error' | 'helperText' | 'loading' | 'required' | 'priority'> {}
 
 /**
  * Textarea component for multi-line text input.
@@ -170,6 +216,8 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
     error, 
     label, 
     helperText,
+    required,
+    priority,
     id,
     ...props 
   }, ref) => {
@@ -184,28 +232,43 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         {label && (
           <label 
             htmlFor={textareaIdToUse}
-            className="block text-sm font-medium text-foreground mb-1"
+            className={cn(
+              "block text-sm font-medium text-foreground mb-1",
+              priority === 'high' && "text-orange-600 dark:text-orange-400",
+              priority === 'urgent' && "text-red-600 dark:text-red-400 font-semibold"
+            )}
           >
             {label}
+            {required && (
+              <span className="text-destructive ml-1" aria-hidden="true">*</span>
+            )}
           </label>
         )}
         
         <textarea
           id={textareaIdToUse}
           className={cn(
-            inputVariants({ variant: textareaVariant, size, className }),
-            "min-h-[80px] resize-vertical"
+            inputVariants({ variant: textareaVariant, size }),
+            "min-h-[80px] resize-vertical",
+            priority === 'high' && "border-orange-300 focus:border-orange-500 focus:ring-orange-500",
+            priority === 'urgent' && "border-red-400 focus:border-red-600 focus:ring-red-600",
+            className
           )}
+          aria-invalid={hasError ? 'true' : undefined}
+          aria-required={required ? 'true' : undefined}
           ref={ref}
           {...props}
         />
         
-        {(error || helperText) && (
-          <p className={cn(
-            "mt-1 text-xs",
-            error ? "text-error" : "text-muted-foreground"
-          )}>
-            {error || helperText}
+        {helperText && !error && (
+          <p className="mt-1 text-xs text-muted-foreground">
+            {helperText}
+          </p>
+        )}
+        
+        {error && (
+          <p className="mt-1 text-xs text-destructive" role="alert">
+            {error}
           </p>
         )}
       </div>

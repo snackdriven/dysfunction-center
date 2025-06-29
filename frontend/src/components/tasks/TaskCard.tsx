@@ -110,17 +110,17 @@ export const TaskCard: React.FC<TaskCardProps> = ({
   return (
     <>
       <Card 
-        className={`transition-all hover:shadow-md ${
+        className={`container-card transition-all hover:shadow-md focus-within:shadow-lg ${
           task.completed ? 'opacity-75' : ''
         } ${
-          isOverdue ? 'border-red-200 bg-red-50' : 
-          isDueToday ? 'border-orange-200 bg-orange-50' : ''
+          isOverdue ? 'border-red-200 bg-red-50 dark:border-red-800 dark:bg-red-950/20' : 
+          isDueToday ? 'border-orange-200 bg-orange-50 dark:border-orange-800 dark:bg-orange-950/20' : ''
         } ${
-          isSelected ? 'ring-2 ring-blue-500 border-blue-200' : ''
+          isSelected ? 'ring-2 ring-blue-500 border-blue-200 dark:ring-blue-400 dark:border-blue-800' : ''
         }`}
       >
-        <CardContent className="p-4">
-          <div className="flex items-start gap-3">
+        <CardContent className="card-layout-horizontal p-4" style={{ padding: 'var(--spacing-normal-element, 1rem)' }}>
+          <div className="flex items-start gap-3" style={{ gap: 'var(--spacing-normal-text, 0.75rem)' }}>
             {/* Selection Checkbox */}
             {selectionMode && (
               <input
@@ -148,11 +148,25 @@ export const TaskCard: React.FC<TaskCardProps> = ({
             <div className="flex-1 min-w-0">
               <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <h4 className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}>
+                  <h4 
+                    className={`font-medium ${task.completed ? 'line-through text-muted-foreground' : ''}`}
+                    style={{ 
+                      fontSize: 'var(--font-size-lg, 1.125rem)',
+                      lineHeight: 'var(--line-height-normal, 1.5)',
+                      letterSpacing: 'var(--letter-spacing-wide, 0.025em)'
+                    }}
+                  >
                     {task.title}
                   </h4>
                   {task.description && (
-                    <p className={`text-sm mt-1 ${task.completed ? 'text-muted-foreground' : 'text-muted-foreground'}`}>
+                    <p 
+                      className={`mt-1 ${task.completed ? 'text-muted-foreground' : 'text-muted-foreground'}`}
+                      style={{ 
+                        fontSize: 'var(--font-size-base, 1rem)',
+                        lineHeight: 'var(--line-height-relaxed, 1.625)',
+                        marginTop: 'var(--spacing-normal-text, 0.5rem)'
+                      }}
+                    >
                       {task.description}
                     </p>
                   )}
