@@ -13,15 +13,20 @@ export const AppShell: React.FC = () => {
       <Header />
       
       <div className="flex">
-        {/* Sidebar */}
-        <Sidebar isOpen={isSidebarOpen} />
+        {/* Sidebar with proper ID for ARIA controls */}
+        <Sidebar id="main-sidebar" isOpen={isSidebarOpen} />
         
-        {/* Main Content */}
+        {/* Main Content with skip link target */}
         <main 
+          id="main-content"
           className={cn(
             "flex-1 min-h-[calc(100vh-4rem)] transition-all duration-200",
-            isSidebarOpen ? "ml-64" : "ml-16"
+            isSidebarOpen ? "ml-0" : "ml-0"
           )}
+          style={{
+            marginLeft: isSidebarOpen ? '16rem' : '4rem'
+          }}
+          tabIndex={-1}
         >
           <div className="container mx-auto p-6 max-w-7xl">
             <Outlet />

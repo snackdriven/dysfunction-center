@@ -66,11 +66,12 @@ const navigationItems = [
 ];
 
 export interface SidebarProps {
+  id?: string;
   isOpen?: boolean;
   className?: string;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ id, isOpen = true, className }) => {
   const location = useLocation();
 
   // Fetch user preferences for avatar
@@ -82,11 +83,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) =>
   const displayName = preferences?.preferences?.display_name || '';
 
   return (
-    <div className={cn(
-      "flex flex-col bg-card border-r border-border transition-all duration-200 ease-in-out",
-      isOpen ? "w-64" : "w-16",
-      className
-    )}>
+    <div 
+      id={id}
+      className={cn(
+        "flex flex-col bg-card border-r border-border transition-all duration-200 ease-in-out fixed left-0 top-16 h-[calc(100vh-4rem)] z-40",
+        isOpen ? "w-64" : "w-16",
+        className
+      )}
+    >
       {/* Avatar and Display Name as Dashboard Link */}
       <div className="p-6 border-b border-border">
         <Link to="/" className="flex items-center gap-2 group">
@@ -102,44 +106,48 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen = true, className }) =>
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-2">
-        {navigationItems.map((item) => {
-          const isActive = location.pathname === item.href;
-          return (
-            <NavLink
-              key={item.name}
-              to={item.href}
-              className={cn(
-                'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative group',
-                isActive
-                  ? 'bg-primary text-primary-foreground'
-                  : 'text-muted-foreground hover:text-foreground hover:bg-accent'
-              )}
-              title={!isOpen ? item.name : undefined}
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              {isOpen && (
-                <div className="flex-1 overflow-hidden">
-                  <div className="truncate">{item.name}</div>
-                  <div className={cn(
-                    'text-xs truncate',
-                    isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'
-                  )}>
-                    {item.description}
-                  </div>
-                </div>
-              )}
-              
-              {/* Tooltip for collapsed state */}
-              {!isOpen && (
-                <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">
-                  {item.name}
-                </div>
-              )}
-            </NavLink>
-          );
-        })}
+      {/* Navigation with proper accessibility structure */}
+      <nav className="flex-1 p-4" aria-label="Main navigation">
+        <ul role="list" className="space-y-2">
+          {navigationItems.map((item) => {
+            const isActive = location.pathname === item.href;
+            return (
+              <li key={item.name}>
+                <NavLink
+                  to={item.href}
+                  className={cn(
+                    'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium transition-colors relative group',
+                    isActive
+                      ? 'bg-primary text-primary-foreground'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-accent'
+                  )}
+                  aria-current={isActive ? 'page' : undefined}
+                  title={!isOpen ? item.name : undefined}
+                >
+                  <item.icon className="h-5 w-5 flex-shrink-0" aria-hidden="true" />
+                  {isOpen && (
+                    <div className="flex-1 overflow-hidden">
+                      <div className="truncate">{item.name}</div>
+                      <div className={cn(
+                        'text-xs truncate',
+                        isActive ? 'text-primary-foreground/70' : 'text-muted-foreground'
+                      )}>
+                        {item.description}
+                      </div>
+                    </div>
+                  )}
+                  
+                  {/* Tooltip for collapsed state */}
+                  {!isOpen && (
+                    <div className="absolute left-full ml-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md opacity-0 group-hover:opacity-100 transition-opacity z-50 whitespace-nowrap pointer-events-none">
+                      {item.name}
+                    </div>
+                  )}
+                </NavLink>
+              </li>
+            );
+          })}
+        </ul>
       </nav>
     </div>
   );

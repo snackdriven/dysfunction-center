@@ -1,6 +1,10 @@
 import React from 'react';
-import { UnifiedDashboard } from '../components/dashboard/UnifiedDashboard';
+import { DashboardTabs } from '../components/dashboard/DashboardTabs';
 
+/**
+ * Main dashboard page with simplified, tabbed interface
+ * Replaces the information-heavy UnifiedDashboard with progressive disclosure
+ */
 export const Dashboard: React.FC = () => {
-  return <UnifiedDashboard />;
+  return <DashboardTabs />;
 };

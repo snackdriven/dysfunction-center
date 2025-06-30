@@ -25,7 +25,12 @@
       "Bash(timeout 30s npm run dev)",
       "Bash(node:*)",
       "Bash(timeout 60s npm start)",
-      "Bash(find:*)"
+      "Bash(find:*)",
+      "Bash(sudo apt-get:*)",
+      "Bash(sudo apt-get install:*)",
+      "Bash(curl:*)",
+      "mcp__filesystem__list_directory",
+      "mcp__filesystem__search_files"
     ],
     "deny": []
   }
