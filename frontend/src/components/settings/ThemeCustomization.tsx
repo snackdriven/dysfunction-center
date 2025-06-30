@@ -17,7 +17,7 @@ import {
   Contrast,
   Bug
 } from 'lucide-react';
-import { useAppStore } from '../../stores/useAppStore';
+import { useAppStore } from '../../stores/appStore';
 import { CustomTheme } from '../../../../shared/types';
 import { ThemeDebugPanel } from './ThemeDebugPanel';
 
@@ -226,7 +226,7 @@ export const ThemeCustomization: React.FC = () => {
     setEditingTheme(updatedTheme);
     
     // Live preview as user types/changes colors
-    previewCustomTheme(updatedTheme);
+    previewCustomTheme?.(updatedTheme);
   };
 
   const handlePropertyChange = (property: keyof CustomTheme, value: any) => {
@@ -238,11 +238,11 @@ export const ThemeCustomization: React.FC = () => {
     setEditingTheme(updatedTheme);
     
     // Live preview property changes
-    previewCustomTheme(updatedTheme);
+    previewCustomTheme?.(updatedTheme);
   };
 
   const applyTheme = (themeToApply: CustomTheme) => {
-    setCustomTheme(themeToApply);
+    setCustomTheme?.(themeToApply);
     setEditingTheme(themeToApply); // Update the editing theme to reflect the applied theme
     setPreviewMode(false);
   };
@@ -250,17 +250,17 @@ export const ThemeCustomization: React.FC = () => {
   const previewTheme = () => {
     if (previewMode) {
       // Clear preview and restore saved theme
-      clearThemePreview();
+      clearThemePreview?.();
       setPreviewMode(false);
     } else {
       // Start preview mode
-      previewCustomTheme(editingTheme);
+      previewCustomTheme?.(editingTheme);
       setPreviewMode(true);
     }
   };
 
   const saveTheme = () => {
-    setCustomTheme(editingTheme);
+    setCustomTheme?.(editingTheme);
     setPreviewMode(false);
     // The editingTheme is already up to date, no need to change it
   };
@@ -306,7 +306,7 @@ export const ThemeCustomization: React.FC = () => {
         importedTheme.updated_at = new Date().toISOString();
         setEditingTheme(importedTheme);
         // Automatically preview the imported theme
-        previewCustomTheme(importedTheme);
+        previewCustomTheme?.(importedTheme);
         setPreviewMode(true);
       } catch (error) {
         alert('Invalid theme file format');

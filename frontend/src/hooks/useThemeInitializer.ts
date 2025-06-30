@@ -1,25 +1,27 @@
 import { useEffect } from 'react';
-import { useAppStore } from '../stores/useAppStore';
+import { useAppStore } from '../stores/appStore';
 
 /**
  * Hook to apply custom theme on app initialization
- * This ensures custom themes are applied after page reload
+ * Sets up theme based on user preferences and system settings
  */
 export const useThemeInitializer = () => {
-  const { customTheme, setCustomTheme } = useAppStore();
+  const { theme } = useAppStore();
 
   useEffect(() => {
-    // Re-apply custom theme if it exists (after page reload)
-    if (customTheme) {
-      // Force re-application of the theme to ensure all styles are set
-      setCustomTheme(customTheme);
+    // Apply the theme immediately on mount
+    if (theme === 'dark') {
+      document.documentElement.classList.add('dark');
+    } else if (theme === 'light') {
+      document.documentElement.classList.remove('dark');
+    } else {
+      // System theme
+      const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      if (prefersDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     }
-  }, []); // Run only once on mount
-
-  // Also listen for customTheme changes to ensure they are applied
-  useEffect(() => {
-    if (customTheme) {
-      setCustomTheme(customTheme);
-    }
-  }, [customTheme, setCustomTheme]);
+  }, [theme]);
 };

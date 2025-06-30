@@ -2,7 +2,7 @@ import React from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
 import { Badge } from '../ui/Badge';
 import { Button } from '../ui/Button';
-import { useAppStore } from '../../stores/useAppStore';
+import { useAppStore } from '../../stores/appStore';
 import { validateTheme, getThemeFromDOM, applyThemeToDOM } from '../../utils/themeUtils';
 
 export const ThemeDebugPanel: React.FC = () => {

@@ -17,7 +17,7 @@ import { Task } from '../../services/tasks';
 import { Habit } from '../../services/habits';
 import { MoodEntry } from '../../services/mood';
 import { integrationService } from '../../services/integration';
-import { useAppStore } from '../../stores/useAppStore';
+import { useAppStore } from '../../stores/appStore';
 import { cn } from '../../utils/cn';
 
 interface IntegratedCalendarViewProps {
@@ -186,7 +186,7 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
 
   const handleDayClick = (dayData: CalendarDayData) => {
     setSelectedDay(dayData);
-    setSelectedDate(dayData.dateString);
+    setSelectedDate(new Date(dayData.dateString));
   };
 
   const handleTaskDragStart = (task: Task) => {

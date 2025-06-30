@@ -198,6 +198,49 @@ export class IntegrationService {
     return response.data;
   }
 
+  // Weekly productivity summary for dashboard insights
+  async getWeeklyProductivitySummary(): Promise<{
+    tasks_completed: number;
+    habits_maintained: number;
+    avg_mood_score: number;
+  }> {
+    const endDate = new Date().toISOString().split('T')[0];
+    const startDate = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    
+    try {
+      const weeklyData = await this.getProductivityDataRange(startDate, endDate);
+      
+      // Aggregate the weekly data
+      const summary = weeklyData.reduce((acc, day) => {
+        acc.tasks_completed += day.tasks?.completed || 0;
+        acc.habits_maintained += day.habits?.completed || 0;
+        if (day.mood?.score) {
+          acc.mood_entries++;
+          acc.mood_total += day.mood.score;
+        }
+        return acc;
+      }, {
+        tasks_completed: 0,
+        habits_maintained: 0,
+        mood_entries: 0,
+        mood_total: 0
+      });
+
+      return {
+        tasks_completed: summary.tasks_completed,
+        habits_maintained: summary.habits_maintained,
+        avg_mood_score: summary.mood_entries > 0 ? summary.mood_total / summary.mood_entries : 0
+      };
+    } catch (error) {
+      // Fallback to default values if API call fails
+      return {
+        tasks_completed: 0,
+        habits_maintained: 0,
+        avg_mood_score: 0
+      };
+    }
+  }
+
   // Data sync status
   async getSyncStatus(): Promise<{ 
     status: 'idle' | 'syncing' | 'error'; 

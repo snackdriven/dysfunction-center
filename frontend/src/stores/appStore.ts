@@ -37,6 +37,9 @@ interface AppState {
   currentView: 'dashboard' | 'tasks' | 'habits' | 'mood' | 'calendar' | 'journal' | 'settings';
   theme: 'light' | 'dark' | 'system';
   
+  // Custom theme support (optional for future implementation)
+  customTheme?: any;
+  
   // Filters
   taskFilters: TaskFilters;
   
@@ -62,6 +65,11 @@ interface AppState {
   setSidebarOpen: (open: boolean) => void;
   setCurrentView: (view: AppState['currentView']) => void;
   setTheme: (theme: AppState['theme']) => void;
+  
+  // Custom theme actions (stub implementations)
+  setCustomTheme?: (theme: any) => void;
+  previewCustomTheme?: (theme: any) => void;
+  clearThemePreview?: () => void;
   
   // Filter actions
   setTaskFilters: (filters: Partial<TaskFilters>) => void;
@@ -126,6 +134,7 @@ export const useAppStore = create<AppState>()(
       sidebarOpen: true,
       currentView: 'dashboard',
       theme: 'system',
+      customTheme: undefined,
       taskFilters: defaultTaskFilters,
       preferences: defaultPreferences,
       loading: {},
@@ -157,6 +166,22 @@ export const useAppStore = create<AppState>()(
             document.documentElement.classList.remove('dark');
           }
         }
+      },
+
+      // Custom theme actions (stub implementations for future use)
+      setCustomTheme: (theme) => {
+        set({ customTheme: theme });
+        // TODO: Implement custom theme application logic
+      },
+      
+      previewCustomTheme: (theme) => {
+        // TODO: Implement theme preview logic
+        console.log('Preview theme:', theme);
+      },
+      
+      clearThemePreview: () => {
+        // TODO: Implement theme preview clearing logic
+        console.log('Clear theme preview');
       },
 
       // Filter actions

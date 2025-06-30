@@ -19,7 +19,7 @@ import {
   ExternalLink
 } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAppStore } from '../../stores/useAppStore';
+import { useAppStore } from '../../stores/appStore';
 import { integrationService } from '../../services/integration';
 import { tasksApi } from '../../services/tasks';
 import { habitsApi } from '../../services/habits';
@@ -46,7 +46,7 @@ export const UnifiedDashboard: React.FC = () => {
   // Fetch unified productivity data
   const { data: productivityData, isLoading: productivityLoading } = useQuery({
     queryKey: ['productivity-data', selectedDate],
-    queryFn: () => integrationService.getDailyProductivityData(selectedDate),
+    queryFn: () => integrationService.getDailyProductivityData(selectedDate.toISOString().split('T')[0]),
   });
 
   // Fetch insights

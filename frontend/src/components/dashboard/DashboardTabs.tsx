@@ -61,7 +61,7 @@ export const DashboardTabs: React.FC = () => {
       </div>
 
       {/* Progressive Disclosure Tab Navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab}>
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="overview">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger 
             value="overview" 
@@ -97,19 +97,19 @@ export const DashboardTabs: React.FC = () => {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="overview" className="mt-6" role="tabpanel" aria-labelledby="overview-tab">
+        <TabsContent value="overview" className="mt-6">
           <ProductivityOverview />
         </TabsContent>
 
-        <TabsContent value="today" className="mt-6" role="tabpanel" aria-labelledby="today-tab">
+        <TabsContent value="today" className="mt-6">
           <TodayFocus />
         </TabsContent>
 
-        <TabsContent value="insights" className="mt-6" role="tabpanel" aria-labelledby="insights-tab">
+        <TabsContent value="insights" className="mt-6">
           <InsightsPanel />
         </TabsContent>
 
-        <TabsContent value="actions" className="mt-6" role="tabpanel" aria-labelledby="actions-tab">
+        <TabsContent value="actions" className="mt-6">
           <QuickActions />
         </TabsContent>
       </Tabs>

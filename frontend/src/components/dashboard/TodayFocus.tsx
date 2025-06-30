@@ -260,7 +260,7 @@ export const TodayFocus: React.FC = () => {
                     </div>
                     <Button 
                       size="sm" 
-                      variant={isCompleted ? "default" : "outline"}
+                      variant={isCompleted ? "primary" : "outline"}
                       onClick={() => handleHabitToggle(habit.id)}
                       disabled={logHabitCompletionMutation.isPending}
                       aria-label={`${isCompleted ? 'Unmark' : 'Mark'} ${habit.name} as completed`}
