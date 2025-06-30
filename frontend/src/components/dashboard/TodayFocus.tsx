@@ -71,7 +71,9 @@ export const TodayFocus: React.FC = () => {
    * Quick habit completion toggle
    */
   const handleHabitToggle = (habitId: number) => {
-    const completion = todayCompletions?.find(c => c.habit_id === habitId);
+    const completion = Array.isArray(todayCompletions) 
+      ? todayCompletions.find(c => c.habit_id === habitId)
+      : undefined;
     const isCompleted = completion?.completed || false;
     logHabitCompletionMutation.mutate({ habitId, completed: !isCompleted });
   };
@@ -80,7 +82,8 @@ export const TodayFocus: React.FC = () => {
    * Check if habit is completed today
    */
   const isHabitCompleted = (habitId: number) => {
-    return todayCompletions?.find(c => c.habit_id === habitId)?.completed || false;
+    if (!Array.isArray(todayCompletions)) return false;
+    return todayCompletions.find(c => c.habit_id === habitId)?.completed || false;
   };
 
   /**

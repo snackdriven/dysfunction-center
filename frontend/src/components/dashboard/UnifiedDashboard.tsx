@@ -156,13 +156,16 @@ export const UnifiedDashboard: React.FC = () => {
   };
 
   const handleHabitToggle = (habitId: number) => {
-    const completion = todayCompletions?.find(c => c.habit_id === habitId);
+    const completion = Array.isArray(todayCompletions) 
+      ? todayCompletions.find(c => c.habit_id === habitId) 
+      : undefined;
     const isCompleted = completion?.completed || false;
     logHabitCompletionMutation.mutate({ habitId, completed: !isCompleted });
   };
 
   const isHabitCompleted = (habitId: number) => {
-    return todayCompletions?.find(c => c.habit_id === habitId)?.completed || false;
+    if (!Array.isArray(todayCompletions)) return false;
+    return todayCompletions.find(c => c.habit_id === habitId)?.completed || false;
   };
 
   const getHabitStreak = (habit: any) => {

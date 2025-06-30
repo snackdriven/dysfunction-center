@@ -19,7 +19,7 @@ export const HabitTrackerWidget: React.FC = () => {
   const logCompletion = useLogHabitCompletion();
 
   const progressData = React.useMemo(() => {
-    if (!habits || !todayCompletions) return { completed: 0, total: 0, percentage: 0 };
+    if (!habits || !Array.isArray(todayCompletions)) return { completed: 0, total: 0, percentage: 0 };
     
     const completed = todayCompletions.filter(c => c.completed).length;
     const total = habits.length;
@@ -32,7 +32,9 @@ export const HabitTrackerWidget: React.FC = () => {
   }, [habits, todayCompletions]);
   const handleToggleHabit = async (habitId: number) => {
     const today = new Date().toISOString().split('T')[0];
-    const currentCompletion = todayCompletions?.find(c => c.habit_id === habitId);
+    const currentCompletion = Array.isArray(todayCompletions) 
+      ? todayCompletions.find(c => c.habit_id === habitId)
+      : undefined;
 
     try {
       await logCompletion.mutateAsync({
@@ -87,7 +89,9 @@ export const HabitTrackerWidget: React.FC = () => {
             <h4 className="font-medium text-sm text-muted-foreground">Today's Habits</h4>
             {habits && habits.length > 0 ? (
               habits.slice(0, 4).map((habit) => {
-                const completion = todayCompletions?.find(c => c.habit_id === habit.id);
+                const completion = Array.isArray(todayCompletions) 
+                  ? todayCompletions.find(c => c.habit_id === habit.id)
+                  : undefined;
                 const isCompleted = completion?.completed || false;
                 
                 return (

@@ -298,3 +298,8 @@ export interface UpdateReminderRequest {
 export interface UpdateReminderResponse {
   habit: Habit;
 }
+
+// Response type for getting today's completions across all habits
+export interface GetTodayCompletionsAllResponse {
+  completions: HabitCompletion[];
+}

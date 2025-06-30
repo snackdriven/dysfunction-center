@@ -52,7 +52,9 @@ export const HabitGrid: React.FC<HabitGridProps> = ({ habits, completions, isLoa
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {activeHabits.map((habit) => {
-              const todayCompletion = completions.find(c => c.habit_id === habit.id);
+              const todayCompletion = Array.isArray(completions) 
+                ? completions.find(c => c.habit_id === habit.id)
+                : undefined;
               return (
                 <HabitCard 
                   key={habit.id} 
@@ -73,7 +75,9 @@ export const HabitGrid: React.FC<HabitGridProps> = ({ habits, completions, isLoa
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {inactiveHabits.map((habit) => {
-              const todayCompletion = completions.find(c => c.habit_id === habit.id);
+              const todayCompletion = Array.isArray(completions) 
+                ? completions.find(c => c.habit_id === habit.id)
+                : undefined;
               return (
                 <HabitCard 
                   key={habit.id} 

@@ -26,6 +26,7 @@ function App() {
             <Routes>
               <Route path="/" element={<AppShell />}>
                 <Route index element={<Dashboard />} />
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="tasks" element={<Tasks />} />
                 <Route path="habits" element={<Habits />} />
                 <Route path="mood" element={<Mood />} />

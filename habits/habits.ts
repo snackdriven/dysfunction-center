@@ -20,7 +20,8 @@ import {
   GetDailyCompletionsRequest,
   GetDailyCompletionsResponse,
   LogMultipleCompletionsRequest,
-  LogMultipleCompletionsResponse
+  LogMultipleCompletionsResponse,
+  GetTodayCompletionsAllResponse
 } from "./types";
 import { 
   sanitizeString, 
@@ -43,15 +44,11 @@ async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
 
 // Get user's End of Day time setting from preferences
 async function getEndOfDayTime(userId: string = 'default_user'): Promise<string> {
+  // Try to call the preferences service if available
   try {
-    // Try to call the preferences service
-    const { preferences } = await import("~encore/clients");
-    const response = await preferences.getPreference({
-      key: 'end_of_day_time',
-      user_id: userId
-    });
-    
-    return response.preference.preference_value || '23:59';
+    // Note: This import might not be available in all environments
+    // Skip preferences service for now
+    throw new Error("Preferences service not available");
   } catch (serviceError) {
     // If preferences service is not available, try to get from shared database
     try {
@@ -699,7 +696,8 @@ export const getHabitHistory = api(
         completed: row.completed,
         notes: row.notes,
         created_at: row.created_at,
-        completion_value: row.completion_value || 1
+        completion_value: row.completion_value || 1,
+        completion_timestamp: row.completion_timestamp || row.created_at
       }));
 
       // Calculate streak data
@@ -731,6 +729,46 @@ export const getHabitHistory = api(
       };
     } catch (error) {
       throw new Error(`Failed to get habit history: ${error instanceof Error ? error.message : 'Unknown error'}`);
+    }
+  }
+);
+
+// Get today's completions across all habits
+export const getTodayCompletionsAll = api(
+  { method: "GET", path: "/habits/completions/today", expose: true },
+  async (req: { date?: string }): Promise<GetTodayCompletionsAllResponse> => {
+    try {
+      const targetDate = req.date || getCurrentDateString();
+
+      // Validate date
+      if (!isValidDateString(targetDate)) {
+        throw new Error("Invalid date format. Use YYYY-MM-DD");
+      }
+
+      // Get all completions for the specified date across all habits
+      const generator = habitDB.query`
+        SELECT *
+        FROM habit_completions 
+        WHERE completion_date = ${targetDate}
+        ORDER BY completion_timestamp DESC
+      `;
+
+      const result = await collectResults(generator);
+      
+      const completions: HabitCompletion[] = result.map((row: any) => ({
+        id: row.id,
+        habit_id: row.habit_id,
+        completion_date: row.completion_date,
+        completed: row.completed,
+        notes: row.notes,
+        created_at: row.created_at,
+        completion_value: row.completion_value || 1,
+        completion_timestamp: row.completion_timestamp || row.created_at
+      }));
+
+      return { completions };
+    } catch (error) {
+      throw new Error(`Failed to get today's completions: ${error instanceof Error ? error.message : 'Unknown error'}`);
     }
   }
 );

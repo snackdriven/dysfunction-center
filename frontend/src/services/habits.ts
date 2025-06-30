@@ -124,7 +124,7 @@ export const habitsApi = {  getHabits: async (): Promise<Habit[]> => {
   getTodayCompletions: async (): Promise<HabitCompletion[]> => {
     const today = new Date().toISOString().split('T')[0];
     const { data } = await api.get('/habits/completions/today', { params: { date: today } });
-    return data;
+    return data.completions || [];
   },
 
   getTemplates: async (category?: string): Promise<HabitTemplate[]> => {
