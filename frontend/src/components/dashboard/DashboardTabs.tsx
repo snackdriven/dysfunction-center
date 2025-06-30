@@ -20,7 +20,7 @@ import { CurrentTimeDisplay } from '../ui/CurrentTimeDisplay';
  * - Focused, task-oriented content organization
  */
 export const DashboardTabs: React.FC = () => {
-  const [activeTab, setActiveTab] = useState('overview');
+  const [activeTab, setActiveTab] = useState('today');
 
   // Fetch user preferences for personalized greeting
   const { data: preferences } = useQuery({
@@ -61,7 +61,7 @@ export const DashboardTabs: React.FC = () => {
       </div>
 
       {/* Progressive Disclosure Tab Navigation */}
-      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="overview">
+      <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="today">
         <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger 
             value="overview" 

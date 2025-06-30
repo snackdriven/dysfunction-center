@@ -1,79 +1,165 @@
 import { defineConfig, devices } from '@playwright/test';
 
 /**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
-
-/**
- * See https://playwright.dev/docs/test-configuration.
+ * Comprehensive Frontend Testing Protocol Configuration
+ * Executive Dysfunction Center - Testing Suite
  */
 export default defineConfig({
   testDir: './tests',
+  
+  /* Global test timeout */
+  timeout: 30 * 1000,
+  
+  /* Expect timeout for assertions */
+  expect: {
+    timeout: 5 * 1000,
+  },
+  
   /* Run tests in files in parallel */
   fullyParallel: true,
+  
   /* Fail the build on CI if you accidentally left test.only in the source code. */
   forbidOnly: !!process.env.CI,
+  
   /* Retry on CI only */
   retries: process.env.CI ? 2 : 0,
+  
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
-  /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
-  /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
+  
+  /* Reporter configuration for comprehensive testing */
+  reporter: [
+    ['html', { outputFolder: 'playwright-report', open: 'never' }],
+    ['json', { outputFile: 'test-results/comprehensive-results.json' }],
+    ['junit', { outputFile: 'test-results/comprehensive-results.xml' }],
+    ['list']
+  ],
+  
+  /* Shared settings for all the projects below. */
   use: {
-    /* Base URL to use in actions like `await page.goto('/')`. */
-    // baseURL: 'http://localhost:3000',
-
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
+    /* Base URL for testing */
+    baseURL: 'http://localhost:3000',
+    
+    /* Collect trace when retrying the failed test. */
     trace: 'on-first-retry',
+    
+    /* Take screenshot on failure */
+    screenshot: 'only-on-failure',
+    
+    /* Record video on failure */
+    video: 'retain-on-failure',
+    
+    /* Global test timeout */
+    actionTimeout: 10 * 1000,
+    
+    /* Navigation timeout */
+    navigationTimeout: 15 * 1000,
   },
 
-  /* Configure projects for major browsers */
+  /* Configure projects for major browsers and accessibility testing */
   projects: [
     {
+      name: 'setup',
+      testMatch: /.*\.setup\.ts/,
+    },
+    
+    /* Desktop Chrome - Primary testing browser */
+    {
       name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
+      use: { 
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+      },
+      dependencies: ['setup'],
     },
 
+    /* Desktop Firefox - Cross-browser compatibility */
     {
       name: 'firefox',
-      use: { ...devices['Desktop Firefox'] },
+      use: { 
+        ...devices['Desktop Firefox'],
+        viewport: { width: 1280, height: 720 },
+      },
+      dependencies: ['setup'],
     },
 
+    /* Desktop Safari - WebKit engine testing */
     {
       name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
+      use: { 
+        ...devices['Desktop Safari'],
+        viewport: { width: 1280, height: 720 },
+      },
+      dependencies: ['setup'],
     },
 
-    /* Test against mobile viewports. */
-    // {
-    //   name: 'Mobile Chrome',
-    //   use: { ...devices['Pixel 5'] },
-    // },
-    // {
-    //   name: 'Mobile Safari',
-    //   use: { ...devices['iPhone 12'] },
-    // },
+    /* Mobile Chrome - Responsive testing */
+    {
+      name: 'Mobile Chrome',
+      use: { 
+        ...devices['Pixel 5'],
+      },
+      dependencies: ['setup'],
+    },
 
-    /* Test against branded browsers. */
-    // {
-    //   name: 'Microsoft Edge',
-    //   use: { ...devices['Desktop Edge'], channel: 'msedge' },
-    // },
-    // {
-    //   name: 'Google Chrome',
-    //   use: { ...devices['Desktop Chrome'], channel: 'chrome' },
-    // },
+    /* Mobile Safari - iOS testing */
+    {
+      name: 'Mobile Safari',
+      use: { 
+        ...devices['iPhone 12'],
+      },
+      dependencies: ['setup'],
+    },
+
+    /* Tablet testing */
+    {
+      name: 'Tablet',
+      use: {
+        ...devices['iPad Pro'],
+      },
+      dependencies: ['setup'],
+    },
+
+    /* High contrast mode testing for accessibility */
+    {
+      name: 'high-contrast',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        colorScheme: 'dark',
+        extraHTTPHeaders: {
+          'prefers-contrast': 'high'
+        }
+      },
+      dependencies: ['setup'],
+    },
+
+    /* Reduced motion testing for accessibility */
+    {
+      name: 'reduced-motion',
+      use: {
+        ...devices['Desktop Chrome'],
+        viewport: { width: 1280, height: 720 },
+        extraHTTPHeaders: {
+          'prefers-reduced-motion': 'reduce'
+        }
+      },
+      dependencies: ['setup'],
+    },
   ],
 
+  /* Folder for test artifacts */
+  outputDir: 'test-results/',
+
   /* Run your local dev server before starting the tests */
-  // webServer: {
-  //   command: 'npm run start',
-  //   url: 'http://localhost:3000',
-  //   reuseExistingServer: !process.env.CI,
-  // },
+  webServer: {
+    command: 'npm start',
+    url: 'http://localhost:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+
+  /* Global setup and teardown */
+  globalSetup: require.resolve('./tests/global-setup.ts'),
+  globalTeardown: require.resolve('./tests/global-teardown.ts'),
 });

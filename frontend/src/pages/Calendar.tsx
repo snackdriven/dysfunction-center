@@ -21,7 +21,7 @@ import { ErrorBoundary } from '../components/common/ErrorBoundary';
 export const Calendar: React.FC = () => {
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [activeView, setActiveView] = useState<CalendarViewType>('week');
+  const [activeView, setActiveView] = useState<CalendarViewType>('3day');
 
   const currentYear = currentDate.getFullYear();
   const currentMonth = currentDate.getMonth();
