@@ -3,9 +3,9 @@ import { cn } from "../../utils/cn";
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /** Visual variant */
-  variant?: 'default' | 'primary' | 'secondary' | 'outline' | 'ghost' | 'destructive' | 'link' | 'prominent';
+  variant?: 'default' | 'primary' | 'secondary' | 'outline';
   /** Size variant */
-  size?: 'sm' | 'md' | 'lg' | 'icon';
+  size?: 'sm' | 'md' | 'lg';
   /** Whether the button is in a loading state */
   loading?: boolean;
   /** Priority level for attention management (executive dysfunction support) */
@@ -40,19 +40,14 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
       default: "bg-gray-200 text-gray-900 hover:bg-gray-300",
       primary: "bg-blue-600 text-white hover:bg-blue-700",
       secondary: "bg-gray-600 text-white hover:bg-gray-700",
-      outline: "border border-gray-300 bg-white hover:bg-gray-50",
-      ghost: "bg-transparent hover:bg-gray-100 text-gray-900",
-      destructive: "bg-red-600 text-white hover:bg-red-700",
-      link: "bg-transparent text-blue-600 underline hover:text-blue-800 px-0 py-0 min-w-0 min-h-0",
-      prominent: "bg-yellow-400 text-black font-bold shadow hover:bg-yellow-500",
+      outline: "border border-gray-300 bg-white hover:bg-gray-50"
     };
 
     // Simple size classes
     const sizeClasses = {
       sm: "h-9 px-3 text-xs",
       md: "h-10 px-4 text-sm",
-      lg: "h-11 px-6 text-base",
-      icon: "h-9 w-9 p-0 flex items-center justify-center",
+      lg: "h-11 px-6 text-base"
     };
     
     return (

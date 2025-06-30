@@ -1,21 +1,55 @@
 import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '../components/ui/Card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '../components/ui/Tabs';
-import { DataExportImport } from '../components/settings/DataExportImport';
-import { ThemeCustomization } from '../components/settings/ThemeCustomization';
 import { GeneralSettings } from '../components/settings/GeneralSettings';
 import { TimeDisplaySettings } from '../components/settings/TimeDisplaySettings';
-import { OfflineSyncManager } from '../components/common/OfflineSyncManager';
-import { HighContrastToggle, ContrastStatus, ColorContrastTester } from '../components/ui/HighContrastMode';
+import { HighContrastToggle, ContrastStatus } from '../components/ui/HighContrastMode';
+import { useTheme } from '../hooks';
+import { Button } from '../components/ui/Button';
 import { 
   Settings as SettingsIcon,
-  Palette,  Download,
-  // User, // Commented out as unused
+  Palette,
   Bell,
-  Shield,
   Eye,
-  // Database // Commented out as unused
+  Sun,
+  Moon
 } from 'lucide-react';
+
+const SimpleThemeToggle: React.FC = () => {
+  const { theme, toggleTheme } = useTheme();
+  
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2">
+          <Palette className="h-5 w-5" />
+          Theme Settings
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h4 className="font-medium">Color Theme</h4>
+            <p className="text-sm text-muted-foreground">
+              Switch between light and dark modes
+            </p>
+          </div>
+          <Button
+            onClick={toggleTheme}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            {theme === 'light' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            {theme === 'light' ? 'Light Mode' : 'Dark Mode'}
+          </Button>
+        </div>
+        <div className="text-sm text-muted-foreground">
+          Currently using <strong>{theme}</strong> theme
+        </div>
+      </CardContent>
+    </Card>
+  );
+};
 
 export const Settings: React.FC = () => {
   const [activeTab, setActiveTab] = useState('general');
@@ -35,14 +69,11 @@ export const Settings: React.FC = () => {
 
       {/* Settings Tabs */}
       <Tabs value={activeTab} onValueChange={setActiveTab} defaultValue="general">
-        <TabsList className="grid w-full grid-cols-7">
+        <TabsList className="grid w-full grid-cols-4">
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="theme">Theme</TabsTrigger>
           <TabsTrigger value="accessibility">Accessibility</TabsTrigger>
-          <TabsTrigger value="data">Data</TabsTrigger>
-          <TabsTrigger value="sync">Sync</TabsTrigger>
           <TabsTrigger value="notifications">Notifications</TabsTrigger>
-          <TabsTrigger value="privacy">Privacy</TabsTrigger>
         </TabsList>
 
         {/* General Settings */}
@@ -53,17 +84,7 @@ export const Settings: React.FC = () => {
 
         {/* Theme Settings */}
         <TabsContent value="theme" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Palette className="h-5 w-5" />
-                Theme Customization
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ThemeCustomization />
-            </CardContent>
-          </Card>
+          <SimpleThemeToggle />
         </TabsContent>
 
         {/* Accessibility Settings */}
@@ -103,46 +124,8 @@ export const Settings: React.FC = () => {
                   <p>• Skip links for easy navigation</p>
                 </div>
               </div>
-              
-              <div>
-                <h4 className="font-medium mb-3">Touch Accessibility</h4>
-                <div className="space-y-2 text-sm text-gray-600 dark:text-gray-400">
-                  <p>• All interactive elements meet 44px minimum touch target size</p>
-                  <p>• Adequate spacing between touch targets</p>
-                  <p>• Touch-friendly gestures and interactions</p>
-                </div>
-              </div>
             </CardContent>
           </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Color Contrast Testing</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <ColorContrastTester />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Data Settings */}
-        <TabsContent value="data" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Download className="h-5 w-5" />
-                Data Management
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <DataExportImport />
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Sync Settings */}
-        <TabsContent value="sync" className="space-y-6">
-          <OfflineSyncManager />
         </TabsContent>
 
         {/* Notifications Settings */}
@@ -172,40 +155,6 @@ export const Settings: React.FC = () => {
                   <h4 className="font-medium">Habit Reminders</h4>
                   <p className="text-sm text-muted-foreground mt-1">
                     Set reminders for individual habits in the Habits section.
-                  </p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        </TabsContent>
-
-        {/* Privacy Settings */}
-        <TabsContent value="privacy" className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle className="flex items-center gap-2">
-                <Shield className="h-5 w-5" />
-                Privacy & Security
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <h4 className="font-medium">Data Storage</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    All your data is stored locally and securely. We do not collect or share personal information.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium">Data Backup</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Use the Data Management tab to create backups of your information.
-                  </p>
-                </div>
-                <div>
-                  <h4 className="font-medium">Account Security</h4>
-                  <p className="text-sm text-muted-foreground mt-1">
-                    Coming soon - User authentication and account management features.
                   </p>
                 </div>
               </div>

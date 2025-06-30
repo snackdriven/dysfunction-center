@@ -3,7 +3,7 @@ import { Outlet } from 'react-router-dom';
 import { AppHeader } from './AppHeader';
 import { AppSidebar } from './AppSidebar';
 import { BreadcrumbNavigation } from '../ui/BreadcrumbNavigation';
-import { AccessibilityTestSuite } from '../testing/AccessibilityTestSuite';
+// AccessibilityTestSuite removed as non-critical testing feature
 
 export const AppShell: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -64,10 +64,7 @@ export const AppShell: React.FC = () => {
         </div>
       </div>
       
-      {/* Accessibility Testing Suite - only in development */}
-      {process.env.NODE_ENV === 'development' && (
-        <AccessibilityTestSuite autoRun={true} />
-      )}
+      {/* Non-critical testing components removed */}
     </div>
   );
 };

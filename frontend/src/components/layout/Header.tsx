@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, Bell, User, Sun, Moon, Monitor, Menu } from 'lucide-react';
+import { Search, Bell, User, Sun, Moon, Menu } from 'lucide-react';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { useNavigation, useTheme } from '../../hooks';
@@ -8,7 +8,7 @@ export const Header: React.FC = () => {
   const { isMobile, toggleSidebar } = useNavigation();
   const { theme, toggleTheme } = useTheme();
 
-  const ThemeIcon = theme === 'light' ? Sun : theme === 'dark' ? Moon : Monitor;
+  const ThemeIcon = theme === 'light' ? Sun : Moon;
 
   return (
     <header className="h-16 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50">
@@ -58,7 +58,7 @@ export const Header: React.FC = () => {
             variant="ghost" 
             size="icon"
             onClick={toggleTheme}
-            title={`Switch to ${theme === 'light' ? 'dark' : theme === 'dark' ? 'system' : 'light'} theme`}
+            title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
           >
             <ThemeIcon className="h-4 w-4" />
           </Button>
