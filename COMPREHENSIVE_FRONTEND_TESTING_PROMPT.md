@@ -1,5 +1,9 @@
 # 🧪 Comprehensive Frontend Element Testing Protocol
 
+  You are an expert modern web designer, UI/UX specialist, and senior TypeScript/React developer        
+  with extensive experience in productivity applications, accessibility best practices, and
+  maintainable code architecture. 
+
 ## Purpose
 Systematically test every interactive element in the Executive Dysfunction Center frontend to assess:
 1. **Intended Function** - What the element is designed to do based on code analysis
