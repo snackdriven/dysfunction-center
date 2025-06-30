@@ -1,53 +1,21 @@
 import * as React from "react";
-import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "../../utils/cn";
-import { FormProps } from "../../types/components";
 
-const inputVariants = cva(
-  "flex w-full rounded-md border px-3 py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 bg-background text-foreground placeholder:text-muted-foreground transition-colors",
-  {
-    variants: {
-      variant: {
-        default: "border-input hover:border-input/80 focus-visible:border-ring",
-        error: "border-destructive focus-visible:ring-destructive hover:border-destructive/80",
-      },
-      size: {
-        sm: "h-9 px-2 py-1 text-xs",
-        md: "h-10 px-3 py-2 text-sm",
-        lg: "h-11 px-4 py-3 text-base",
-      },
-    },
-    defaultVariants: {
-      variant: "default",
-      size: "md",
-    },
-  }
-);
-
-export interface InputProps
-  extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'onChange'>,
-    VariantProps<typeof inputVariants>,
-    FormProps {
-  /**
-   * Icon to display at the start of the input
-   */
+export interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  /** Field label */
+  label?: string;
+  /** Error message to display */
+  error?: string;
+  /** Helper text displayed below the field */
+  helperText?: string;
+  /** Whether the component is in a loading state */
+  loading?: boolean;
+  /** Icon to display at the start of the input */
   startIcon?: React.ReactNode;
-  /**
-   * Icon to display at the end of the input
-   */
+  /** Icon to display at the end of the input */
   endIcon?: React.ReactNode;
-  /**
-   * Input value for controlled components
-   */
-  value?: string;
-  /**
-   * Change handler with standardized signature
-   */
-  onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement>) => void;
-  /**
-   * Input type
-   */
-  type?: 'text' | 'email' | 'password' | 'search' | 'tel' | 'url' | 'number' | 'date' | 'time' | 'datetime-local';
+  /** Priority level for attention management (executive dysfunction support) */
+  priority?: 'high' | 'urgent';
 }
 
 /**
@@ -65,8 +33,6 @@ export interface InputProps
 const Input = React.forwardRef<HTMLInputElement, InputProps>(
   ({ 
     className, 
-    variant, 
-    size, 
     type = "text", 
     error, 
     label, 
@@ -76,33 +42,18 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
     id,
     required,
     loading,
-    value,
-    onChange,
     priority,
-    'data-testid': dataTestId,
-    'aria-label': ariaLabel,
-    'aria-describedby': ariaDescribedby,
-    'aria-invalid': ariaInvalid,
     ...props 
   }, ref) => {
     const inputId = React.useId();
     const hasError = !!error;
-    const inputVariant = hasError ? "error" : variant;
-
     const idToUse = id || inputId;
     const descriptionId = `${idToUse}-description`;
     const errorId = `${idToUse}-error`;
 
-    // Handle controlled component change
-    const handleChange = React.useCallback((event: React.ChangeEvent<HTMLInputElement>) => {
-      if (onChange) {
-        onChange(event.target.value, event);
-      }
-    }, [onChange]);
-
     // Build aria-describedby
     const ariaDescribedByParts = [
-      ariaDescribedby,
+      props['aria-describedby'],
       helperText && descriptionId,
       error && errorId
     ].filter(Boolean);
@@ -115,72 +66,65 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
           <label 
             htmlFor={idToUse}
             className={cn(
-              "block text-sm font-medium text-foreground mb-1",
-              priority === 'high' && "text-orange-600 dark:text-orange-400",
-              priority === 'urgent' && "text-red-600 dark:text-red-400 font-semibold"
+              "block text-sm font-medium mb-1",
+              priority === 'high' && "text-orange-600",
+              priority === 'urgent' && "text-red-600 font-semibold"
             )}
           >
             {label}
-            {required && (
-              <span className="text-destructive ml-1" aria-hidden="true">*</span>
-            )}
+            {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
         
         <div className="relative">
           {startIcon && (
-            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <div className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
               {startIcon}
             </div>
           )}
           
           <input
+            {...props}
             type={type}
             id={idToUse}
-            value={value}
-            onChange={handleChange}
             disabled={loading || props.disabled}
             className={cn(
-              inputVariants({ variant: inputVariant, size }),
+              "flex w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50",
+              hasError ? "border-red-500 focus:ring-red-500" : "border-gray-300",
               startIcon && "pl-9",
               endIcon && "pr-9",
               loading && "cursor-wait",
-              priority === 'high' && "border-orange-300 focus:border-orange-500 focus:ring-orange-500",
-              priority === 'urgent' && "border-red-400 focus:border-red-600 focus:ring-red-600",
+              priority === 'high' && "border-orange-400 focus:ring-orange-500",
+              priority === 'urgent' && "border-red-500 focus:ring-red-500",
               className
             )}
             ref={ref}
             aria-describedby={finalAriaDescribedBy}
-            aria-invalid={ariaInvalid ?? (hasError ? 'true' : undefined)}
-            aria-required={required ? 'true' : undefined}
-            aria-label={ariaLabel}
-            data-testid={dataTestId}
-            {...props}
+            aria-invalid={hasError}
+            aria-required={required}
           />
           
           {loading && (
             <div className="absolute right-3 top-1/2 -translate-y-1/2">
-              <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+              <div className="animate-spin h-4 w-4 border-2 border-gray-300 border-t-blue-500 rounded-full" />
             </div>
           )}
           
           {!loading && endIcon && (
-            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+            <div className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">
               {endIcon}
             </div>
           )}
         </div>
         
-        {/* Helper text */}
         {helperText && !error && (
-          <p id={descriptionId} className="mt-1 text-xs text-muted-foreground">
+          <p id={descriptionId} className="mt-1 text-xs text-gray-600">
             {helperText}
           </p>
         )}
         
-        {/* Error display */}
         {error && (
-          <p id={errorId} className="mt-1 text-xs text-destructive" role="alert">
+          <p id={errorId} className="mt-1 text-xs text-red-600" role="alert">
             {error}
           </p>
         )}
@@ -191,10 +135,16 @@ const Input = React.forwardRef<HTMLInputElement, InputProps>(
 
 Input.displayName = "Input";
 
-export interface TextareaProps
-  extends Omit<React.TextareaHTMLAttributes<HTMLTextAreaElement>, 'size'>,
-    VariantProps<typeof inputVariants>,
-    Pick<FormProps, 'label' | 'error' | 'helperText' | 'loading' | 'required' | 'priority'> {}
+export interface TextareaProps extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  /** Field label */
+  label?: string;
+  /** Error message to display */
+  error?: string;
+  /** Helper text displayed below the field */
+  helperText?: string;
+  /** Priority level for attention management */
+  priority?: 'high' | 'urgent';
+}
 
 /**
  * Textarea component for multi-line text input.
@@ -211,8 +161,6 @@ export interface TextareaProps
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   ({ 
     className, 
-    variant, 
-    size, 
     error, 
     label, 
     helperText,
@@ -223,8 +171,6 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
   }, ref) => {
     const textareaId = React.useId();
     const hasError = !!error;
-    const textareaVariant = hasError ? "error" : variant;
-
     const textareaIdToUse = id || textareaId;
 
     return (
@@ -233,41 +179,39 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
           <label 
             htmlFor={textareaIdToUse}
             className={cn(
-              "block text-sm font-medium text-foreground mb-1",
-              priority === 'high' && "text-orange-600 dark:text-orange-400",
-              priority === 'urgent' && "text-red-600 dark:text-red-400 font-semibold"
+              "block text-sm font-medium mb-1",
+              priority === 'high' && "text-orange-600",
+              priority === 'urgent' && "text-red-600 font-semibold"
             )}
           >
             {label}
-            {required && (
-              <span className="text-destructive ml-1" aria-hidden="true">*</span>
-            )}
+            {required && <span className="text-red-500 ml-1">*</span>}
           </label>
         )}
         
         <textarea
+          {...props}
           id={textareaIdToUse}
           className={cn(
-            inputVariants({ variant: textareaVariant, size }),
-            "min-h-[80px] resize-vertical",
-            priority === 'high' && "border-orange-300 focus:border-orange-500 focus:ring-orange-500",
-            priority === 'urgent' && "border-red-400 focus:border-red-600 focus:ring-red-600",
+            "flex w-full rounded-md border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50 min-h-[80px] resize-vertical",
+            hasError ? "border-red-500 focus:ring-red-500" : "border-gray-300",
+            priority === 'high' && "border-orange-400 focus:ring-orange-500",
+            priority === 'urgent' && "border-red-500 focus:ring-red-500",
             className
           )}
-          aria-invalid={hasError ? 'true' : undefined}
-          aria-required={required ? 'true' : undefined}
+          aria-invalid={hasError}
+          aria-required={required}
           ref={ref}
-          {...props}
         />
         
         {helperText && !error && (
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-xs text-gray-600">
             {helperText}
           </p>
         )}
         
         {error && (
-          <p className="mt-1 text-xs text-destructive" role="alert">
+          <p className="mt-1 text-xs text-red-600" role="alert">
             {error}
           </p>
         )}
@@ -278,4 +222,4 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
 
 Textarea.displayName = "Textarea";
 
-export { Input, Textarea, inputVariants };
+export { Input, Textarea };

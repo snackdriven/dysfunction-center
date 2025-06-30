@@ -4,23 +4,25 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Executive Dysfunction Center is a comprehensive productivity tracking application built with Encore.ts featuring advanced task management, habit tracking, mood logging, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area and is currently in Phase 2 with enhanced functionality.
+Executive Dysfunction Center is a productivity tracking application built with Encore.ts featuring task management, habit tracking, mood logging, journaling, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area and is currently in Phase 2.
 
 ## Development Commands
 
 ### Running the Application
-- `npm run dev` or `encore run` - Start development server with hot reload
+- `encore run` or `npm run dev` - Start development server with hot reload (serves both backend and frontend)
 - `encore db migrate` - Run database migrations (required after schema changes)
 
 ### Testing
-- `npm test` or `encore test` - Run all tests using Vitest
-- `npm run test:watch` - Run tests in watch mode
-- `npm run test:coverage` - Run tests with coverage report
+- `npm test` or `encore test` - Run all backend tests using Vitest
+- `npm run test:watch` - Run backend tests in watch mode
+- `npm run test:coverage` - Run backend tests with coverage report
+- `cd frontend && npm test` - Run frontend tests only
+- `cd frontend && npm run lint` - Run ESLint on frontend code
 
 ### Frontend Development
-- `cd frontend && npm start` - Start React development server (frontend only)
+- `cd frontend && npm start` - Start React development server (frontend only, for development without backend)
 - `cd frontend && npm run build` - Build frontend for production
-- `cd frontend && npm test` - Run frontend tests only
+- `cd frontend && npm install` - Install frontend dependencies after checkout
 
 ### Building and Deployment
 - `npm run build` or `encore build` - Build for production
@@ -29,6 +31,7 @@ Executive Dysfunction Center is a comprehensive productivity tracking applicatio
 ### Development Dashboard
 - While `encore run` is running, access the local developer dashboard at http://localhost:9400/
 - API testing available at http://localhost:4000/
+- Frontend runs at http://localhost:3000/ when started separately
 
 ## Architecture
 
@@ -36,23 +39,25 @@ Executive Dysfunction Center is a comprehensive productivity tracking applicatio
 The application follows Encore.ts microservices patterns with these services:
 
 1. **API Service** (`/api`) - General API endpoints including health checks and information endpoints
-2. **Tasks Service** (`/tasks`) - Advanced task management with categories, tags, time tracking, subtasks, and bulk operations
-3. **Habits Service** (`/habits`) - Enhanced habit tracking with templates, flexible targets, streak analytics, and reminders
+2. **Tasks Service** (`/tasks`) - Task management with categories, tags, time tracking, subtasks, and bulk operations
+3. **Habits Service** (`/habits`) - Habit tracking with templates, configurable targets, streak analytics, and reminders
 4. **Mood Service** (`/mood`) - Detailed mood logging with triggers, context tracking, and pattern analysis
-5. **Calendar Service** (`/calendar`) - Full calendar integration with event management, recurrence, and task linking
-6. **Preferences Service** (`/preferences`) - User preferences and theme management
+5. **Journal Service** (`/journal`) - Journaling with entries, templates, and search functionality
+6. **Calendar Service** (`/calendar`) - Full calendar integration with event management, recurrence, and task linking
+7. **Preferences Service** (`/preferences`) - User preferences and theme management
 
 ### Database Architecture
-- **PostgreSQL** with comprehensive migration system
+- **PostgreSQL** with migration system
 - **Each service manages its own database** with independent schemas
 - **Migration execution order** is critical - see `MIGRATION_ORDER.md` for proper deployment sequence
 - **Foreign key relationships** between services (e.g., calendar events can link to tasks)
-- **Advanced indexing** for optimal query performance across all tables
+- **Indexing** for query performance across all tables
 
-### Phase 2 Enhanced Features
+### Phase 2 Features
 - **Task Management**: Categories, tags, time tracking, subtasks, recurrence patterns, bulk operations
-- **Habit Tracking**: Templates (10+ pre-built), flexible completion types (boolean/count/duration), advanced analytics
+- **Habit Tracking**: Templates (10+ pre-built), configurable completion types (boolean/count/duration), analytics
 - **Mood Tracking**: Multi-dimensional tracking (primary/secondary mood, energy, stress), trigger system, context awareness
+- **Journal Service**: Entry creation, templates, search functionality, markdown support
 - **Calendar Integration**: Full calendar with day/week/month views, recurrence support, task deadline integration
 
 ### Key Files Per Service
@@ -60,8 +65,9 @@ The application follows Encore.ts microservices patterns with these services:
 - `types.ts` - Service-specific TypeScript interfaces (heavily enhanced in Phase 2)
 - `migrations/` - Database schema files with both up and down migrations
 - Additional Phase 2 files:
-  - `tasks/categories.ts`, `tasks/tags.ts`, `tasks/time-tracking.ts` - Enhanced task features
+  - `tasks/categories.ts`, `tasks/tags.ts`, `tasks/time-tracking.ts` - Task features
   - `habits/templates.ts` - Habit template management
+  - `journal/journal.ts` - Journal entry management
   - `calendar/events.ts`, `calendar/views.ts` - Calendar functionality
 
 ### Shared Architecture
@@ -69,21 +75,26 @@ The application follows Encore.ts microservices patterns with these services:
 - `shared/utils.ts` - Utility functions for validation, sanitization, and common operations
 
 ### Frontend Architecture
-- **React 19** with **TypeScript** and **Tailwind CSS**
+- **React 18** with **TypeScript** and **Tailwind CSS**
 - **React Router** for navigation between pages
 - **TanStack Query** for server state management and caching
 - **Zustand** for client-side state management
 - **Radix UI** components for accessible UI primitives
 - **React Hook Form** with **Zod** validation for forms
-- **Vitest** and **React Testing Library** for frontend testing
+- **React Testing Library** for frontend testing
+- **React Big Calendar** for calendar views
+- **Recharts** for data visualization
 
 #### Frontend Structure
 - `frontend/src/components/` - Reusable UI components organized by feature
-- `frontend/src/pages/` - Page-level components (Dashboard, Tasks, Habits, Mood, Calendar)
+  - `ui/` - Design system components (Button, Input, Layout, etc.)
+  - `layout/` - App shell components (AppShell, Header, Sidebar)
+  - `tasks/`, `habits/`, `mood/`, `journal/`, `calendar/` - Feature-specific components
+- `frontend/src/pages/` - Page-level components (Dashboard, Tasks, Habits, Mood, Journal, Calendar, Settings)
 - `frontend/src/services/` - API client functions that match backend services
 - `frontend/src/hooks/` - Custom React hooks
 - `frontend/src/stores/` - Zustand stores for global state
-- `frontend/src/providers/` - React context providers
+- `frontend/src/types/` - TypeScript type definitions including simplified component interfaces
 
 ## Development Patterns
 
@@ -100,7 +111,7 @@ The application follows Encore.ts microservices patterns with these services:
 
 ### Error Handling
 - Consistent error responses using `APIError` interface from `shared/types.ts`
-- Comprehensive validation using TypeScript interfaces
+- Validation using TypeScript interfaces
 - Database transaction support for complex operations
 
 ### Database Query Patterns
@@ -110,10 +121,16 @@ The application follows Encore.ts microservices patterns with these services:
 - In-memory filtering for complex criteria when needed
 
 ### Type Safety
-- Strict TypeScript configuration with enhanced interfaces for Phase 2
+- Strict TypeScript configuration with interfaces for Phase 2
 - Service-specific types in each `types.ts` file
 - Shared types for common data structures
-- Enhanced interfaces support optional Phase 2 fields for backward compatibility
+- Interfaces support optional Phase 2 fields for backward compatibility
+
+### Component System (Simplified)
+- **Simplified interfaces**: 4 core interfaces (BaseComponentProps, FormProps, LayoutProps, InteractiveProps)
+- **Input/Form components**: Use FormProps interface with essential props only
+- **Layout components**: Single Layout component replaces Grid/Stack/Container system
+- **See COMPONENT_SIMPLIFICATION_MIGRATION.md** for migration guide from previous over-engineered system
 
 ### Frontend Development Patterns
 - **API Integration**: Frontend services in `frontend/src/services/` mirror backend service structure
@@ -130,10 +147,11 @@ The application follows Encore.ts microservices patterns with these services:
 
 ## Testing Strategy
 
-- Comprehensive test files for all services (`*.test.ts`)
-- Tests cover both Phase 1 core functionality and Phase 2 enhancements
+- Test files for all services (`*.test.ts`)
+- Tests cover both Phase 1 core functionality and Phase 2 features
 - Vitest framework with support for async database operations
 - Test database isolation and proper cleanup
+- Frontend tests use React Testing Library with Jest DOM matchers
 
 ## Development Workflow
 
@@ -182,11 +200,13 @@ async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
 
 ## Phase 2 Implementation Status
 
-✅ **Completed**: All Phase 2 features implemented including advanced task management, enhanced habit tracking, detailed mood logging, and full calendar integration.
+✅ **Completed**: All Phase 2 features implemented including task management, habit tracking, detailed mood logging, journaling, and full calendar integration.
 
-**Key Phase 2 Enhancements:**
+**Key Phase 2 Features:**
 - Task categories, tags, time tracking, and subtasks
-- Habit templates and flexible target system
+- Habit templates and configurable target system
 - Multi-dimensional mood tracking with triggers
+- Journal entries with templates and search
 - Complete calendar system with task integration
-- Advanced analytics and pattern recognition across all services
+- Analytics and pattern recognition across all services
+- Component system simplification (see COMPONENT_SIMPLIFICATION_MIGRATION.md)

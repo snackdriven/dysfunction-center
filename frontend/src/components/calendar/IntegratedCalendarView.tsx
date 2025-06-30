@@ -60,13 +60,29 @@ interface CalendarDayData {
   productivityScore?: number;
 }
 
+// Simple error boundary for the calendar
+class CalendarErrorBoundary extends React.Component<{children: React.ReactNode}, {hasError: boolean}> {
+  constructor(props: {children: React.ReactNode}) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() { return { hasError: true }; }
+  componentDidCatch(error: any, info: any) { console.error('Calendar error:', error, info); }
+  render() {
+    if (this.state.hasError) {
+      return <div className="p-8 text-center text-red-600">Something went wrong loading the calendar.</div>;
+    }
+    return this.props.children;
+  }
+}
+
 export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
   currentDate,
   viewType,
-  events,
-  tasks,
-  habits,
-  moodEntries,
+  events = [],
+  tasks = [],
+  habits = [],
+  moodEntries = [],
   isLoading
 }) => {
   const [selectedDay, setSelectedDay] = useState<CalendarDayData | null>(null);
@@ -86,12 +102,13 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
     
     // Filter data for this day
     const dayEvents = events.filter(event => {
+      if (!event || !event.start_datetime) return false;
       const eventDate = new Date(event.start_datetime).toISOString().split('T')[0];
       return eventDate === dateStr;
     });
 
     const dayTasks = tasks.filter(task => {
-      if (!task.due_date) return false;
+      if (!task || !task.due_date) return false;
       const taskDate = new Date(task.due_date).toISOString().split('T')[0];
       return taskDate === dateStr;
     });
@@ -103,6 +120,7 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
     });
 
     const dayMood = moodEntries.find(mood => {
+      if (!mood || !mood.entry_date) return false;
       const moodDate = new Date(mood.entry_date).toISOString().split('T')[0];
       return moodDate === dateStr;
     });
@@ -233,7 +251,7 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
   }
 
   return (
-    <>
+    <CalendarErrorBoundary>
       <div className="bg-card rounded-lg border">
         {/* Calendar Header */}
         <div className="grid grid-cols-7 border-b">
@@ -531,6 +549,6 @@ export const IntegratedCalendarView: React.FC<IntegratedCalendarViewProps> = ({
           </DialogContent>
         </Dialog>
       )}
-    </>
+    </CalendarErrorBoundary>
   );
 };
