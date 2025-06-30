@@ -179,7 +179,13 @@ export const MoodAnalytics: React.FC = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={analyticsData.trendData}>
+              <LineChart 
+                data={analyticsData.trendData}
+                role="img"
+                aria-label="Mood trend line chart showing mood scores over the last 14 days"
+              >
+                <title>Mood Trend Over Time</title>
+                <desc>Line chart displaying daily mood scores from 1 to 5 over the past two weeks</desc>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" fontSize={12} />
                 <YAxis domain={[1, 5]} fontSize={12} />
@@ -209,7 +215,12 @@ export const MoodAnalytics: React.FC = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
+              <PieChart
+                role="img"
+                aria-label="Mood distribution pie chart showing percentage breakdown of mood levels"
+              >
+                <title>Mood Distribution Chart</title>
+                <desc>Pie chart displaying the percentage distribution of mood entries across different mood levels (1-5)</desc>
                 <Pie
                   data={analyticsData.distributionData}
                   cx="50%"
@@ -240,7 +251,13 @@ export const MoodAnalytics: React.FC = () => {
           </CardHeader>
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={analyticsData.weeklyData}>
+              <BarChart 
+                data={analyticsData.weeklyData}
+                role="img"
+                aria-label="Weekly mood patterns bar chart showing average mood scores by day of week"
+              >
+                <title>Weekly Mood Patterns</title>
+                <desc>Bar chart displaying average mood scores for each day of the week from Sunday to Saturday</desc>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="day" fontSize={12} />
                 <YAxis domain={[0, 5]} fontSize={12} />

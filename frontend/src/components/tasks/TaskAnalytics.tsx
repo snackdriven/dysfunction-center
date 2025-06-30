@@ -265,7 +265,13 @@ export const TaskAnalytics: React.FC<TaskAnalyticsProps> = ({
                 <ResponsiveContainer width="100%" height={300}>
                   <RechartsPieChart>
                     <Tooltip />
-                    <RechartsPieChart data={priorityDistribution}>
+                    <RechartsPieChart 
+                      data={priorityDistribution}
+                      role="img"
+                      aria-label="Priority distribution pie chart showing task breakdown by priority level"
+                    >
+                      <title>Task Priority Distribution</title>
+                      <desc>Pie chart displaying the percentage breakdown of tasks by priority: High, Medium, and Low</desc>
                       {priorityDistribution.map((entry: any, index: number) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
@@ -286,7 +292,13 @@ export const TaskAnalytics: React.FC<TaskAnalyticsProps> = ({
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={categoryPerformance}>
+                  <BarChart 
+                    data={categoryPerformance}
+                    role="img"
+                    aria-label="Category performance bar chart showing completion rates by task category"
+                  >
+                    <title>Category Performance Chart</title>
+                    <desc>Bar chart displaying completion rates as percentages for each task category</desc>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="category" />
                     <YAxis />
@@ -309,7 +321,13 @@ export const TaskAnalytics: React.FC<TaskAnalyticsProps> = ({
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={400}>
-                <LineChart data={completionTrendData}>
+                <LineChart 
+                  data={completionTrendData}
+                  role="img"
+                  aria-label="Task completion trends line chart showing completed and created tasks over time"
+                >
+                  <title>Task Completion Trends</title>
+                  <desc>Line chart displaying the number of completed tasks versus created tasks over the selected time period</desc>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="date" />
                   <YAxis />
@@ -335,7 +353,14 @@ export const TaskAnalytics: React.FC<TaskAnalyticsProps> = ({
               </CardHeader>
               <CardContent>
                 <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={timeToCompletion} layout="horizontal">
+                  <BarChart 
+                    data={timeToCompletion} 
+                    layout="horizontal"
+                    role="img"
+                    aria-label="Time to completion horizontal bar chart showing task distribution by completion timeframe"
+                  >
+                    <title>Time to Completion Distribution</title>
+                    <desc>Horizontal bar chart showing how many tasks were completed within different time ranges</desc>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis type="number" />
                     <YAxis dataKey="range" type="category" width={80} />

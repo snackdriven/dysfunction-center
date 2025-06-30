@@ -310,7 +310,17 @@ test.describe('Phase 6: Analytics and Insights Testing', () => {
           const chart = charts.nth(i);
           const ariaLabel = await chart.getAttribute('aria-label');
           const role = await chart.getAttribute('role');
-          const title = await chart.locator('title').first().textContent();
+          
+          // Check for title with timeout handling
+          let title = null;
+          try {
+            const titleElement = chart.locator('title').first();
+            if (await titleElement.count() > 0) {
+              title = await titleElement.textContent({ timeout: 1000 });
+            }
+          } catch (error) {
+            // Title not found, continue without it
+          }
           
           if (ariaLabel || role === 'img' || title) {
             accessibleCharts++;

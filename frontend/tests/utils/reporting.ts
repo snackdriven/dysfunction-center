@@ -192,14 +192,16 @@ export class TestReporter {
       'PASS': '#22c55e',
       'CONDITIONAL_PASS': '#f59e0b',
       'FAIL': '#ef4444',
-      'CRITICAL_FAIL': '#dc2626'
+      'CRITICAL_FAIL': '#dc2626',
+      'SKIP': '#6b7280'
     };
 
     const statusIcons = {
       'PASS': '✅',
       'CONDITIONAL_PASS': '⚠️',
       'FAIL': '❌',
-      'CRITICAL_FAIL': '🚨'
+      'CRITICAL_FAIL': '🚨',
+      'SKIP': '⏭️'
     };
 
     return `
@@ -348,7 +350,8 @@ export class TestReporter {
       'PASS': '✅',
       'CONDITIONAL_PASS': '⚠️',
       'FAIL': '❌',
-      'CRITICAL_FAIL': '🚨'
+      'CRITICAL_FAIL': '🚨',
+      'SKIP': '⏭️'
     };
 
     return `# 🧪 Comprehensive Frontend Testing Report

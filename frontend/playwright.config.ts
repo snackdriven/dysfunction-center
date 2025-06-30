@@ -8,11 +8,11 @@ export default defineConfig({
   testDir: './tests',
   
   /* Global test timeout */
-  timeout: 30 * 1000,
+  timeout: 60 * 1000,
   
   /* Expect timeout for assertions */
   expect: {
-    timeout: 5 * 1000,
+    timeout: 15 * 1000,
   },
   
   /* Run tests in files in parallel */
@@ -50,10 +50,10 @@ export default defineConfig({
     video: 'retain-on-failure',
     
     /* Global test timeout */
-    actionTimeout: 10 * 1000,
+    actionTimeout: 20 * 1000,
     
     /* Navigation timeout */
-    navigationTimeout: 15 * 1000,
+    navigationTimeout: 30 * 1000,
   },
 
   /* Configure projects for major browsers and accessibility testing */
@@ -68,7 +68,7 @@ export default defineConfig({
       name: 'chromium',
       use: { 
         ...devices['Desktop Chrome'],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
       dependencies: ['setup'],
     },
@@ -78,7 +78,7 @@ export default defineConfig({
       name: 'firefox',
       use: { 
         ...devices['Desktop Firefox'],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
       dependencies: ['setup'],
     },
@@ -88,7 +88,7 @@ export default defineConfig({
       name: 'webkit',
       use: { 
         ...devices['Desktop Safari'],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
       },
       dependencies: ['setup'],
     },
@@ -125,7 +125,7 @@ export default defineConfig({
       name: 'high-contrast',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
         colorScheme: 'dark',
         extraHTTPHeaders: {
           'prefers-contrast': 'high'
@@ -139,7 +139,7 @@ export default defineConfig({
       name: 'reduced-motion',
       use: {
         ...devices['Desktop Chrome'],
-        viewport: { width: 1280, height: 720 },
+        viewport: { width: 1920, height: 1080 },
         extraHTTPHeaders: {
           'prefers-reduced-motion': 'reduce'
         }

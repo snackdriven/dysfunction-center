@@ -94,8 +94,8 @@ async function globalSetup(config: FullConfig) {
       arch: process.arch
     },
     config: {
-      timeout: config.timeout,
-      retries: config.retries,
+      timeout: config.projects[0].timeout,
+      retries: config.projects[0].retries,
       workers: config.workers,
       reporter: config.reporter
     }
