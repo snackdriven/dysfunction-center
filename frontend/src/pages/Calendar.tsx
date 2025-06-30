@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
 import { Button } from '../components/ui/Button';
 import { CalendarMonthView } from '../components/calendar/CalendarMonthView';
-import { CalendarAgendaViewEnhanced } from '../components/calendar/CalendarAgendaViewEnhanced';
 import { CalendarWeekView } from '../components/calendar/CalendarWeekView';
 import { CalendarDayView } from '../components/calendar/CalendarDayView';
 import { Calendar3DayView } from '../components/calendar/Calendar3DayView';
 import { Calendar2WeekView } from '../components/calendar/Calendar2WeekView';
+import { CalendarAgendaView } from '../components/calendar/CalendarAgendaView';
 import { CalendarViewSelector, CalendarViewType } from '../components/calendar/CalendarViewSelector';
 import { EventForm } from '../components/calendar/EventForm';
 import { Dialog, DialogContent, DialogTrigger } from '../components/ui/Dialog';
@@ -255,13 +255,11 @@ export const Calendar: React.FC = () => {
           />
         )}
         {activeView === 'agenda' && (
-          <CalendarAgendaViewEnhanced 
+          <CalendarAgendaView 
             currentDate={currentDate}
             events={events || []}
             tasks={tasks || []}
-            habits={habits || []}
-            moodEntries={moodEntries || []}
-            onAddEvent={() => setIsCreateDialogOpen(true)}
+            isLoading={isLoading}
           />
         )}
       </div>

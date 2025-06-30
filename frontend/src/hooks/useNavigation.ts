@@ -1,28 +1,13 @@
 import { useUIStore } from '../stores/uiStore';
 
 /**
- * Hook for managing navigation state
+ * Simplified navigation state management
  */
 export function useNavigation() {
-  const {
-    isSidebarOpen,
-    isMobileMenuOpen,
-    isMobile,
-    toggleSidebar,
-    toggleMobileMenu,
-    closeMobileMenu,
-    openMobileMenu,
-    setMobile,
-  } = useUIStore();
+  const { isSidebarOpen, toggleSidebar } = useUIStore();
 
   return {
     isSidebarOpen,
-    isMobileMenuOpen,
-    isMobile,
     toggleSidebar,
-    toggleMobileMenu,
-    closeMobileMenu,
-    openMobileMenu,
-    setMobile,
   };
 }

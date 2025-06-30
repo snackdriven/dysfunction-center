@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-Executive Dysfunction Center is a comprehensive productivity tracking application built with Encore.ts featuring advanced task management, habit tracking, mood logging, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area and is currently in Phase 2 with enhanced functionality.
+Executive Dysfunction Center is a comprehensive productivity tracking application built with Encore.ts featuring advanced task management, habit tracking, mood logging, calendar integration, and theme customization. The project uses a microservices architecture with separate services for each feature area.
 
 ## Development Commands
 
@@ -32,7 +32,7 @@ Executive Dysfunction Center is a comprehensive productivity tracking applicatio
 
 ## Architecture
 
-### Service Structure (Phase 2)
+### Service Structure 
 The application follows Encore.ts microservices patterns with these services:
 
 1. **API Service** (`/api`) - General API endpoints including health checks and information endpoints
@@ -45,11 +45,10 @@ The application follows Encore.ts microservices patterns with these services:
 ### Database Architecture
 - **PostgreSQL** with comprehensive migration system
 - **Each service manages its own database** with independent schemas
-- **Migration execution order** is critical - see `MIGRATION_ORDER.md` for proper deployment sequence
 - **Foreign key relationships** between services (e.g., calendar events can link to tasks)
 - **Advanced indexing** for optimal query performance across all tables
 
-### Phase 2 Enhanced Features
+
 - **Task Management**: Categories, tags, time tracking, subtasks, recurrence patterns, bulk operations
 - **Habit Tracking**: Templates (10+ pre-built), flexible completion types (boolean/count/duration), advanced analytics
 - **Mood Tracking**: Multi-dimensional tracking (primary/secondary mood, energy, stress), trigger system, context awareness
@@ -122,11 +121,6 @@ The application follows Encore.ts microservices patterns with these services:
 - **State Management**: TanStack Query for server state, Zustand for client state
 - **Testing**: Component tests with React Testing Library, API mocking with MSW patterns
 
-## API Documentation
-
-- **Phase 1 API**: `API_DOCUMENTATION.md` - Original MVP endpoints
-- **Phase 2 API**: `API_PHASE_2_DOCUMENTATION.md` - Complete enhanced API documentation
-- **100% Backward Compatible**: All Phase 1 endpoints continue to work unchanged
 
 ## Testing Strategy
 
@@ -179,14 +173,3 @@ async function collectResults<T>(generator: AsyncGenerator<T>): Promise<T[]> {
   return results;
 }
 ```
-
-## Phase 2 Implementation Status
-
-✅ **Completed**: All Phase 2 features implemented including advanced task management, enhanced habit tracking, detailed mood logging, and full calendar integration.
-
-**Key Phase 2 Enhancements:**
-- Task categories, tags, time tracking, and subtasks
-- Habit templates and flexible target system
-- Multi-dimensional mood tracking with triggers
-- Complete calendar system with task integration
-- Advanced analytics and pattern recognition across all services
